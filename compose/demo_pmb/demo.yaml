@@ -1,0 +1,73 @@
+services:
+  tm-service:
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/trading-manager:0.2.0"
+#    image: "bluebird.com/bluebird/trading-manager:0.2.0"
+    ports:
+      - "9090:8080"
+    depends_on:
+      - tm-db
+      - tm-ke-service
+    env_file:
+      - path: ".env"
+        required: true # default
+      - path: "./env/.env.tm"
+        required: true # default
+    environment:
+      - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+    networks:
+      - tm-net
+  demo-entsoe-service:
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"
+    build:
+      dockerfile: ./docker/entsoe-demo/Dockerfile
+      args:
+        REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
+        REGISTRY_PROJECT: ${REGISTRY_PROJECT}
+        IMAGE_TAG: 0.2.0
+      #      context: ..
+      tags:
+        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"
+    #        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:0.2.0"
+    depends_on:
+      - tm-db
+      - tm-ke-service
+    env_file:
+      - path: ".env"
+        required: true # default
+      - path: "./env/.env.entsoe.demo"
+        required: true # default
+    environment:
+      - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+    networks:
+      - tm-net
+  tm-db:
+    image: postgres:alpine3.23
+    environment:
+      - POSTGRESQL_USERNAME=${DB_USER}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRESQL_PASSWORD=${DB_PASS}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRESQL_DATABASE=${DB_NAME}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - tm-net
+  tm-db-adminer:
+    image: adminer:latest
+    restart: always
+    depends_on:
+      - tm-db
+    ports:
+      - 9199:8080
+    networks:
+      - tm-net
+  tm-ke-service:
+    image: ghcr.io/tno/knowledge-engine/smart-connector:1.4.0
+    environment:
+      KE_RUNTIME_PORT: 8280
+    ports:
+      - 8280:8280
+    networks:
+      - tm-net
+networks:
+  tm-net:
+    driver: bridge

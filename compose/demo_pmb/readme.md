@@ -8,14 +8,14 @@ docker save -o ./images/tm-demo-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/
 ```
  
 załadowanie obrazów:
-docker load -i tm-entsoe-service-app_latest.tar
-docker load -i tm-service-app_latest.tar
+docker load -i ./images/trading-manager.0.2.0.tar
+docker load -i ./images/tm-demo-entsoe-service.latest.tar
 
 stworzenie kontenerów:
-docker-compose -p pmb -f demo.yml --env-file .env create
+docker-compose -p pmb -f demo.yaml --env-file .env create
 
 uruchomienie
-docker-compose -p pmb -f demo.yml --env-file .env start
+docker-compose -p pmb -f demo.yaml --env-file .env start
 
 uruchomienie pozostałych kontenerów ( kontenery uruchamiają się szybciej niż postgresql zacznie odpowiadać) :
 docker-compose -p pmb -f demo.yml --env-file .env start

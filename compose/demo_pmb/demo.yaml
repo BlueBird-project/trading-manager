@@ -1,7 +1,7 @@
 services:
   tm-service:
     image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/trading-manager:0.2.0"
-#    image: "bluebird.com/bluebird/trading-manager:0.2.0"
+    #    image: "bluebird.com/bluebird/trading-manager:0.2.0"
     ports:
       - "9090:8080"
     depends_on:
@@ -49,6 +49,8 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRESQL_DATABASE=${DB_NAME}
       - POSTGRES_DB=${DB_NAME}
+    ports:
+      - 5432:5432
     networks:
       - tm-net
   tm-db-adminer:

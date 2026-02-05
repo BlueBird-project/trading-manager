@@ -2,13 +2,13 @@
 
 ```shell
 
-docker save -o ./images/trading-manager.0.2.0.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:0.2.0"
+docker save -o ./images/trading-manager.0.3.0.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:0.3.0"
 docker save -o ./images/tm-demo-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-demo-entsoe-service:latest" 
 
 ```
  
 załadowanie obrazów:
-docker load -i ./images/trading-manager.0.2.0.tar
+docker load -i ./images/trading-manager.0.3.0.tar
 docker load -i ./images/tm-demo-entsoe-service.latest.tar
 
 stworzenie kontenerów:
@@ -26,6 +26,8 @@ docker exec pmb-tm-service-1 python demo_ki.py --country {country_name} -d {date
 docker exec pmb-tm-service-1 python demo_ki.py --country POLAND -d 2026-01-31
 docker exec pmb-tm-service-1 python demo_ki.py --country SPAIN -d 2026-01-31
 
+docker exec pmb-tm-service-1 python demo_ki.py --country SPAIN -d 2026-01-31 --type dayahead
+docker exec pmb-tm-service-1 python demo_ki.py --country SPAIN -d 2026-01-31 --type intraday
 w demie dostępne dane sa z ostatnich 30 dni  (docelowo bedzie trzeba zaimplementować pobieranie danych na żądanie :
 
 pgadmin (baza danych):

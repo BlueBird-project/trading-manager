@@ -1,6 +1,6 @@
 services:
   tm-service:
-    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/trading-manager:0.2.0"
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/trading-manager:0.3.0"
     #    image: "bluebird.com/bluebird/trading-manager:0.2.0"
     ports:
       - "9090:8080"
@@ -23,7 +23,7 @@ services:
       args:
         REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
         REGISTRY_PROJECT: ${REGISTRY_PROJECT}
-        IMAGE_TAG: 0.2.0
+        IMAGE_TAG: 0.3.0
       #      context: ..
       tags:
         - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"

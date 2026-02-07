@@ -1,1 +1,4 @@
 /compose/old_samples/
+compose/demo_pmb/images/
+compose/.idea/
+compose/demo_pmb/env/.env.secrets

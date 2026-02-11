@@ -1,0 +1,37 @@
+--extra-index-url https://__token__:glpat-ImK7hy9M8LSfcyRsGTCbi286MQp1OjFmNAk.01.0z15f6qqh@gitlab.pcss.pl/api/v4/projects/2735/packages/pypi/simple
+
+#--extra-index-url https://__token__:glpat-EaRCeh5fogTS7qpaj-UPdG86MQp1OjFlYgk.01.0z0i9xw87@gitlab.pcss.pl/api/v4/projects/2530/packages/pypi/simple
+
+
+
+
+pydantic-settings~=2.11.0
+python-keycloak~=5.3.1
+pydantic~=2.12.4
+fastapi~=0.114.2
+orjson~=3.10.12
+#starlette~=0.37.2
+PyJWT~=2.10.1
+shapeshifter-uftp~=2.0.1
+xsdata~=25.4
+shapeshifter_uftp~=2.0.1
+beautifulsoup4~=4.13.4
+requests~=2.32.4
+PyYAML~=6.0.2
+apscheduler~=3.11.0
+packaging~=25.0
+jsonpickle==4.1.1
+unidecode==1.4.0
+pytz==2025.2
+sqlalchemy~=2.0.44
+psycopg2-binary~=2.9.11
+uvicorn==0.38.0
+isodate==0.7.2
+rdflib==7.5.0
+setuptools==80.10.2
+#git+https://github.com/BlueBird-project/ke-pyclient.git@v0.22.8
+#git+https://github.com/BlueBird-project/ke-pyclient.git@dev
+git+https://github.com/BlueBird-project/ke-pyclient.git@kb_filter
+ke_client==0.22.8
+
+effi_onto_tools==0.19.13

@@ -1,0 +1,2 @@
+ki_vars:
+  DAY_DURATION: "PT1440M"^^xsd:duration

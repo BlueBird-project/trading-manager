@@ -1,0 +1,51 @@
+knowledge_engine:
+  knowledge_base_id: 'https://tm.pcss.pl/ke/smartconnector'
+  kb_name: 'TM service'
+  kb_description: 'TM service'
+  prefixes:
+    kb: "${KB_ID}/"
+    ubmarket: "https://ubeflex.bluebird.eu/market/"
+    rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    rdfs: "<http://www.w3.org/2000/01/rdf-schema#>"
+    s4ener: "https://saref.etsi.org/saref4ener/"
+  include:
+    - "./resources/deployment/ki/dam.yml"
+    - "./resources/deployment/ki/fm.yml"
+    - "./resources/deployment/ki/dt.yml"
+  #    - "./resources/deployment/ki/capacity.yml" TODO:
+  graph_patterns:
+    tou-price:
+      name: "tou-price"
+      description: "Data points for TOU (tou_uri) timeseries. "
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+      required_bindings:
+        - "tou_uri"
+      pattern:
+        - ' ?tou_uri s4ener:producedBy <http://tm.bluebird.com>  .'
+        - ' ?dp s4ener:belongsToTimeSeries ?tou_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '     s4ener:hasEffectivePeriod ${ISP_UNIT}; saref:hasResult ?dpr.'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
+    tou-price-info:
+      name: "tou-price-info"
+      description: "TOU metadata - find TOU timeseries (tou_uri) "
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+        om: "http://www.ontology-of-units-of-measure.org/resource/om-2/"
+      required_bindings:
+        - "time_create"
+        - "tou_period"
+      pattern:
+        - ' ?tou_uri rdf:type s4ener:TimeSeries .'
+        - ' ?tou_uri s4ener:producedBy <http://tm.bluebird.com>  .'
+        - ' ?tou_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
+        - ' ?tou_uri ubmarket:hasPowerRange  ?power_range .'
+        - ' ?tou_uri s4ener:hasCreationTime ?time_create .'
+        - ' ?tou_uri s4ener:hasEffectivePeriod  ?tou_period .'
+        - ' ?power_range s4ener:endOfRange ?power_range_max ; s4ener:startOfRange ?power_range_min . '
+        - '	?power_range_max rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+        - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
+        - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+        - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'

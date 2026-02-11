@@ -1,0 +1,46 @@
+knowledge_engine:
+  kb_name: ""
+  kb_description: ""
+  graph_patterns:
+    fm-ts-info-request:
+      name: "fm-ts-info-request"
+      description: "Exchange information about the saref:timeseries. Recommended saref usage :
+       s4ener:Consumption, s4ener:Downflex,   s4ener:Production,  s4ener:Upflex  "
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        time: "http://www.w3.org/2006/time#"
+        saref: "https://saref.etsi.org/core/"
+      pattern:
+        - ' <http://fm.bluebird.com>  rdf:type saref:Service . '
+        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+      result_pattern:
+        - ' ?ts_uri rdf:type s4ener:TimeSeries ; s4ener:hasUsage ?ts_usage; '
+        - ' s4ener:producedBy  <http://fm.bluebird.com> ; s4ener:hasUpdateRate ${ISP_UNIT} ; '
+        - ' s4ener:hasCreationTime ?time_create ; s4ener:hasEffectivePeriod ?ts_interval_uri .'
+    fm-ts:
+      name: "fm-ts"
+      description: "Exchange information about list of points for belonging to saref:timeseries"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+      required_bindings:
+        - "ts_uri"
+      pattern:
+        - ' ?ts_uri rdf:type s4ener:TimeSeries ;  s4ener:producedBy  <http://fm.bluebird.com> . '
+        - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "Megawatt" .'
+    fm-ts-evaluate:
+      name: "fm-ts-evaluate"
+      description: "Evaluate power demand"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+      pattern:
+        - ' ?ts_uri rdf:type s4ener:TimeSeries ;  s4ener:producedBy  <http://fm.bluebird.com> . '
+        - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "Megawatt" .'
+      result_pattern:
+        - ' ?dp   saref:hasResult ?cost_dpr .'
+        - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "PLN" .'

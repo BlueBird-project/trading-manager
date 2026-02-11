@@ -1,0 +1,50 @@
+knowledge_engine:
+  kb_name: ""
+  kb_description: ""
+  graph_patterns:
+    dt-info:
+      name: "dt-info"
+      description: "Digital Twin info"
+      prefixes:
+        s4city: "https://saref.etsi.org/s4city/"
+        foaf: "http://xmlns.com/foaf/0.1/"
+        saref: "https://saref.etsi.org/core/"
+      pattern:
+        - ' ?dt_uri rdf:type saref:Service ; saref:represents ?command_uri .'
+        - ' ?command_uri  rdf:type saref:CommandOfInterest; saref:observes ?market_uri .'
+        - ' ?command_uri  rdf:type ubmarket:MarketType .'
+      result_pattern:
+        - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
+    dt-ts-info:
+      name: "dt-ts-info"
+      description: "DT's timeseries's general information"
+      required_bindings:
+        - "command_uri"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+        time: "http://www.w3.org/2006/time#"
+      pattern:
+        - ' ?command_uri  saref:hasOutput ?ts_uri; rdf:type saref:CommandOfInterest .'
+        - ' ?ts_uri rdf:type s4ener:TimeSeries .'
+        - ' ?ts_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
+        - ' ?ts_uri s4ener:hasCreationTime ?time_create .'
+        - ' ?ts_uri s4ener:hasEffectivePeriod  ?ts_interval_uri .'
+        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to'
+      result_pattern:
+        - ' ?command_uri  saref:hasOutput ?ts_uri .'
+    dt-ts:
+      name: "dt-ts"
+      description: "DT's timeseries's "
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+      required_bindings:
+        - "ts_uri"
+      pattern:
+        - ' ?ts_uri rdf:type ubmarket:Forecast .'
+        - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
+      result_pattern:
+        - ' ?ts_uri rdf:type s4ener:TimeSeries .'

@@ -1,0 +1,90 @@
+knowledge_engine:
+  kb_name: ""
+  kb_description: ""
+  graph_patterns:
+    market:
+      name: "market"
+      description: "Basic information about the market"
+      prefixes:
+        s4city: "https://saref.etsi.org/s4city/"
+        foaf: "http://xmlns.com/foaf/0.1/"
+        rdfs: "http://www.w3.org/2000/01/rdf-schema#"
+      pattern:
+        - ' ?market_uri rdf:type ?market_type ; rdfs:subClassOf foaf:Agent ;'
+        - '      s4city:hasAdministrativeArea ?country_uri .'
+        - ' ?country_uri rdf:type s4city:Country ; ubmarket:hasISO3166Name ?country_name .'
+        - ' ?market_type rdf:type ubmarket:MarketType .'
+    market-offer-info-filtered:
+      name: "market-offer-info-filtered"
+      description: "Information about new offer with time filter"
+      required_bindings:
+        - "market_uri"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        time: "http://www.w3.org/2006/time#"
+      pattern:
+        - ' ?market_uri rdf:type ?market_type .'
+        - ' ?market_type rdf:type ubmarket:MarketType .'
+        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+        - ' ?offer_uri s4ener:producedBy ?market_uri .'
+        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
+        - ' ?offer_uri s4ener:hasUpdateRate ?update_rate .'
+        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+        - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
+        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+    market-offer-info:
+      name: "market-offer-info"
+      description: "Information about new offer"
+      required_bindings:
+        - "market_uri"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+      pattern:
+        - ' ?market_uri rdf:type ?market_type .'
+        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+        - ' ?offer_uri s4ener:producedBy ?market_uri .'
+        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
+        - ' ?offer_uri s4ener:hasUpdateRate ?update_rate .'
+        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+        - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
+#    market-offer-info-query:
+#      name: "market-offer-info-query"
+#      description: "Information about new offer"
+#      prefixes:
+#        time: "http://www.w3.org/2006/time#"
+#        xsd: "http://www.w3.org/2001/XMLSchema#"
+#      pattern:
+#        - ' ?market_uri rdf:type ubmarket:DayAheadMarket .'
+#        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+#      result_pattern:
+#        - ' ?offer_uri rdf:type s4ener:TimeSeries .'
+#        - ' ?offer_uri s4ener:producedBy kb:market .'
+#        - ' ?offer_uri s4ener:hasUpdateRate "PT60M"^^xsd:duration .'
+#        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+#        - ' ?offer_uri s4ener:hasEffectivePeriod  "PT1440M"^^xsd:duration .'
+    market-offer:
+      name: "market-offer"
+      description: "Daily offer of the market"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+      required_bindings:
+        - "offer_uri"
+      pattern:
+        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+        - ' ?dp s4ener:belongsToTimeSeries ?offer_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ?duration ; saref:hasResult ?dpr.'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn ?is_measured_in.'
+#    market-offer2:
+#      name: "market-offer2"
+#      description: "Daily offer of the market"
+#      prefixes:
+#        xsd: "http://www.w3.org/2001/XMLSchema#"
+#        saref: "https://saref.etsi.org/core/"
+#      required_bindings:
+#        - "offer_uri"
+#      pattern:
+#        - ' ?dp s4ener:belongsToTimeSeries ?offer_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+#        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+#        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
+

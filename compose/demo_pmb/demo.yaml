@@ -23,7 +23,7 @@ services:
       args:
         REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
         REGISTRY_PROJECT: ${REGISTRY_PROJECT}
-        IMAGE_TAG: 0.3.0
+        IMAGE_TAG: 0.4.0
       #      context: ..
       tags:
         - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"
@@ -35,6 +35,8 @@ services:
       - path: ".env"
         required: true # default
       - path: "./env/.env.entsoe.demo"
+        required: true # default
+      - path: "./env/.env.secrets"
         required: true # default
     environment:
       - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/

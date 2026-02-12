@@ -9,9 +9,9 @@ knowledge_engine:
     rdfs: "<http://www.w3.org/2000/01/rdf-schema#>"
     s4ener: "https://saref.etsi.org/saref4ener/"
   include:
-    - "./resources/deployment/ki/dam.yml"
-    - "./resources/deployment/ki/fm.yml"
-    - "./resources/deployment/ki/dt.yml"
+    - "./resources/deployment/ki/dam.yaml"
+    - "./resources/deployment/ki/fm.yaml"
+    - "./resources/deployment/ki/dt.yaml"
   #    - "./resources/deployment/ki/capacity.yml" TODO:
   graph_patterns:
     tou-price:

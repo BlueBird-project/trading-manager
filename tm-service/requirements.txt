@@ -30,8 +30,8 @@ isodate==0.7.2
 rdflib==7.5.0
 setuptools==80.10.2
 #git+https://github.com/BlueBird-project/ke-pyclient.git@v0.22.8
-#git+https://github.com/BlueBird-project/ke-pyclient.git@dev
-git+https://github.com/BlueBird-project/ke-pyclient.git@kb_filter
-ke_client==0.22.8
+git+https://github.com/BlueBird-project/ke-pyclient.git@dev
+
+ke_client==0.22.10
 
 effi_onto_tools==0.19.13

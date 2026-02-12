@@ -8,6 +8,12 @@ app:
   use_scheduler: false
   use_rest_api: true
   use_ke_api: true
+  country_list:
+    - "Poland"
+    - "Spain"
+    - "Germany"
+    - "Belgium"
+    - "Austria"
 #db does not require env prefix
 #TODO: make db as prefix -> db_host = "DB_" + "HOST"
 db:
@@ -26,7 +32,7 @@ db:
 ke:
   #  knowledge_base_id: TODO:
   #  rest_endpoint:
-  ki_config_path: ./resources/deployment/ke_config.yml
+  ki_config_path: ./resources/deployment/ke_config.yaml
   ki_vars:
     DAY_DURATION: '"PT1440M"^^xsd:duration'
     ISP_UNIT: '"PT15M"^^xsd:duration'

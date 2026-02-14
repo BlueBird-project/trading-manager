@@ -1,5 +1,42 @@
 -- Adminer 5.3.0 PostgreSQL 17.4 dump
- 
+
+ DROP TABLE IF EXISTS "${table_prefix}service_jobs";
+ DROP SEQUENCE IF EXISTS ${table_prefix}service_jobs_job_id_seq;
+ CREATE SEQUENCE ${table_prefix}service_jobs_job_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1;
+
+ CREATE TABLE "public"."${table_prefix}service_jobs" (
+     "job_id" bigint DEFAULT nextval('${table_prefix}service_jobs_job_id_seq') NOT NULL,
+     "command_uri" character varying(250) NOT NULL,
+     "job_name" character varying(50) NOT NULL,
+     "job_description" character varying(50),
+     "update_ts" bigint NOT NULL,
+     "ext" character varying(10000),
+     CONSTRAINT "${table_prefix}service_jobs_key" PRIMARY KEY ("job_id")
+ )
+ WITH (oids = false);
+
+ CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (command_uri);
+
+
+DROP TABLE IF EXISTS "${table_prefix}dt_info";
+DROP SEQUENCE IF EXISTS ${table_prefix}dt_info_id_seq;
+CREATE SEQUENCE ${table_prefix}dt_info_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1;
+
+CREATE TABLE "public"."${table_prefix}dt_info" (
+    "dt_id" bigint DEFAULT nextval('${table_prefix}dt_info_id_seq') NOT NULL,
+    "dt_uri" character varying(250) NOT NULL,
+    "job_id" bigint,
+    "market_id" bigint,
+    "update_ts" bigint NOT NULL,
+    "ext" character varying(10000),
+    CONSTRAINT "${table_prefix}dt_info_key" PRIMARY KEY ("dt_id")
+)
+WITH (oids = false);
+
+CREATE UNIQUE INDEX ${table_prefix}dt_info_dt_uri ON public.${table_prefix}dt_info USING btree (dt_uri);
+
+
+
 DROP TABLE IF EXISTS "${table_prefix}consumption_range";
 DROP SEQUENCE IF EXISTS ${table_prefix}consumption_range_range_id_seq;
 CREATE SEQUENCE ${table_prefix}consumption_range_range_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1;
@@ -43,6 +80,8 @@ CREATE SEQUENCE ${table_prefix}forecast_model_model_id_seq INCREMENT 1 MINVALUE 
 
 CREATE TABLE "public"."${table_prefix}forecast_model" (
     "model_id" integer DEFAULT nextval('${table_prefix}forecast_model_model_id_seq') NOT NULL,
+    "market_id" bigint NOT NULL,
+    "job_id" bigint NOT NULL,
     "model_uri" character varying(300),
     "model_name" character varying(30),
     "model_description" character varying(1000),
@@ -98,6 +137,7 @@ CREATE INDEX ${table_prefix}market_offer_offer_id ON public.${table_prefix}marke
 DROP TABLE IF EXISTS "${table_prefix}market_offer_forecast";
 CREATE TABLE "public"."${table_prefix}market_offer_forecast" (
     "forecast_id" bigint NOT NULL,
+    "model_id" bigint NOT NULL,
     "isp_start" integer NOT NULL,
     "range_id" integer NOT NULL,
     "cost_mwh" double precision,
@@ -146,4 +186,9 @@ ALTER TABLE ONLY "public"."${table_prefix}market_offer_forecast" ADD CONSTRAINT 
 ALTER TABLE ONLY "public"."${table_prefix}offer_details" ADD CONSTRAINT "${table_prefix}offer_details_market_id_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 
 INSERT INTO   "public"."${table_prefix}consumption_range" ("min_value" , "max_value"  ) VALUES (NULL,NULL);
+
+
+
+ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_market_details_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_service_jobs_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}service_jobs(job_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 -- 2025-11-28 12:49:20 UTC

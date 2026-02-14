@@ -17,7 +17,7 @@ knowledge_engine:
         - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
     dt-ts-info:
       name: "dt-ts-info"
-      description: "DT's timeseries's general information"
+      description: "DT's timeseries's metadata, model's , model's parameters, error rates"
       required_bindings:
         - "command_uri"
       prefixes:
@@ -26,7 +26,7 @@ knowledge_engine:
         time: "http://www.w3.org/2006/time#"
       pattern:
         - ' ?command_uri  saref:hasOutput ?ts_uri; rdf:type saref:CommandOfInterest .'
-        - ' ?ts_uri rdf:type s4ener:TimeSeries .'
+        - ' ?ts_uri rdf:type ubmarket:Forecast .'
         - ' ?ts_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
         - ' ?ts_uri s4ener:hasCreationTime ?time_create .'
         - ' ?ts_uri s4ener:hasEffectivePeriod  ?ts_interval_uri .'

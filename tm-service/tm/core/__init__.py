@@ -16,7 +16,7 @@ class APPSettings(DictBaseSettings):
     use_rest_api: bool = Field(default=True)
     use_ke_api: bool = Field(default=False)
     # logging_out_path: str = Field(default="./resources/logging.ini")
-    # ke_config_path: str = Field(default="./resources/ke_config.yml")
+    # ke_config_path: str = Field(default="./resources/ke_config.yaml")
     country_list: List[str] = Field(default=[])
     model_config = SettingsConfigDict(env_prefix='APP_', env_file=DictBaseSettings.env_path(),
                                       env_file_encoding="utf-8")

@@ -39,6 +39,7 @@ if __name__ == "__main__" and app_settings:
         from tm.modules.ke_interaction import setup_ke
 
         setup_ke()
+
         from tm.modules.ke_interaction import interactions as ki
 
         if app_settings.use_scheduler or app_settings.use_rest_api:

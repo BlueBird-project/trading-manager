@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import List
 
-from tm.schemas.job_dao import JobDAO
+from tm.models.job_dao import JobDAO
 
 
 class JobAPI:

@@ -1,12 +1,10 @@
-from abc import abstractmethod
 from typing import List
 
-from effi_onto_tools.db.dao import DAO
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
 from tm.core.db.api.job_api import JobAPI
 from tm.core.db.postgresql.api_impl import QueryObject
-from tm.schemas.job_dao import JobDAO
+from tm.models.job_dao import JobDAO
 
 
 # class JobDAO

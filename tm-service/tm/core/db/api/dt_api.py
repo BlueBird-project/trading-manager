@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import List
 
-from tm.schemas.digital_twin import DigitalTwinDAO
+from tm.models.digital_twin import DigitalTwinDAO
 
 
 class DTAPI:

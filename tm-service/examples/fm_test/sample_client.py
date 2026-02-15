@@ -1,20 +1,15 @@
 import logging
 import time
+from typing import List
 
-from effi_onto_tools.utils.enum_utils import EnumUtils
-
-
-class KIVars(EnumUtils):
-    ISP_UNIT = "ISP_UNIT"
-    DAY_DURATION = "DAY_DURATION"
+from ke_client import KIHolder, KEClient
 
 
-def _set_ke_client(bg_mode=False):
+def _set_ke_client(ke_ki_client: KEClient, bg_mode=False):
     from tm.modules.ke_interaction.interactions import setup_ke
-    from tm.modules.ke_interaction.interactions import ki_client as ke_ki_client
+    setup_ke()
     import ke_client
     ke_client.VERIFY_SERVER_CERT = False
-    setup_ke()
 
     # ke_client.KE_CONFIG_PATH = ke_config_path
     MAX_ATTEMPTS = 20
@@ -67,16 +62,13 @@ def _set_ke_client(bg_mode=False):
     return ke_ki_client
 
 
-def set_bg_ke_client():
-    ki_client=_set_ke_client(bg_mode=True)
+def set_bg_ke_client(interaction_list: List[KIHolder]):
+    ki_client: KEClient = KEClient.build(logger=logging.getLogger())
+    for ki in interaction_list:
+        ki_client.include(ki_holder=ki)
+    ki_client = _set_ke_client(ki_client, bg_mode=True)
     while not ki_client.is_registered:
         # TODO: stop service id can't register
         logging.info(f"KE client is not registered, wait for all KI to be registered.")
         time.sleep(3)
     return ki_client
-
-
-
-def set_sync_ke_client():
-    from tm.modules.ke_interaction.interactions import ki_client
-    _set_ke_client(bg_mode=False)

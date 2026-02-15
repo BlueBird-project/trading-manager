@@ -27,7 +27,7 @@ class AppArgs(BaseModel):
 def get_args() -> AppArgs:
     parser = argparse.ArgumentParser()
     # parser.add_argument('-d', '--debug', help='enable debug logs', action='store_true')
-    parser.add_argument('-c', '--config-path', help='YAML config path', default='./resources/config.yml')
+    parser.add_argument('-c', '--config-path', help='YAML config path', default='./resources/config.yaml')
     parser.add_argument('--env', help='env path', default='.env')
     parser.add_argument('--hash-pg-schema', help='generate db hash', default=False, action='store_true')
     # parser.add_argument('--hash-pg-schema', help='generate db hash', default=False, action='store_true')
@@ -43,7 +43,7 @@ class DemoArgs(BaseModel):
 
 def get_demo_args() -> Tuple[AppArgs, DemoArgs]:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config-path', help='YAML config path', default='/config/config.yml')
+    parser.add_argument('-c', '--config-path', help='YAML config path', default='/config/config.yaml')
     parser.add_argument('--env', help='env path', default='/env/.env.tm.demo')
     parser.add_argument('--country', help='country', default='POLAND')
     parser.add_argument('--type', help='market type', default='INTRADAY')

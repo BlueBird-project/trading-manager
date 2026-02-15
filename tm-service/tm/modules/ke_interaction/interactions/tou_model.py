@@ -2,7 +2,6 @@ from typing import Optional, Tuple, Union
 
 from ke_client import BindingsBase, rdf_nil, OptionalLiteral
 
-from tm.modules.ke_interaction.interactions import ki_client
 from effi_onto_tools.utils import time_utils
 from ke_client import ki_object, SplitURIBase, ki_split_uri
 from rdflib import URIRef, Literal
@@ -99,7 +98,7 @@ class TOUPriceQuery(BindingsBase):
 
 # region uris
 
-@ki_split_uri(uri_template=f"{ki_client.kb_id}/offer" + "/${offer_id}/${range_id}/${period_minutes}/${isp_start}")
+@ki_split_uri(uri_template=f"offer" + "/${offer_id}/${range_id}/${period_minutes}/${isp_start}")
 class OfferDPSplitURI(SplitURIBase):
     range_id: int
     period_minutes: int
@@ -107,31 +106,31 @@ class OfferDPSplitURI(SplitURIBase):
     isp_start: int
 
 
-@ki_split_uri(uri_template=f"{ki_client.kb_id}/offer" + "/${range_id}/${period_minutes}/${isp_start}")
-class TOUDPSplitURI(SplitURIBase):
-    range_id: int
-    period_minutes: int
-    isp_start: int
+# @ki_split_uri(uri_template=f"offer" + "/${range_id}/${period_minutes}/${isp_start}")
+# class TOUDPSplitURI(SplitURIBase):
+#     range_id: int
+#     period_minutes: int
+#     isp_start: int
 
 
-@ki_split_uri(uri_template=f"{ki_client.kb_id}/tou" + "/${range_id}/${period_minutes}/${ts}")
+@ki_split_uri(uri_template="tou/${range_id}/${period_minutes}/${ts}")
 class TOUSplitURI(SplitURIBase):
     range_id: int
     period_minutes: int
     ts: int
 
 
-@ki_split_uri(uri_template=f"{ki_client.kb_id}/tou_range" + "/${range_id}")
+@ki_split_uri(uri_template="tou_range/${range_id}")
 class TOURangeURI(SplitURIBase):
     range_id: int
 
 
-@ki_split_uri(uri_template=f"{ki_client.kb_id}/tou_range_max" + "/${range_id}")
+@ki_split_uri(uri_template=f"tou_range_max" + "/${range_id}")
 class TOURangeMaxURI(SplitURIBase):
     range_id: int
 
 
-@ki_split_uri(uri_template=f"{ki_client.kb_id}/tou_range_min" + "/${range_id}")
+@ki_split_uri(uri_template=f"tou_range_min" + "/${range_id}")
 class TOURangeMinURI(SplitURIBase):
     range_id: int
 

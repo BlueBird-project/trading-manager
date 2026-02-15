@@ -1,13 +1,14 @@
 import logging
 from collections import defaultdict
-from typing import List, Set, Dict, Optional
+from typing import List,  Dict, Optional
 from effi_onto_tools.utils import time_utils
+from rdflib import URIRef, Literal
 
 from tm.models.market import EnergyMarket
 from tm.models.market_offer import EnergyMarketOfferInfo, EnergyMarketOffer
 
 from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings, MarketOfferInfoBindings, \
-    MarketOfferBindings, UBEFLEX_MARKET_BASE
+    MarketOfferBindings, UBEFLEX_MARKET_BASE, CountryUri, MarketType, EnergyMarketRequest
 
 # TODO: make isp unit configurable (minutes, seconds etc)
 __ISP_LEN_MS__ = 60 * 1000  # MINUTES as MILISECONDS
@@ -87,3 +88,16 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
             saved_bindings[offer_info.offer_uri].append(
                 dao_manager.offer_dao.add_offer(market_offer_items=market_offer_items))
     return saved_bindings
+
+
+def list_markets(market_query: Optional[EnergyMarketRequest]):
+    from tm.core.db.postgresql import dao_manager
+    if market_query is not None:
+        # todo: filter
+        market_query.market_type
+        market_query.country_name
+    markets = [EnergyMarketBindings(market_uri=URIRef(m.market_uri), country_name=Literal(m.market_location),
+                                    country_uri=CountryUri(country=m.market_location).uri_ref,
+                                    market_type=MarketType.value(m.market_type).uri_ref) for m in
+               dao_manager.market_dao.list_subscribed_market()]
+    return markets

@@ -19,15 +19,22 @@ ki = KIHolder()
 def _get_all_markets():
     from tm.core import app_settings
     return TargetedBindings(
-        bindings=[EnergyMarketRequest(market_location=Literal(c)) for c in app_settings.country_list],
+        bindings=[EnergyMarketRequest(country_name=Literal(c)) for c in app_settings.country_list],
         # knowledge_bases=['https://demo.entsoe.bluebird.com/ke'])
         knowledge_bases=[])
+
+
+@ki.answer("market")
+def on_market_request(ki_id: str, bindings: List[EnergyMarketRequest]):
+    if len(bindings) > 0:
+        return dam_service.list_markets(market_query=bindings[0])
+    return dam_service.list_markets(market_query=None)
 
 
 @ki.react("market")
 def on_market_information(ki_id: str, bindings: List[EnergyMarketBindings]):
     from tm.core import app_settings
-    subscribed_countries = [b for b in bindings if b.market_location.upper() in app_settings.country_list_upper]
+    subscribed_countries = [b for b in bindings if b.country_name.upper() in app_settings.country_list_upper]
     dam_service.save_markets(market_bindings=subscribed_countries)
     return []
 

@@ -36,9 +36,8 @@ if __name__ == "__main__" and app_settings:
 
         ke_client.VERIFY_SERVER_CERT = False
         ke_client.ENV_FILE = tm.app_args.env_path
-        from tm.modules.ke_interaction import setup_ke
 
-        setup_ke()
+        # setup_ke()
 
         from tm.modules.ke_interaction import interactions as ki
 

@@ -1,11 +1,13 @@
 import math
-from typing import Optional, Union
+from typing import Optional, Union, Type
 
 from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.utils import time_utils
 from isodate import parse_duration
-from ke_client import ki_object, is_nil, ki_split_uri, SplitURIBase,   OptionalLiteral
+from ke_client import ki_object, is_nil, ki_split_uri, SplitURIBase, OptionalLiteral
 from ke_client import BindingsBase
+from ke_client.utils.enum_utils import EnumUtils, BaseEnum, EnumItem
+from pydantic import BaseModel, ConfigDict
 from rdflib import URIRef, Literal
 from rdflib.util import from_n3
 
@@ -15,11 +17,22 @@ DAYAHEAD_MARKET_TYPE = URIRef(value="DayAheadMarket", base=UBEFLEX_MARKET_BASE)
 INTRADAY_MARKET_TYPE = URIRef(value="IntradayMarket", base=UBEFLEX_MARKET_BASE)
 
 
+class MarketTypeValue(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    name: str
+    uri_ref: URIRef
+
+
+class MarketType(BaseEnum["MarketTypeValue"]):
+    DAY_AHEAD = EnumItem(MarketTypeValue(name="DayAheadMarket", uri_ref=DAYAHEAD_MARKET_TYPE), alias="DayAheadMarket")
+    INTRADAY = EnumItem(MarketTypeValue(name="IntradayMarket", uri_ref=INTRADAY_MARKET_TYPE), alias="IntradayMarket")
+
+
 @ki_object("market")
 class EnergyMarketBindings(BindingsBase):
     market_uri: URIRef
-    market_location: Literal
-    country: URIRef
+    country_name: Literal
+    country_uri: URIRef
     market_type: URIRef
 
     # market_type: Literal = Literal("ubmarket:DayAheadMarket")
@@ -32,37 +45,38 @@ class EnergyMarketBindings(BindingsBase):
 
 @ki_object("market", allow_partial=True)
 class EnergyMarketRequest(BindingsBase):
-    market_location: Literal
+    country_name: OptionalLiteral = None
+    market_type: Optional[URIRef] = None
 
 
-@ki_object("market-offer-info-query", allow_partial=True)
-class MarketOfferInfoQuery(BindingsBase):
-    ts_interval_uri: URIRef
-    market_uri: URIRef
-    ts_date_from: Literal
-    ts_date_to: Literal
+# @ki_object("market-offer-info-query", allow_partial=True)
+# class MarketOfferInfoQuery(BindingsBase):
+#     ts_interval_uri: URIRef
+#     market_uri: URIRef
+#     ts_date_from: Literal
+#     ts_date_to: Literal
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
+#
+#     @property
+#     def ts_from(self) -> int:
+#         return time_utils.xsd_to_ts(self.ts_date_from)
+#
+#     @property
+#     def ts_to(self) -> int:
+#         return time_utils.xsd_to_ts(self.ts_date_to)
 
-    def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
 
-    @property
-    def ts_from(self) -> int:
-        return time_utils.xsd_to_ts(self.ts_date_from)
-
-    @property
-    def ts_to(self) -> int:
-        return time_utils.xsd_to_ts(self.ts_date_to)
-
-
-@ki_object("market-offer-info-query", result=True)
-class MarketOfferInfoResponse(BindingsBase):
-    market_uri: URIRef
-    offer_uri: URIRef
-    time_create: Literal
-
-    @property
-    def create_ts(self):
-        return time_utils.xsd_to_ts(self.time_create)
+# @ki_object("market-offer-info-query", result=True)
+# class MarketOfferInfoResponse(BindingsBase):
+#     market_uri: URIRef
+#     offer_uri: URIRef
+#     time_create: Literal
+#
+#     @property
+#     def create_ts(self):
+#         return time_utils.xsd_to_ts(self.time_create)
 
 
 @ki_object("market-offer-info")
@@ -178,3 +192,8 @@ class MarketOfferRequest(BindingsBase):
 class TimeIntervalUri(SplitURIBase):
     ts_from: int
     ts_to: int
+
+
+@ki_split_uri(uri_template="https://ubeflex.bluebird.eu/country/${country}")
+class CountryUri(SplitURIBase):
+    country: str

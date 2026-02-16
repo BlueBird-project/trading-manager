@@ -18,6 +18,10 @@ ki = KIHolder()
 @ki.ask("market")
 def _get_all_markets():
     from tm.core import app_settings
+    # return TargetedBindings(
+    #     bindings=[EnergyMarketRequest(country_name=Literal(c)) for c in app_settings.country_list],
+    #     # knowledge_bases=['https://demo.entsoe.bluebird.com/ke'])
+    #     knowledge_bases=[])
     return TargetedBindings(
         bindings=[EnergyMarketRequest(country_name=Literal(c)) for c in app_settings.country_list],
         # knowledge_bases=['https://demo.entsoe.bluebird.com/ke'])
@@ -35,14 +39,15 @@ def on_market_request(ki_id: str, bindings: List[EnergyMarketRequest]):
 def on_market_information(ki_id: str, bindings: List[EnergyMarketBindings]):
     from tm.core import app_settings
     subscribed_countries = [b for b in bindings if b.country_name.upper() in app_settings.country_list_upper]
-    dam_service.save_markets(market_bindings=subscribed_countries)
+    dam_service.save_markets(market_bindings=subscribed_countries, subscribe=True)
     return []
 
 
 def get_all_markets() -> List[EnergyMarketBindings]:
     bindings: KIAskResponse = _get_all_markets()
     market_bindings = [EnergyMarketBindings(**b) for b in bindings.bindingSet]
-    dam_service.save_markets(market_bindings=market_bindings)
+    # TODO: unsubscribe all markets in the DB
+    dam_service.save_markets(market_bindings=market_bindings, subscribe=True)
     return market_bindings
 
 

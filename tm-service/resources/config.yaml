@@ -12,8 +12,8 @@ app:
     - "Poland"
     - "Spain"
     - "Germany"
-    - "Belgium"
-    - "Austria"
+#    - "Belgium"
+#    - "Austria"
 #db does not require env prefix
 #TODO: make db as prefix -> db_host = "DB_" + "HOST"
 db:
@@ -32,6 +32,7 @@ db:
 ke:
   #  knowledge_base_id: TODO:
   #  rest_endpoint:
+  allow_partial_ki: true
   ki_config_path: ./resources/deployment/ke_config.yaml
   ki_vars:
     DAY_DURATION: '"PT1440M"^^xsd:duration'

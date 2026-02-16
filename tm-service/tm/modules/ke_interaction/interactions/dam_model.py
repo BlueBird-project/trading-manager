@@ -49,6 +49,9 @@ class EnergyMarketRequest(BindingsBase):
     market_type: Optional[URIRef] = None
 
 
+# @ki_object("market", allow_partial=True)
+# class EnergyMarketRequest(BindingsBase):
+#     country_name: OptionalLiteral = None
 # @ki_object("market-offer-info-query", allow_partial=True)
 # class MarketOfferInfoQuery(BindingsBase):
 #     ts_interval_uri: URIRef

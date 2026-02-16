@@ -13,6 +13,7 @@ ki = KIHolder()
 # region digital twin service details
 @ki.react("dt-info")
 def on_dt_info(ki_id, bindings: List[DigitalTwinInfo]) -> List[DigitalTwinInfoACK]:
+    print("dt-info")
     ack = dt_service.process(bindings)
     return ack
 

@@ -24,9 +24,9 @@ class MarketQueries:
     FROM "${table_prefix}market_details" WHERE market_uri = :market_uri   """
 
     INSERT_MARKET = """INSERT INTO "${table_prefix}market_details" 
-    ("market_uri", "market_name", "market_type", "market_description", "market_location",
+    ("market_uri", "market_name", "market_type", "market_description", "market_location","subscribe",
      "isp_unit", "isp_len", "update_ts", "ext") 
-     VALUES (:market_uri,:market_name,:market_type, :market_description, :market_location,
+     VALUES (:market_uri,:market_name,:market_type, :market_description, :market_location,:subscribe,
      :isp_unit,:isp_len,extract(epoch from now()) * 1000,:ext)
    
         """

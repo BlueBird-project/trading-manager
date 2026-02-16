@@ -37,7 +37,7 @@ def get_range_tou(binding_query: List[TOUPriceInfoQuery ]) ->   List[TOUPriceInf
         if is_nil(q.power_range) :
             # TODO: check if range exist
             range_id = dao_manager.offer_dao.get_range(None, None).range_id
-            tou_uriref = TOUSplitURI(range_id=range_id, period_minutes=time_span_ms / 60000, ts=ts_from).uri_ref
+            tou_uriref = TOUSplitURI(prefix=ki_client.kb_id,range_id=range_id, period_minutes=time_span_ms / 60000, ts=ts_from).uri_ref
             return [TOUPriceInfo(**{**q.input_bindings, **{"tou_uri": tou_uriref}})]
 
         min_val, max_val = q.get_power_limit()
@@ -47,9 +47,9 @@ def get_range_tou(binding_query: List[TOUPriceInfoQuery ]) ->   List[TOUPriceInf
             # power_range = tou_range_uri_parser.n3(TOURangeSplitURI(range_id=ri.range_id))
             # range_max = tou_range_max.n3(TOURangeSplitURI(range_id=ri.range_id))
             # range_min = tou_range_min.n3(TOURangeSplitURI(range_id=ri.range_id))
-            power_range = TOURangeURI(range_id=ri.range_id).n3()
-            range_max = TOURangeMaxURI(range_id=ri.range_id).n3()
-            range_min = TOURangeMinURI(range_id=ri.range_id).n3()
+            power_range = TOURangeURI(prefix=ki_client.kb_id,range_id=ri.range_id).n3()
+            range_max = TOURangeMaxURI(prefix=ki_client.kb_id,range_id=ri.range_id).n3()
+            range_min = TOURangeMinURI(prefix=ki_client.kb_id,range_id=ri.range_id).n3()
             tou_uri = TOUSplitURI(range_id=ri.range_id, period_minutes=time_span_ms / 60000, ts=ts_from).n3()
             ri_max_val = ri.max_value if ri.max_value is not None else URIRef("rdf:nil")
             ri_min_val = ri.min_value if ri.min_value is not None else URIRef("rdf:nil")
@@ -68,7 +68,7 @@ def get_price(binding_query: List[TOUPriceQuery]) -> List[TOUPrice]:
     from tm.core.db.postgresql import dao_manager
     # TODO: we support only one first binding query
     for q in binding_query:
-        split_uri = TOUSplitURI.parse(q.tou_uri)
+        split_uri = TOUSplitURI.parse(uri=q.tou_uri,prefix=ki_client.kb_id)
         ts = TimeSpan(ts_from=split_uri.ts, ts_to=split_uri.ts + split_uri.period_minutes * 60 * 1000)
         # time_span_ms =  from_n3(KIVars.DAY_DURATION)
         # TODO  use all suybscribed markets
@@ -79,7 +79,7 @@ def get_price(binding_query: List[TOUPriceQuery]) -> List[TOUPrice]:
         def converter(o: EnergyMarketOffer):
             tou_uri = q.tou_uri
             # tou_uri_parser.n3(TOUSplitURI(range_id=o.range_id, period_minutes=o.isp_len, ts=o.ts))
-            dp_uri = OfferDPSplitURI(range_id=o.range_id, period_minutes=o.isp_len, offer_id=o.offer_id,
+            dp_uri = OfferDPSplitURI(prefix=ki_client.kb_id,range_id=o.range_id, period_minutes=o.isp_len, offer_id=o.offer_id,
                                      isp_start=o.isp_start).uri
             return TOUPrice(tou_uri=tou_uri, dp=URIRef(dp_uri), ts=Literal(time_utils.xsd_from_ts(o.ts)),
                             dpr=URIRef(dp_uri + "/dpr"),

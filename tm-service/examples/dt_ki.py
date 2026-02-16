@@ -60,11 +60,11 @@ if __name__ == "__main__" and app_settings:
 
     print(f"Observed market : {market}")
     while True:
-        print("start")
         try:
             from examples.fm_test.dt_interactions import post_dt_info
 
             print(f"tick: {client.state()}")
+            print(f"Post dt")
             post_dt_info(market_uri=market.market_uri)
             sleep(5)
         except Exception as ex:

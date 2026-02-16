@@ -57,6 +57,14 @@ if __name__ == "__main__":
 
         task_manager.setup_scheduler()
 
+    from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
+
+    # markets=get_all_markets()
+    # print("#########################")
+    # print("markets:")
+    # print("#########################")
+    # print(markets)
+    # print("#########################")
     if app_settings.use_rest_api:
         import uvicorn
         from tm.modules.tm_api.router import router as tm_router

@@ -1,6 +1,6 @@
 import logging
 from collections import defaultdict
-from typing import List,  Dict, Optional
+from typing import List, Dict, Optional
 from effi_onto_tools.utils import time_utils
 from rdflib import URIRef, Literal
 
@@ -14,15 +14,16 @@ from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBinding
 __ISP_LEN_MS__ = 60 * 1000  # MINUTES as MILISECONDS
 
 
-def save_markets(market_bindings: List[EnergyMarketBindings]):
+def save_markets(market_bindings: List[EnergyMarketBindings], subscribe: bool = False):
     from tm.core.db.postgresql import dao_manager
     for binding in market_bindings:
-        market = EnergyMarket(**vars(binding))
+        market = EnergyMarket(market_location=binding.country_name, **vars(binding))
 
         db_market = dao_manager.market_dao.get_market(binding.market_uri)
         if db_market is None:
             market.market_type = market.market_type.replace(UBEFLEX_MARKET_BASE, "")
             market.market_name = market.market_type + ":" + market.market_location
+            market.subscribe = subscribe
             dao_manager.market_dao.save_market(market)
         else:
             #         TODO:  update on duplicate ?

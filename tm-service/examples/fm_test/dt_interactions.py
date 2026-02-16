@@ -19,7 +19,6 @@ def _post_dt_info(market_uri: URIRef) -> List[DigitalTwinInfo]:
 
     return [dt_info]
 
-
 #
 # @ki_client.answer("dt-info")
 # def on_dt_info_request(ki_id, bindings):

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
@@ -12,7 +12,9 @@ from tm.models.job_dao import JobDAO
 class JobAPIQueries(QueryObject):
     __PROJECTION__ = """ "job_id", "command_uri" ,"job_name" ,"job_description" ,"update_ts" ,"ext" """
     __TABLE_NAME__ = "service_jobs"
-    LIST = """SELECT #{projection}  FROM "${table_prefix}${table_name}" """
+    LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" """
+    SELECT_BY_COMMAND = """SELECT ${projection}  FROM "${table_prefix}${table_name}"
+     WHERE command_uri = :command_uri """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
      ( "command_uri","job_name","job_description","ext" ,"update_ts"  )
@@ -38,3 +40,7 @@ class JobAPIImpl(JobAPI):
     def list(self, ) -> List[JobDAO]:
         with ConnectionWrapper() as conn:
             return conn.select(q=self.queries.LIST, args={}, obj_type=JobDAO)
+
+    def get(self, command_uri: str) -> Optional[JobDAO]:
+        with ConnectionWrapper() as conn:
+            return conn.get(q=self.queries.SELECT_BY_COMMAND, args={"command_uri": command_uri}, obj_type=JobDAO)

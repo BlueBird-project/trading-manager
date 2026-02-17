@@ -27,8 +27,6 @@ utils.ENV_FILE = tm.app_args.env_path
 tm.set_logging()
 logging.info(f"START {service_settings.name}")
 
-
-
 if __name__ == "__main__" and app_settings:
     logging.info("INIT KI")
     # setup ke
@@ -38,16 +36,20 @@ if __name__ == "__main__" and app_settings:
     ke_client.ENV_FILE = tm.app_args.env_path
     from examples.ki.sample_client import set_bg_ke_client
     from examples.ki.sample_ki import sample_ki
+    from examples.ki.fm_interactions import fm_ki
 
-    client=set_bg_ke_client([sample_ki])
+    client = set_bg_ke_client([sample_ki, fm_ki])
 
     while True:
-        print("start")
         try:
+            from examples.ki.fm_interactions import evaluate_flexibility
+
             print(f"tick: {client.state()}")
-            from examples.ki.sample_ki import   request_market
-            print(request_market())
-            sleep(5)
+            print(f"Ask for prices")
+            response = evaluate_flexibility()
+            print(len(response))
+            print(response)
+            sleep(60)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

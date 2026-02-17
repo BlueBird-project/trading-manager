@@ -34,7 +34,7 @@ class JobAPIImpl(JobAPI):
                                       return_id_col="job_id")
             if inserted_id is None:
                 raise ValueError(f"Job not saved: {job.__dict__}")
-            job.market_id = inserted_id
+            job.job_id = inserted_id
             return job
 
     def list(self, ) -> List[JobDAO]:

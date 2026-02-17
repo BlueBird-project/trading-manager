@@ -34,7 +34,7 @@ class DTAPIImpl(DTAPI):
                                       return_id_col="dt_id")
             if inserted_id is None:
                 raise ValueError(f"DigitalTwin not saved: {job.__dict__}")
-            job.market_id = inserted_id
+            job.dt_id = inserted_id
             return job
 
     def list(self, ) -> List[DigitalTwinDAO]:

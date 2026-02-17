@@ -45,7 +45,7 @@ def on_market_information(ki_id: str, bindings: List[EnergyMarketBindings]):
 
 def get_all_markets() -> List[EnergyMarketBindings]:
     bindings: KIAskResponse = _get_all_markets()
-    market_bindings = [EnergyMarketBindings(**b) for b in bindings.bindingSet]
+    market_bindings = [EnergyMarketBindings(**b) for b in bindings.binding_set]
     # TODO: unsubscribe all markets in the DB
     dam_service.save_markets(market_bindings=market_bindings, subscribe=True)
     return market_bindings
@@ -68,9 +68,9 @@ def _get_market_offer_info_filtered(market_uri: URIRef, ti: Optional[TimeSpan]):
 def get_market_offer_info_filtered(market_uri: str, ti: Optional[TimeSpan]) -> List[MarketOfferInfoBindings]:
     bindings: KIAskResponse = _get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=ti)
     if ti is not None:
-        market_offer_bindings = [MarketOfferInfoFilteredBindings(**b) for b in bindings.bindingSet]
+        market_offer_bindings = [MarketOfferInfoFilteredBindings(**b) for b in bindings.binding_set]
     else:
-        market_offer_bindings = [MarketOfferInfoBindings(**b) for b in bindings.bindingSet]
+        market_offer_bindings = [MarketOfferInfoBindings(**b) for b in bindings.binding_set]
     logging.info(f"Received {len(market_offer_bindings)} offers.")
     dam_service.save_offer_info(offer_bindings=market_offer_bindings)
     return market_offer_bindings
@@ -98,6 +98,6 @@ def get_market_offer(offer_uris: List[str], clear_prev: bool = True):
         return {}
     bindings: KIAskResponse = _get_market_offer(offer_uris=[URIRef(offer_uri) for offer_uri in offer_uris])
 
-    offer_bindings = [MarketOfferBindings(**b) for b in bindings.bindingSet]
+    offer_bindings = [MarketOfferBindings(**b) for b in bindings.binding_set]
     return dam_service.save_offer(offer_bindings=offer_bindings, clear=clear_prev)
 # endregion

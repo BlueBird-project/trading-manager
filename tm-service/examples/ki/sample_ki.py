@@ -17,4 +17,4 @@ def _request_market(query: List[EnergyMarketRequest]):
 
 def request_market() -> List[EnergyMarketBindings]:
     resp: KIAskResponse = _request_market(query=[])
-    return [EnergyMarketBindings(**b) for b in resp.bindingSet]
+    return [EnergyMarketBindings(**b) for b in resp.binding_set]

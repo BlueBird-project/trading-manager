@@ -33,10 +33,10 @@ def request_ts_info(ts: TimeSpan) -> List[FMTSResponse]:
         ts_date_from=Literal(time_utils.xsd_from_ts(ts.ts_from)),
         ts_date_to=Literal(time_utils.xsd_from_ts(ts.ts_to)),
     ))
-    return [FMTSResponse(**b) for b in resp_bindings.resultBindingSet]
+    return [FMTSResponse(**b) for b in resp_bindings.result_binding_set]
 
 
 def request_data(ts_uris: List[str]) -> List[FMPnt]:
     ts_uri_refs = [FMPntQuery(ts_uri=URIRef(ts_uri)) for ts_uri in ts_uris]
     bindings: KIAskResponse = _request_data(ts_uris=ts_uri_refs)
-    return [FMPnt(**b) for b in bindings.bindingSet]
+    return [FMPnt(**b) for b in bindings.binding_set]

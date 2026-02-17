@@ -1,4 +1,5 @@
 import logging
+from ke_client import KEClient
 
 
 def setup_ke():
@@ -19,14 +20,19 @@ def setup_ke():
 
 setup_ke()
 
-from tm.modules.ke_interaction.interactions.dam_interactions import ki
-from tm.modules.ke_interaction.interactions.dt_interactions import ki as dt_ki
-from tm.modules.ke_interaction.interactions.fm_interactions import ki as fm_ki
-from tm.modules.ke_interaction.interactions.tou_interactions import ki as tou_ki
-from ke_client import KEClient
 
-ki_client: KEClient = KEClient.build(logger=logging.getLogger())
-ki_client.include(ki_holder=ki)
-ki_client.include(ki_holder=dt_ki)
-ki_client.include(ki_holder=fm_ki)
-ki_client.include(ki_holder=tou_ki)
+def init_client() -> KEClient:
+    from tm.modules.ke_interaction.interactions.dam_interactions import ki
+    from tm.modules.ke_interaction.interactions.dt_interactions import ki as dt_ki
+    from tm.modules.ke_interaction.interactions.fm_interactions import ki as fm_ki
+    from tm.modules.ke_interaction.interactions.tou_interactions import ki as tou_ki
+
+    client: KEClient = KEClient.build(logger=logging.getLogger())
+    client.include(ki_holder=ki)
+    client.include(ki_holder=dt_ki)
+    client.include(ki_holder=fm_ki)
+    client.include(ki_holder=tou_ki)
+    return client
+
+
+ki_client: KEClient = init_client()

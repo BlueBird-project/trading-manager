@@ -1,4 +1,4 @@
-import logging
+
 
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.base import BaseScheduler
@@ -28,6 +28,7 @@ def init(bg=True):
 def setup_scheduler():
     from tm.core import app_settings
     global service_job_scheduler
+    import logging
     logging.info("INIT task scheduler")
 
     if app_settings.use_rest_api:

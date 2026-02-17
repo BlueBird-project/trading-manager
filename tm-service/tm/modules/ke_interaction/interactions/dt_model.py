@@ -64,6 +64,10 @@ class DTTSInfoACK(BindingsBase):
     command_uri: URIRef
     ts_uri: URIRef
 
+@ki_object("dt-ts", result=True)
+class DTTSACK(BindingsBase):
+    ts_uri: URIRef
+
 
 # @ki_object("dt-ts-info", allow_partial=True)
 # class DTTSInfoRequest(BindingsBase):
@@ -117,36 +121,35 @@ class DTPntRequest(BindingsBase):
         return DTTSUri.parse(uri=self.ts_uri)
 
 
-@ki_split_uri(uri_template="http://${dt_uri}/${ts_start}/${ts_end}")
+@ki_split_uri(uri_template="ts/${ts_start}/${ts_end}")
 class DTTSUri(SplitURIBase):
-    dt_uri: str
     ts_start: int
     ts_end: int
 
-    def __init__(self, dt_uri: str, **kwargs):
-        dt_uri = self.normalize_kb_id(kb_id=dt_uri)
-        super().__init__(dt_uri=dt_uri, **kwargs)
+    # def __init__(self, dt_uri: str, **kwargs):
+    #     dt_uri = self.normalize_kb_id(kb_id=dt_uri)
+    #     super().__init__(dt_uri=dt_uri, **kwargs)
 
 
-@ki_split_uri(uri_template="http://${dt_uri}/${ts_start}/${ts_end}/dp/${isp}")
+@ki_split_uri(uri_template="${ts_start}/${ts_end}/dp/${isp}")
 class DTDPUri(SplitURIBase):
-    dt_uri: str
+    # dt_uri: str
     ts_start: int
     ts_end: int
     isp: int
 
-    def __init__(self, dt_uri: str, **kwargs):
-        dt_uri = self.normalize_kb_id(kb_id=dt_uri)
-        super().__init__(dt_uri=dt_uri, **kwargs)
+    # def __init__(self, dt_uri: str, **kwargs):
+    #     dt_uri = self.normalize_kb_id(kb_id=dt_uri)
+    #     super().__init__(dt_uri=dt_uri, **kwargs)
 
 
-@ki_split_uri(uri_template="http://${dt_uri}/${ts_start}/${ts_end}/dpr/${isp}")
+@ki_split_uri(uri_template="${ts_start}/${ts_end}/dpr/${isp}")
 class DTDPRUri(SplitURIBase):
-    dt_uri: str
+    # dt_uri: str
     ts_start: int
     ts_end: int
     isp: int
 
-    def __init__(self, dt_uri: str, **kwargs):
-        dt_uri = self.normalize_kb_id(kb_id=dt_uri)
-        super().__init__(dt_uri=dt_uri, **kwargs)
+    # def __init__(self, dt_uri: str, **kwargs):
+    #     dt_uri = self.normalize_kb_id(kb_id=dt_uri)
+    #     super().__init__(dt_uri=dt_uri, **kwargs)

@@ -3,6 +3,7 @@ import logging
 from typing import List
 
 from ke_client.utils import to_json
+from rdflib import URIRef
 
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DigitalTwinInfoACK
 from tm.models.digital_twin import DigitalTwinDAO
@@ -30,5 +31,5 @@ def process(dt_info_list: List[DigitalTwinInfo]) -> List[DigitalTwinInfoACK]:
                     DigitalTwinDAO(dt_uri=dt_info.dt_uri, market_id=market.market_id, job_id=job.job_id))
             else:
                 dt = db_dt
-            response.append(DigitalTwinInfoACK(dt_uri=dt.dt_uri, command_uri=job.command_uri))
+            response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
     return response

@@ -24,7 +24,6 @@ def _init_command_uri(market_uri: str):
 #
 @dt_ki.post("dt-info")
 def _post_dt_info(market_uri: URIRef) -> List[DigitalTwinInfo]:
-    from tm.modules.ke_interaction.interactions import ki_client
     dt_info = DigitalTwinInfo(dt_uri=URIRef(dt_ki.get_kb_id()),
                               command_uri=_init_command_uri(market_uri=str(_market_uri)),
                               market_uri=market_uri)

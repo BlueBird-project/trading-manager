@@ -1,6 +1,6 @@
 from typing import Optional, Union, Any
 
-from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object
+from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
 from effi_onto_tools.utils import time_utils
 from rdflib import URIRef, Literal
 
@@ -49,9 +49,9 @@ class FMEvaluateQuery(BindingsBase):
 
 @ki_object("fm-ts-evaluate", result=True)
 class FMEvaluateResponse(BindingsBase):
-    dp: URIRef
+    cost_dp: URIRef
     cost_dpr: URIRef
-    cost: Union[Literal, URIRef]
+    cost: OptionalLiteral
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)

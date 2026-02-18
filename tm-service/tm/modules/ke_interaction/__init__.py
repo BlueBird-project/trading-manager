@@ -11,7 +11,7 @@ class KIVars(EnumUtils):
 
 def _set_ke_client(bg_mode=False):
     from tm.modules.ke_interaction.interactions import setup_ke
-    from tm.modules.ke_interaction.interactions import ki_client as ke_ki_client
+    from tm.modules.ke_interaction.interactions.client import ki_client as ke_ki_client
     import ke_client
     ke_client.VERIFY_SERVER_CERT = False
     setup_ke()
@@ -78,5 +78,4 @@ def set_bg_ke_client():
 
 
 def set_sync_ke_client():
-    from tm.modules.ke_interaction.interactions import ki_client
     _set_ke_client(bg_mode=False)

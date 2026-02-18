@@ -18,7 +18,7 @@ def setup_ke():
         setattr(KIVars, k, ki_vars[k])
 
 
-setup_ke()
+
 
 
 def init_client() -> KEClient:
@@ -35,4 +35,4 @@ def init_client() -> KEClient:
     return client
 
 
-ki_client: KEClient = init_client()
+

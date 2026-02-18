@@ -2,6 +2,8 @@ import logging
 from datetime import datetime, timedelta
 
 from apscheduler.schedulers.base import BaseScheduler
+from effi_onto_tools.db import TimeSpan
+from effi_onto_tools.utils import time_utils
 
 
 def _dt_jobs(scheduler: BaseScheduler):
@@ -31,10 +33,34 @@ def _dt_jobs(scheduler: BaseScheduler):
 
     job = scheduler.get_job("dt_check")
     from tm import core
-    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=30)))
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=120)))
     job = scheduler.get_job("forecast_scan")
 
-    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=60)))
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=180)))
+
+
+def _fm_jobs(scheduler: BaseScheduler):
+    @scheduler.scheduled_job(trigger='cron', id="flexibility_scan", day_of_week='*', hour='8',
+                             minute='15',
+                             month='*', year='*', day='*', max_instances=1, coalesce=True)
+    def scan_flexibility():
+        from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info, request_data
+        logging.info("Scan for flexibility")
+        # todo: set 'req' argument
+        cur_ts = time_utils.current_timestamp()
+        ts_info = request_ts_info(ts=TimeSpan(ts_from=cur_ts, ts_to=cur_ts + 3600 * 1000 * 24))
+        logging.info(f"Scanned fms: {",".join([ts.ts_uri for ts in ts_info])}")
+        # TODO: request_data
+        for uri in ts_info:
+            ts = request_data(ts_uris=[uri.ts_uri])
+            logging.info(f"received flexibility timeseries , length: {len(ts)} , for {uri.ts_uri}")
+            #         TODO store timeseries
+            print(ts)
+
+    from tm import core
+    job = scheduler.get_job("flexibility_scan")
+
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=5)))
 
 
 def add_jobs(service_job_scheduler: BaseScheduler):
@@ -49,3 +75,4 @@ def add_jobs(service_job_scheduler: BaseScheduler):
         # ke_client.stop()
 
     _dt_jobs(scheduler=service_job_scheduler)
+    _fm_jobs(scheduler=service_job_scheduler)

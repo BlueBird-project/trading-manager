@@ -34,6 +34,8 @@ if __name__ == "__main__" and app_settings:
 
     ke_client.VERIFY_SERVER_CERT = False
     ke_client.ENV_FILE = tm.app_args.env_path
+    from tm.modules.ke_interaction.interactions import setup_ke
+    setup_ke()
     from examples.ki.sample_client import set_bg_ke_client
     from examples.ki.sample_ki import sample_ki
     from examples.ki.fm_interactions import fm_ki
@@ -45,10 +47,10 @@ if __name__ == "__main__" and app_settings:
             from examples.ki.fm_interactions import evaluate_flexibility
 
             print(f"tick: {client.state()}")
-            print(f"Ask for prices")
-            response = evaluate_flexibility()
-            print(len(response))
-            print(response)
+            # print(f"Ask for prices")
+            # response = evaluate_flexibility()
+            # print(len(response))
+            # print(response)
             sleep(60)
         except Exception as ex:
             print("Some issue occurred: ")

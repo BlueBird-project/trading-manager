@@ -58,7 +58,14 @@ if __name__ == "__main__":
         task_manager.setup_scheduler()
 
     from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
+    from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info
 
+    cur_ts = time_utils.current_timestamp()
+    while True:
+        print("ticktick1")
+        ts_info = request_ts_info(ts=TimeSpan(ts_from=cur_ts, ts_to=cur_ts + 3600 * 1000 * 24))
+        print("ticktick")
+        sleep(50)
     # markets=get_all_markets()
     # print("#########################")
     # print("markets:")

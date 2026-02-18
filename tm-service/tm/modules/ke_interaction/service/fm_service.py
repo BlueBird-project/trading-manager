@@ -22,7 +22,7 @@ def evaluate(query: List[FMEvaluateQuery]) -> List[FMEvaluateResponse]:
 
         range_id = dao_manager.offer_dao.get_range(None, None).range_id
         # tou_uri = tou_model.TOUSplitURI(range_id=range_id, period_minutes=ts_uri.period_minutes, ts=ts)
-        tou_price = FMEvaluateResponse(dp=dp_uri.uri_ref, cost_dpr=URIRef(dp_uri.uri + "/dpr"), cost=rdf_nil)
+        tou_price = FMEvaluateResponse(cost_dp=dp_uri.uri_ref, cost_dpr=URIRef(dp_uri.uri + "/dpr"), cost=rdf_nil)
 
         response.append(tou_price)
 

@@ -35,6 +35,8 @@ if __name__ == "__main__" and app_settings:
     ke_client.VERIFY_SERVER_CERT = False
     ke_client.ENV_FILE = tm.app_args.env_path
     from examples.ki.sample_client import set_bg_ke_client
+    from tm.modules.ke_interaction.interactions import setup_ke
+    setup_ke()
     from examples.ki.sample_ki import sample_ki
     from examples.ki.dt_interactions import dt_ki
 

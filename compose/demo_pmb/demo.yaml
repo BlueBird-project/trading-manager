@@ -18,12 +18,14 @@ services:
       - tm-net
   demo-entsoe-service:
     image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"
+    ports:
+      - "11001:8080"
     build:
       dockerfile: ./docker/entsoe-demo/Dockerfile
       args:
         REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
         REGISTRY_PROJECT: ${REGISTRY_PROJECT}
-        IMAGE_TAG: 0.4.5
+        IMAGE_TAG: 0.4.6
       #      context: ..
       tags:
         - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"

@@ -27,3 +27,7 @@ class MarketAPI(DAO):
     @abstractmethod
     def get_market(self, market_uri: str) -> EnergyMarket:
         pass
+
+    @abstractmethod
+    def set_subscribe(self, market_id: int, subscribe: bool) -> bool:
+        pass

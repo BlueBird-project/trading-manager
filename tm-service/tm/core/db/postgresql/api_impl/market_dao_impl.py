@@ -33,6 +33,8 @@ class MarketQueries:
     # ON CONFLICT ("market_uri" ) DO UPDATE
     # SET update_ts = extract(epoch from now()) * 1000, date_str= EXCLUDED.date_str,
     # isp_len= EXCLUDED.isp_len,  cost_mwh= EXCLUDED.cost_mwh
+    SET_MARKET_SUBSCRIBE = """UPDATE "${table_prefix}market_details"  set "subscribe" = :subscribe
+     WHERE "market_id" = :market_id"""
 
 
 class MarketAPIImpl(MarketAPI):
@@ -66,3 +68,7 @@ class MarketAPIImpl(MarketAPI):
             args = {"market_uri": market_uri}
             market = conn.get(q=self.queries.SELECT_MARKET_BY_URI, args=args, obj_type=EnergyMarket)
             return market
+
+    def set_subscribe(self, market_id: int, subscribe: bool) -> bool:
+        with ConnectionWrapper() as conn:
+            return conn.update(self.queries.SET_MARKET_SUBSCRIBE, {'market_id': market_id, "subscribe": subscribe}) == 1

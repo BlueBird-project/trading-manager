@@ -25,7 +25,7 @@ services:
       args:
         REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
         REGISTRY_PROJECT: ${REGISTRY_PROJECT}
-        IMAGE_TAG: 0.4.6
+        IMAGE_TAG: 0.4.7
       #      context: ..
       tags:
         - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"

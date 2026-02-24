@@ -4,7 +4,7 @@ from typing import Optional, Union, Type
 from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.utils import time_utils
 from isodate import parse_duration
-from ke_client import ki_object, is_nil, ki_split_uri, SplitURIBase, OptionalLiteral
+from ke_client import ki_object, is_nil, ki_split_uri, SplitURIBase, OptionalLiteral, rdf_nil
 from ke_client import BindingsBase
 from ke_client.utils.enum_utils import EnumUtils, BaseEnum, EnumItem
 from pydantic import BaseModel, ConfigDict
@@ -88,12 +88,15 @@ class MarketOfferInfoBindings(BindingsBase):
     market_type: URIRef
     offer_uri: URIRef
     time_create: Literal
-    sequence: Union[Literal, URIRef, None] = None
+    sequence: OptionalLiteral = None
     update_rate: Literal
     duration: Literal
 
-    # def __init__(self, **kwargs):
-    #     super().__init__(bindings=kwargs)
+    def __init__(self, skip_nil=True, **kwargs):
+        super().__init__(bindings=kwargs)
+        if skip_nil:
+            if is_nil(self.sequence):
+                self.sequence = None
 
     @property
     def create_ts(self):
@@ -153,7 +156,7 @@ class MarketOfferInfoFilteredRequest(MarketOfferInfoRequest):
 
     def __init__(self, ti: Optional[TimeSpan] = None, **kwargs):
         if ti is None:
-            super().__init__(ts_interval_uri=None, ts_date_from=None, ts_date_to=None, **kwargs)
+            super().__init__(ts_interval_uri=rdf_nil, ts_date_from=rdf_nil, ts_date_to=rdf_nil, **kwargs)
         else:
             ts_interval_uri_ref = TimeIntervalUri(ts_from=ti.ts_from, ts_to=ti.ts_to).uri_ref
             super().__init__(ts_interval_uri=ts_interval_uri_ref,

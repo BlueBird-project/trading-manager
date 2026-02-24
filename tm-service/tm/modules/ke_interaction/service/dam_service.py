@@ -19,15 +19,16 @@ def save_markets(market_bindings: List[EnergyMarketBindings], subscribe: bool = 
     for binding in market_bindings:
         market = EnergyMarket(market_location=binding.country_name, **vars(binding))
 
-        db_market = dao_manager.market_dao.get_market(binding.market_uri)
+        db_market = dao_manager.market_api.get_market(binding.market_uri)
         if db_market is None:
             market.market_type = market.market_type.replace(UBEFLEX_MARKET_BASE, "")
             market.market_name = market.market_type + ":" + market.market_location
             market.subscribe = subscribe
-            dao_manager.market_dao.save_market(market)
+            dao_manager.market_api.save_market(market)
         else:
             #         TODO:  update on duplicate ?
             logging.info(f"Market is registered: {binding.market_uri}")
+            dao_manager.market_api.set_subscribe(db_market.market_id, subscribe)
 
 
 def save_offer_info(offer_bindings: List[MarketOfferInfoBindings]):
@@ -35,7 +36,7 @@ def save_offer_info(offer_bindings: List[MarketOfferInfoBindings]):
     for binding in offer_bindings:
         import tm.core as core
         date_str = time_utils.datetime_to_str(time_utils.from_timestamp(binding.create_ts), tz=core.__TIME_ZONE__)
-        market = dao_manager.market_dao.get_market(binding.market_uri)
+        market = dao_manager.market_api.get_market(binding.market_uri)
         if market is None:
             logging.warning(f"Market not registered: {binding.market_uri}")
         else:
@@ -91,6 +92,17 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
     return saved_bindings
 
 
+def get_all_markets() -> List[EnergyMarket]:
+    from tm.core.db.postgresql import dao_manager
+    return dao_manager.market_api.list_subscribed_market()
+
+
+def unsubscribe_markets() -> List[EnergyMarket]:
+    from tm.core.db.postgresql import dao_manager
+    for m in dao_manager.market_api.list_market():
+        dao_manager.market_api.set_subscribe(market_id=m.market_id, subscribe=False)
+
+
 def list_markets(market_query: Optional[EnergyMarketRequest]):
     from tm.core.db.postgresql import dao_manager
     if market_query is not None:
@@ -100,5 +112,5 @@ def list_markets(market_query: Optional[EnergyMarketRequest]):
     markets = [EnergyMarketBindings(market_uri=URIRef(m.market_uri), country_name=Literal(m.market_location),
                                     country_uri=CountryUri(country=m.market_location).uri_ref,
                                     market_type=MarketType.value(m.market_type).uri_ref) for m in
-               dao_manager.market_dao.list_subscribed_market()]
+               dao_manager.market_api.list_subscribed_market()]
     return markets

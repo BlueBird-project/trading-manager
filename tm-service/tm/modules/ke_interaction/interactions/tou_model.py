@@ -32,7 +32,7 @@ class TOUPriceInfoQuery(BindingsBase):
     tou_period: Literal
     max_value: OptionalLiteral = None
     min_value: OptionalLiteral = None
-    power_range: URIRef
+    power_range: Optional[URIRef] = None
 
     def __init__(self, **kwargs):
         if "power_range" not in kwargs:
@@ -51,10 +51,10 @@ class TOUPriceInfo(BindingsBase):
     time_create: Literal
     tou_period: Literal
     power_range: URIRef
-    power_range_max: URIRef = rdf_nil
-    max_value: Union[Literal, URIRef] = rdf_nil
-    power_range_min: URIRef = rdf_nil
-    min_value: Union[Literal, URIRef] = rdf_nil
+    power_range_max: Optional[URIRef] = rdf_nil
+    max_value: OptionalLiteral = rdf_nil
+    power_range_min: Optional[URIRef] = rdf_nil
+    min_value: OptionalLiteral = rdf_nil
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)
@@ -71,7 +71,7 @@ class TOUPrice(BindingsBase):
     dp: URIRef
     ts: Literal
     dpr: URIRef
-    value: Union[Literal, URIRef, None]
+    value: OptionalLiteral
 
     def __init__(self, **kwargs):
         if "value" not in kwargs:

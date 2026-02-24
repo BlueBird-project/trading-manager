@@ -43,10 +43,12 @@ def on_market_information(ki_id: str, bindings: List[EnergyMarketBindings]):
     return []
 
 
-def get_all_markets() -> List[EnergyMarketBindings]:
+def get_all_markets(reset_markets:bool=False) -> List[EnergyMarketBindings]:
     bindings: KIAskResponse = _get_all_markets()
     market_bindings = [EnergyMarketBindings(**b) for b in bindings.binding_set]
     # TODO: unsubscribe all markets in the DB
+    if reset_markets:
+        dam_service.unsubscribe_markets()
     dam_service.save_markets(market_bindings=market_bindings, subscribe=True)
     return market_bindings
 
@@ -56,6 +58,7 @@ def get_all_markets() -> List[EnergyMarketBindings]:
 # region offer details (timeseries metadata)
 @ki.react("market-offer-info")
 def on_market_offer_info(ki_id: str, bindings: List[MarketOfferInfoBindings]):
+
     dam_service.save_offer_info(offer_bindings=bindings)
     return []
 
@@ -76,8 +79,15 @@ def get_market_offer_info_filtered(market_uri: str, ti: Optional[TimeSpan]) -> L
     return market_offer_bindings
 
 
-def get_current_market_offer_info(market_uri: str) -> List[MarketOfferInfoBindings]:
-    return get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=None)
+def get_current_market_offer_info(market_uri: Optional[str] = None) -> List[MarketOfferInfoBindings]:
+    if market_uri is None:
+        markets = dam_service.get_all_markets()
+        accu = []
+        for market in markets:
+            accu += get_market_offer_info_filtered(market_uri=URIRef(market.market_uri), ti=None)
+        return accu
+    else:
+        return get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=None)
 
 
 # endregion

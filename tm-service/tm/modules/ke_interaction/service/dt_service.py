@@ -15,7 +15,7 @@ def process(dt_info_list: List[DigitalTwinInfo]) -> List[DigitalTwinInfoACK]:
     # TODO: update all dt metadata ?
     for dt_info in dt_info_list:
         from tm.core.db.postgresql import dao_manager
-        market = dao_manager.market_dao.get_market(market_uri=dt_info.market_uri)
+        market = dao_manager.market_api.get_market(market_uri=dt_info.market_uri)
         if market is None:
             logging.error(f"Unknown market: {dt_info.market_uri}")
         else:

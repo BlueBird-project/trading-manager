@@ -71,4 +71,5 @@ def set_bg_ke_client(interaction_list: List[KIHolder]):
         # TODO: stop service id can't register
         logging.info(f"KE client is not registered, wait for all KI to be registered.")
         time.sleep(3)
+    time.sleep(1)
     return ki_client

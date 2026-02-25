@@ -1,13 +1,12 @@
 import random
 from typing import List
 
-from ke_client import KIHolder
-from ke_client.ki_model import KIPostResponse, KIAskResponse
-
-from tm.modules.ke_interaction.interactions.fm_model import BindingsBase
+from ke_client import KIHolder, TargetedBindings
+from ke_client.ki_model import KIPostResponse
 from tm.modules.ke_interaction.interactions.fm_model import *
 
 fm_ki = KIHolder()
+TM_KB_ID = "http://demo.tm.bluebird.com"
 
 
 # BindingsBase
@@ -45,16 +44,17 @@ def _evaluate_request():
     ts_usage = URIRef("s4ener:Consumption")
     # ts_usage2 = URIRef("s4ener:Production")
     ts_uri = FMTSSplitURI(ts_from=current_ts, ts_to=ts_end, period_minutes=15, ts_usage=ts_usage)
-    response = []
-    for i in range(0, 24*4):
+    response: List[FMEvaluateQuery] = []
+    # return response
+    for i in range(0, 24 * 4):
         ts = i * hour_ms + current_ts
         xsd_ts = time_utils.xsd_from_ts(ts)
         dp_uri = DPSplitURI(ts_start=ts, ts_usage=FMTSSplitURI.convert_ts_usage(ts_usage), isp_start=i)
         dpr_uri_ref = URIRef(dp_uri.uri + "/dpr")
         value = Literal(random.randrange(400, 1200))
         response.append(FMEvaluateQuery(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
-                                        value=value).n3())
-    return response
+                                        value=value))
+    return TargetedBindings(bindings=response, knowledge_bases=[TM_KB_ID])
 
 
 # @fm_ki.ask("fm-ts-evaluate")
@@ -72,7 +72,7 @@ def on_fm_request(ki_id: str, bindings: List[FMPntQuery]):
         ts_resp = [FMPnt(ts_uri=ts_uri,
                          dp=
                          DPSplitURI(ts_start=parsed_uri.ts_to, ts_usage=parsed_uri.ts_usage, isp_start=i).n3(),
-                         ts=Literal(time_utils.xsd_from_ts(parsed_uri.ts_from + i*15 *60* 1000)),
+                         ts=Literal(time_utils.xsd_from_ts(parsed_uri.ts_from + i * 15 * 60 * 1000)),
                          dpr=URIRef(
                              DPSplitURI(ts_start=parsed_uri.ts_to, ts_usage=parsed_uri.ts_usage,
                                         isp_start=i).uri + "/dpr"),

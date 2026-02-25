@@ -190,5 +190,5 @@ INSERT INTO   "public"."${table_prefix}consumption_range" ("min_value" , "max_va
 
 
 ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_market_details_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_service_jobs_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}service_jobs(job_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_service_jobs_fkey" FOREIGN KEY (job_id) REFERENCES ${table_prefix}service_jobs(job_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 -- 2025-11-28 12:49:20 UTC

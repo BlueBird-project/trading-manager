@@ -22,7 +22,7 @@ def _request_data(ts_uris: List[FMPntQuery]):
 
 
 @ki.react("fm-ts-evaluate")
-def _on_evaluate_request(ki_id, bindings:List[FMEvaluateQuery]):
+def _on_evaluate_request(ki_id, bindings: List[FMEvaluateQuery]):
     print("fm react")
     print(len(bindings))
     resp = fm_service.evaluate(bindings)

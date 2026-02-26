@@ -68,13 +68,13 @@ def _set_ke_client(bg_mode=False):
 
 
 def set_bg_ke_client():
-    ki_client=_set_ke_client(bg_mode=True)
+    ki_client = _set_ke_client(bg_mode=True)
     while not ki_client.is_registered:
         # TODO: stop service id can't register
         logging.info(f"KE client is not registered, wait for all KI to be registered.")
         time.sleep(3)
+    time.sleep(2)
     return ki_client
-
 
 
 def set_sync_ke_client():

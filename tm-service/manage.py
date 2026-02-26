@@ -1,12 +1,5 @@
 import logging
-import time
 from time import sleep
-from typing import List, Optional
-
-import psycopg2
-from effi_onto_tools.db import TimeSpan
-from effi_onto_tools.utils import time_utils
-from rdflib import URIRef
 
 import tm
 
@@ -57,15 +50,30 @@ if __name__ == "__main__":
 
         task_manager.setup_scheduler()
 
-    from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
+    from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets, get_market_offer, \
+        get_current_market_offer_info
     from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info
 
-    cur_ts = time_utils.current_timestamp()
-    while True:
-        print("ticktick1")
-        ts_info = request_ts_info(ts=TimeSpan(ts_from=cur_ts, ts_to=cur_ts + 3600 * 1000 * 24))
-        print("ticktick")
-        sleep(50)
+    # # todo add to the job scheduler
+    # sleep(5)
+    # markets = get_all_markets(True)
+    #
+    # from tm.modules.ke_interaction.interactions.dam_interactions import get_current_market_offer_info, \
+    #     get_market_offer
+    # offer_infos = get_current_market_offer_info()
+    # get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
+    #
+    # print(markets)
+    # offer_infos = get_current_market_offer_info()
+    # offer_dict = get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
+    # for uri,offer in offer_dict.items():
+    #     print(f"{uri}:{len(offer)}")
+    # cur_ts = time_utils.current_timestamp()
+    # while True:
+    #     print("ticktick1")
+    #     # ts_info = request_ts_info(ts=TimeSpan(ts_from=cur_ts, ts_to=cur_ts + 3600 * 1000 * 24))
+    #     print("ticktick")
+    #     sleep(50)
     # markets=get_all_markets()
     # print("#########################")
     # print("markets:")
@@ -76,12 +84,14 @@ if __name__ == "__main__":
         import uvicorn
         from tm.modules.tm_api.router import router as tm_router
         from tm.core.healthcheck.router import router as healthcheck_router
+        from tm.modules.ke_interaction.router import ki_router
         # from main.modules.tge_api.admin_router import router as admin_router
         from fastapi import FastAPI
 
         app = FastAPI(docs_url="/api",
                       openapi_url="/openapi.json", redoc_url="/redoc")
         app.include_router(router=tm_router, prefix="/api")
+        app.include_router(router=ki_router, prefix="/ki")
 
         healthcheck_app = FastAPI(docs_url="/docs",
                                   openapi_url="/openapi.json", redoc_url="/redoc")

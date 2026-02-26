@@ -55,6 +55,9 @@ knowledge_engine:
         - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
         - '     s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "Megawatt" .'
+#      result_pattern:
+#        - ' ?cost_dp   saref:hasResult ?cost_dpr .'
+#        - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "PLN" .'
       result_pattern:
         - ' ?cost_dp   saref:hasResult ?cost_dpr .'
         - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "PLN" .'

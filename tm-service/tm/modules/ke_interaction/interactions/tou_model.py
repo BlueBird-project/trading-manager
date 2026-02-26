@@ -50,7 +50,7 @@ class TOUPriceInfo(BindingsBase):
     tou_uri: URIRef
     time_create: Literal
     tou_period: Literal
-    power_range: URIRef
+    power_range: Optional[URIRef]=rdf_nil
     power_range_max: Optional[URIRef] = rdf_nil
     max_value: OptionalLiteral = rdf_nil
     power_range_min: Optional[URIRef] = rdf_nil

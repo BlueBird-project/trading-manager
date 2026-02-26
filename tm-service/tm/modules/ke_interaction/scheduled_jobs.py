@@ -1,9 +1,13 @@
 import logging
+import threading
 from datetime import datetime, timedelta
+from time import sleep
 
 from apscheduler.schedulers.base import BaseScheduler
 from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.utils import time_utils
+
+_BASE_TIME_OFFSET_ = 60
 
 
 def _dt_jobs(scheduler: BaseScheduler):
@@ -33,10 +37,10 @@ def _dt_jobs(scheduler: BaseScheduler):
 
     job = scheduler.get_job("dt_check")
     from tm import core
-    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=120)))
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=_BASE_TIME_OFFSET_ + 120)))
     job = scheduler.get_job("forecast_scan")
 
-    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=180)))
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=_BASE_TIME_OFFSET_ + 180)))
 
 
 def _fm_jobs(scheduler: BaseScheduler):
@@ -60,7 +64,49 @@ def _fm_jobs(scheduler: BaseScheduler):
     from tm import core
     job = scheduler.get_job("flexibility_scan")
 
-    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=5)))
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=_BASE_TIME_OFFSET_ + 240)))
+
+
+def _dam_jobs(scheduler: BaseScheduler):
+    @scheduler.scheduled_job(trigger='cron', id="market_scan", day_of_week='*', hour='8',
+                             minute='15',
+                             month='*', year='*', day='*', max_instances=1, coalesce=True)
+    def market_scan():
+        from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info, request_data
+        logging.info("Scan for dam markets")
+        # todo: set 'req' argument
+        from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
+        get_all_markets(False)
+
+    @scheduler.scheduled_job(trigger='cron', id="offer_scan", day_of_week='*', hour='8,19',
+                             minute='25',
+                             month='*', year='*', day='*', max_instances=1, coalesce=True)
+    def scan_market():
+        from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info, request_data
+        logging.info("Scan for dam offer")
+        # todo: set 'req' argument
+        from tm.modules.ke_interaction.interactions.dam_interactions import get_current_market_offer_info, \
+            get_market_offer
+        offer_infos = get_current_market_offer_info()
+        get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
+
+    from tm import core
+    job = scheduler.get_job("market_scan")
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=_BASE_TIME_OFFSET_ + 30)))
+
+    job = scheduler.get_job("offer_scan")
+    job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=_BASE_TIME_OFFSET_ + 90)))
+
+    def _get_markets():
+        from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
+        # TODO: improve market management
+        sleep(20)
+        #wait for client to register
+        get_all_markets(True)
+        scan_market()
+
+    # t = threading.Thread(target=_get_markets)
+    # t.start()
 
 
 def add_jobs(service_job_scheduler: BaseScheduler):
@@ -75,4 +121,5 @@ def add_jobs(service_job_scheduler: BaseScheduler):
         # ke_client.stop()
 
     _dt_jobs(scheduler=service_job_scheduler)
+    _dam_jobs(scheduler=service_job_scheduler)
     _fm_jobs(scheduler=service_job_scheduler)

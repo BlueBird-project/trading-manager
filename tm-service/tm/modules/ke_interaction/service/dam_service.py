@@ -87,8 +87,7 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
                                        isp_len=binding.isp_len(offer_info.isp_unit))
 
                 market_offer_items[i] = mo
-            saved_bindings[offer_info.offer_uri].append(
-                dao_manager.offer_dao.add_offer(market_offer_items=market_offer_items))
+            saved_bindings[offer_info.offer_uri]=dao_manager.offer_dao.add_offer(market_offer_items=market_offer_items)
     return saved_bindings
 
 

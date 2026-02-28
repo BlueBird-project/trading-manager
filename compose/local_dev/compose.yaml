@@ -17,26 +17,24 @@ services:
     networks:
       - tm-net
   demo-entsoe-service:
-    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-local-entsoe-service:latest"
     ports:
       - "11001:8080"
     build:
-      dockerfile: ./docker/entsoe-demo/Dockerfile
+      dockerfile: ./docker/entsoe-service/Dockerfile
       args:
         REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
         REGISTRY_PROJECT: ${REGISTRY_PROJECT}
         IMAGE_TAG: 0.4.10
-      #      context: ..
       tags:
-        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:latest"
-    #        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-demo-entsoe-service:0.2.0"
+        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-local-entsoe-service:latest"
     depends_on:
       - tm-db
       - tm-ke-service
     env_file:
       - path: ".env"
         required: true # default
-      - path: "./env/.env.entsoe.demo"
+      - path: "./env/.env.entsoe"
         required: true # default
       - path: "./env/.env.secrets"
         required: true # default

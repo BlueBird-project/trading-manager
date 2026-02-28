@@ -1,5 +1,58 @@
+## Docker
+
+Root directory: `local_dev`
+
+### Build
+
+```yaml
+docker-compose -p local -f compose.yaml --env-file .env build 
+```
+
+### Run
+
+```yaml
+docker-compose -p local -f compose.yaml --env-file .env create
+docker-compose -p local -f compose.yaml --env-file .env start 
+```
+
+## Services
+
+### ENTSO-E
+
+#### Configure
+
+This service requires API TOKEN (
+ENTSOE_TOKEN) - [acquire token](https://www.amsleser.no/blog/post/21-obtaining-api-token-from-entso-e)  
+Put token in [./env/.env.secrets](./env/.env.secrets)
+
+Market configuration is located in [./docker/entsoe-service/entsoe.yaml](./docker/entsoe-service/entsoe.yaml)
+
+#### Additional information
+
+Service loads prices for 5 days for configured markets
+
+### PGAdmin (DB viewer)
+
+By default PGAdmin is exposed to: http://localhost:9199/
+
+Login settings:
+
+```
+system: postgresql
+server: local-tm-db-1
+Username: postgres
+password: postgres
+database: postgres
+```
+
+```
+schema: public
+```
+
 ##### sample FM URI:
+
 http://fm.bluebird.com/ts/1772215794840/1772302194840/15/2
+
 ## export image
 
 ```shell
@@ -8,7 +61,7 @@ docker save -o ./images/trading-manager.0.3.0.tar "$Env:REGISTRY_DOMAIN/$Env:REG
 docker save -o ./images/tm-demo-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-demo-entsoe-service:latest" 
 
 ```
- 
+
 załadowanie obrazów:
 docker load -i ./images/trading-manager.0.3.0.tar
 docker load -i ./images/tm-demo-entsoe-service.latest.tar

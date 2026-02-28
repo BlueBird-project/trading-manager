@@ -4,7 +4,7 @@ ARG REGISTRY_PROJECT
 ARG IMAGE_TAG
 FROM ${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-entsoe-service:$IMAGE_TAG
 
-COPY /docker/entsoe-demo/entsoe.yaml /app/resources/deployment/entsoe.yaml
+COPY /docker/entsoe-service/entsoe.yaml /app/resources/deployment/entsoe.yaml
 
 ENV KE_KI_CONFIG_PATH="/app/resources/deployment/ke_config.yaml"
 ENV DB_INIT_SCRIPT_LOCATION="/app/resources/deployment/db/pg_init.sql"

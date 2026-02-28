@@ -31,6 +31,12 @@ Market configuration is located in [./docker/entsoe-service/entsoe.yaml](./docke
 
 Service loads prices for 5 days for configured markets
 
+### Trading Manager
+
+#### Configuration
+
+Sample TM configuration with subscribed markets can be found here: [config](./docker/trading-manager/config.yaml)
+
 ### PGAdmin (DB viewer)
 
 By default PGAdmin is exposed to: http://localhost:9199/

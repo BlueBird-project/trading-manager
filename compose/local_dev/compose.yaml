@@ -14,6 +14,9 @@ services:
         required: true # default
     environment:
       - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+
+    volumes:
+      - ./docker/trading-manager/config.yaml:/config/config.yaml
     networks:
       - tm-net
   demo-entsoe-service:

@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 
 from effi_onto_tools.db import TimeSpan
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 from ke_client import KIHolder
 from ke_client.ki_model import KIAskResponse
 from rdflib import URIRef, Literal

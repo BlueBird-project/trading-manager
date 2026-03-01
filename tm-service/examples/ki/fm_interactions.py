@@ -6,7 +6,10 @@ from ke_client.ki_model import KIPostResponse
 from tm.modules.ke_interaction.interactions.fm_model import *
 
 fm_ki = KIHolder()
-TM_KB_ID = "http://demo.tm.bluebird.com"
+TM_KB_ID = ["http://demo.tm.bluebird.com", "http://tm.bluebird.com"]
+
+
+# TM_KB_ID = "http://demo.tm.bluebird.com"
 
 
 # BindingsBase
@@ -54,7 +57,7 @@ def _evaluate_request():
         value = Literal(random.randrange(400, 1200))
         response.append(FMEvaluateQuery(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
                                         value=value))
-    return TargetedBindings(bindings=response, knowledge_bases=[TM_KB_ID])
+    return TargetedBindings(bindings=response, knowledge_bases=TM_KB_ID)
 
 
 # @fm_ki.ask("fm-ts-evaluate")

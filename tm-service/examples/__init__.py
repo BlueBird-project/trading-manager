@@ -1,7 +1,8 @@
-from effi_onto_tools.utils.enum_utils import EnumUtils
+
+from ke_client.utils.enum_utils import BaseEnum
 
 
-class KIVars(EnumUtils):
+class KIVars(BaseEnum):
     ISP_UNIT = "ISP_UNIT"
     DAY_DURATION = "DAY_DURATION"
 

@@ -61,9 +61,9 @@ if __name__ == "__main__" and app_settings:
                 print(prices)
             sleep(15)
             ###########################
-            print(f"Ask for prices")
+            print(f"Evaluate power plan")
             response = evaluate_flexibility()
-            print(f"End for prices")
+            print(f"End Evaluate power plan")
             print(len(response))
             print(response)
             sleep(45)

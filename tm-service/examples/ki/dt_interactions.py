@@ -2,7 +2,7 @@ import hashlib
 import random
 from typing import List
 
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 from ke_client import KIHolder
 from ke_client.ki_model import KIPostResponse
 from rdflib import URIRef, Literal
@@ -12,6 +12,7 @@ from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfoACK, 
 dt_ki = KIHolder()
 _market_uri: URIRef = None
 _current_forecast_uri: DTTSUri = None
+TM_KB_ID = ["http://demo.tm.bluebird.com", "http://tm.bluebird.com"]
 
 
 def _init_command_uri(market_uri: str):
@@ -63,13 +64,15 @@ def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     global _market_uri
     global _current_forecast_uri
     if _current_forecast_uri is None:
-        return []
+        current_forecast_uri = _get_forecast_uri()
+    else:
+        current_forecast_uri = _current_forecast_uri
     print("dt-ts-info")
     ts_start = time_utils.current_timestamp()
     ts_end = ts_start + 3600 * 1000 * 24
-    ts_interval_uri = URIRef(_current_forecast_uri.uri + "/interval")
+    ts_interval_uri = URIRef(current_forecast_uri.uri + "/interval")
     ds_info = DTTSInfo(command_uri=_init_command_uri(market_uri=str(_market_uri)),
-                       ts_uri=_current_forecast_uri.uri_ref,
+                       ts_uri=current_forecast_uri.uri_ref,
                        time_create=Literal(time_utils.xsd_from_ts(time_utils.current_timestamp())),
                        ts_interval_uri=ts_interval_uri,
                        ts_date_from=Literal(time_utils.xsd_from_ts(ts_start)),
@@ -115,8 +118,10 @@ def on_dt_ts_request(ki_id, bindings: List[DTPntRequest]) -> List[DTPnt]:
     else:
         global _current_forecast_uri
         if _current_forecast_uri is None:
-            return []
-        sample_ts = _generate_sample_ts(ts_uri=_current_forecast_uri)
+            current_forecast_uri = _get_forecast_uri()
+        else:
+            current_forecast_uri = _current_forecast_uri
+        sample_ts = _generate_sample_ts(ts_uri=current_forecast_uri)
 
     print(f"forecast size: {len(sample_ts)}")
     return sample_ts
@@ -136,11 +141,16 @@ def post_dt_info() -> List[DigitalTwinInfoACK]:
     return [DigitalTwinInfoACK(**b) for b in resp_bindings.result_binding_set]
 
 
-def post_forecast(market_uri: URIRef) -> List[DTTSACK]:
-    global _current_forecast_uri
+def _get_forecast_uri() -> DTTSUri:
     ts_start = time_utils.current_timestamp()
     ts_end = ts_start + 3600 * 1000 * 24
     ts_uri = DTTSUri(prefix=dt_ki.get_kb_id(), ts_start=ts_start, ts_end=ts_end)
+    return ts_uri
+
+
+def post_forecast(market_uri: URIRef) -> List[DTTSACK]:
+    global _current_forecast_uri
+    ts_uri = _get_forecast_uri()
     _current_forecast_uri = ts_uri
     resp_bindings: KIPostResponse = _post_ts_info(market_uri, ts_uri)
     info_ack = [DTTSInfoACK(**b) for b in resp_bindings.result_binding_set]

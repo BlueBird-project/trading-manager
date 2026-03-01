@@ -7,8 +7,9 @@ from tm.utils import TimeSpan
 ki_router = APIRouter(prefix="", tags=["KI"])
 
 
-@ki_router.get("/dam/scan")
-@ki_router.post("/dam/scan")
+@ki_router.post("/dam/scan", description="Scan for available markets in the network,"
+                                         " current offers metadata and current offers time series")
+# @ki_router.get("/dam/scan")
 async def dam_scan() -> Dict[str, Any]:
     res = {}
     from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
@@ -22,8 +23,9 @@ async def dam_scan() -> Dict[str, Any]:
     return res
 
 
-@ki_router.get("/dt/scan", description="returns List[DigitalTwinInfoACK]")
-@ki_router.post("/dt/scan", description="returns List[DigitalTwinInfoACK]")
+# @ki_router.get("/dt/scan", description="returns List[DigitalTwinInfoACK]")
+@ki_router.post("/dt/scan", response_description="returns List[DigitalTwinInfoACK]",
+                description="Scan for available digital twin services in KE network")
 # async def dt_scan() -> List[DigitalTwinInfoACK]:
 async def dt_scan() -> List[Dict[str, Any]]:
     from tm.modules.ke_interaction.interactions.dt_interactions import request_dt_info
@@ -31,8 +33,8 @@ async def dt_scan() -> List[Dict[str, Any]]:
     return [b.n3() for b in dt_ack]
 
 
-@ki_router.get("/dt/forecast")
-@ki_router.post("/dt/forecast")
+# @ki_router.get("/dt/forecast")
+@ki_router.post("/dt/forecast", description="Request for forecast from DT ")
 async def scan_forecast() -> Dict[str, Any]:
     res = {}
     from tm.modules.ke_interaction.interactions.dt_interactions import request_dt_ts_info, request_dt_data_by_id
@@ -45,8 +47,9 @@ async def scan_forecast() -> Dict[str, Any]:
     return res
 
 
-@ki_router.get("/fm/ask/flex_info", description="returns List[FMTSResponse]")
-@ki_router.post("/fm/ask/flex_info", description="returns List[FMTSResponse]")
+# @ki_router.get("/fm/ask/flex_info", description="returns List[FMTSResponse]")
+@ki_router.post("/fm/ask/flex_info", response_description="returns List[FMTSResponse]",
+                description="request for flexibility from FM")
 async def flex_info(ts: Optional[TimeSpan] = None) -> List[Dict[str, Any]]:
     # async def flex_info(ts: Optional[TimeSpan] = None) -> List[FMTSResponse]:
     from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info
@@ -56,7 +59,8 @@ async def flex_info(ts: Optional[TimeSpan] = None) -> List[Dict[str, Any]]:
     return [t.n3() for t in request_ts_info(ts=ts)]
 
 
-@ki_router.post("/fm/ask/flex_ts", description="returns List[FMPnt]")
+@ki_router.post("/fm/ask/flex_ts", response_description="returns List[FMPnt]",
+                description="Request flexibility timeseries")
 async def flex_ts(ts_uri: str) -> List[Dict[str, Any]]:
     # async def flex_ts(ts_uri: str) -> List[FMPnt]:
     from tm.modules.ke_interaction.interactions.fm_interactions import request_data

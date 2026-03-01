@@ -5,7 +5,7 @@ from time import sleep
 
 from apscheduler.schedulers.base import BaseScheduler
 from effi_onto_tools.db import TimeSpan
-from ke_client.utils import time_utils 
+from ke_client.utils import time_utils
 
 _BASE_TIME_OFFSET_ = 60
 
@@ -72,7 +72,6 @@ def _dam_jobs(scheduler: BaseScheduler):
                              minute='15',
                              month='*', year='*', day='*', max_instances=1, coalesce=True)
     def market_scan():
-        from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info, request_data
         logging.info("Scan for dam markets")
         # todo: set 'req' argument
         from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
@@ -82,7 +81,6 @@ def _dam_jobs(scheduler: BaseScheduler):
                              minute='25',
                              month='*', year='*', day='*', max_instances=1, coalesce=True)
     def scan_market():
-        from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info, request_data
         logging.info("Scan for dam offer")
         # todo: set 'req' argument
         from tm.modules.ke_interaction.interactions.dam_interactions import get_current_market_offer_info, \

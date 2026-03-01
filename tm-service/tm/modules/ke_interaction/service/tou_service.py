@@ -19,7 +19,8 @@ from tm.modules.ke_interaction.interactions.tou_model import *
 #         # time_span_ms =  from_n3(KIVars.DAY_DURATION)
 #         time_span_ms = int(parse_duration(q.tou_period, as_timedelta_if_possible=True).total_seconds() * 1000)
 #         range_id = dao_manager.offer_dao.get_range(None, None).range_id
-#         # tou_uriref = tou_uri_parser.n3(TOUSplitURI(range_id=range_id, period_minutes=time_span_ms / 60000, ts=ts_from))
+#         # tou_uriref = tou_uri_parser.n3(TOUSplitURI(range_id=range_id,
+#         period_minutes=time_span_ms / 60000, ts=ts_from))
 #         tou_uriref = TOUSplitURI(range_id=range_id, period_minutes=time_span_ms / 60000, ts=ts_from).uri_ref
 #         kwargs = {**q.__dict__, **{"tou_uri": tou_uriref}}
 #         return [TOUPriceInfoSimpleResponse(**kwargs).n3()]

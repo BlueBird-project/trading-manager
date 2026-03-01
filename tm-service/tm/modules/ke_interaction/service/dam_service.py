@@ -96,7 +96,7 @@ def get_all_markets() -> List[EnergyMarket]:
     return dao_manager.market_api.list_subscribed_market()
 
 
-def unsubscribe_markets() -> List[EnergyMarket]:
+def unsubscribe_markets()  :
     from tm.core.db.postgresql import dao_manager
     for m in dao_manager.market_api.list_market():
         dao_manager.market_api.set_subscribe(market_id=m.market_id, subscribe=False)

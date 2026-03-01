@@ -1,9 +1,9 @@
-from typing import List, Optional, Union
+from typing import List, Union
 
 from effi_onto_tools.db import TimeSpan
-from ke_client.utils import time_utils 
 from ke_client import KIHolder
 from ke_client.ki_model import KIAskResponse
+from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
 tou_ki = KIHolder()

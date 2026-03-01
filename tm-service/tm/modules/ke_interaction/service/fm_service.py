@@ -1,13 +1,12 @@
-from typing import List, Any
+from typing import List
 
-from ke_client.utils import time_utils 
 from ke_client import rdf_nil
+from ke_client.utils import time_utils
 from rdflib import URIRef
 
 from tm.core.db.postgresql import dao_manager
 from tm.modules.ke_interaction.interactions.fm_model import FMTSSplitURI, FMEvaluateQuery, DPSplitURI, \
     FMEvaluateResponse
-from tm.modules.ke_interaction.interactions import tou_model
 
 
 # def evaluate(q: List[FMEvaluateQuery]):

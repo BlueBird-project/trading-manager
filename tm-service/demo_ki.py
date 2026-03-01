@@ -1,8 +1,13 @@
 import logging
 import os
 import time
-from time import sleep
 from typing import List
+
+from ke_client.utils import time_utils
+
+import tm
+from tm.models.market_offer import EnergyMarketOffer
+from tm.utils import TimeSpan
 
 # os.environ['APP_USE_REST_API'] = "True"
 # os.environ['APP_USE_KE_API'] = "True"
@@ -15,11 +20,6 @@ from typing import List
 # os.environ['DB_HOST'] = "localhost"
 # os.environ['KE_REST_ENDPOINT'] = 'http://localhost:8280/rest/'
 # os.environ.setdefault("SERVICE_LOG_DIR", "d:/tmp/logs/")
-from effi_onto_tools.db import TimeSpan
-from effi_onto_tools.utils import time_utils
-
-import tm
-from tm.models.market_offer import EnergyMarketOffer
 
 ###
 # setup configurations
@@ -42,10 +42,9 @@ if __name__ == "__main__" and app_settings:
 
     ke_client.VERIFY_SERVER_CERT = False
     ke_client.ENV_FILE = tm.app_args.env_path
-    from tm.modules.ke_interaction import setup_ke
+    from examples import setup_ke
 
     setup_ke()
-    from tm.modules.ke_interaction import interactions as ki
 
     if app_settings.use_scheduler or app_settings.use_rest_api:
         from tm.modules.ke_interaction import set_bg_ke_client
@@ -57,13 +56,14 @@ if __name__ == "__main__" and app_settings:
 
         set_sync_ke_client()
 
-    from tm.modules.ke_interaction.interactions import   dam_interactions,   EnergyMarketBindings
+    from tm.modules.ke_interaction.interactions import   dam_interactions
+    from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings
+    from tm.modules.ke_interaction.interactions.client import ki_client
 
     # TEST:
     while not ki_client.is_registered:
         print("wait for registration")
         time.sleep(5)
-    from tm.core.db.postgresql import dao_manager
 
     # while True:
     try:

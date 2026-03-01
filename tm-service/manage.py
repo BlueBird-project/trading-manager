@@ -1,5 +1,4 @@
 import logging
-from time import sleep
 
 import tm
 
@@ -32,8 +31,6 @@ if __name__ == "__main__" and app_settings:
 
         # setup_ke()
 
-        from tm.modules.ke_interaction import interactions as ki
-
         if app_settings.use_scheduler or app_settings.use_rest_api:
             from tm.modules.ke_interaction import set_bg_ke_client
 
@@ -49,10 +46,6 @@ if __name__ == "__main__":
         from tm.core import task_manager
 
         task_manager.setup_scheduler()
-
-    from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets, get_market_offer, \
-        get_current_market_offer_info
-    from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info
 
     # # todo add to the job scheduler
     # sleep(5)

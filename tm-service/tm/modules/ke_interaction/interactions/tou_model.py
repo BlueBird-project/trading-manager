@@ -1,9 +1,8 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 from ke_client import BindingsBase, rdf_nil, OptionalLiteral
-
-from ke_client.utils import time_utils 
 from ke_client import ki_object, SplitURIBase, ki_split_uri
+from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
 

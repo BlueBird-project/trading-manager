@@ -1,13 +1,12 @@
-import json
 import logging
 from typing import List
 
 from ke_client.utils import to_json
 from rdflib import URIRef
 
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DigitalTwinInfoACK
 from tm.models.digital_twin import DigitalTwinDAO
 from tm.models.job_dao import JobDAO
+from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DigitalTwinInfoACK
 
 
 def process(dt_info_list: List[DigitalTwinInfo]) -> List[DigitalTwinInfoACK]:

@@ -17,7 +17,7 @@ class TimeSpan(BaseModel):
             ts_to = time_utils.current_timestamp()
         ts_from = ts_from if ts_from is not None else ts_to - DAY_MS
         ts_to = ts_to if ts_to is not None else ts_from + DAY_MS
-        if ts_to <  ts_from:
+        if ts_to < ts_from:
             raise ValueError("Time from cannot be after time to")
         super().__init__(ts_from=ts_from, ts_to=ts_to)
 

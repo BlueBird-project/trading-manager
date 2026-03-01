@@ -11,7 +11,7 @@ def check_ke(report: Dict) -> Dict:
     from tm.core import app_settings
     report["knowledge_engine_api_available"] = app_settings.use_ke_api
     if app_settings.use_ke_api:
-        from tm.modules.ke_interaction.interactions import ki_client
+        from tm.modules.ke_interaction.interactions.client import ki_client
         report["knowledge_engine_api_state"] = ki_client.state()
         report["knowledge_engine_api_registered"] = ki_client.is_registered
     return report
@@ -20,7 +20,7 @@ def check_ke(report: Dict) -> Dict:
 def ke_state() -> bool:
     from tm.core import app_settings
     if app_settings.use_ke_api:
-        from tm.modules.ke_interaction.interactions import ki_client
+        from tm.modules.ke_interaction.interactions.client import ki_client
         return  ki_client.state()
     else:
         return True

@@ -11,6 +11,11 @@ docker save -o d:/tmp/${image_name}_${image_version}.tar ${full_image_name}
 
 docker save -o d:/tmp/${image_name}_${image_version}.tar ${full_image_name}
 
+### Healthcheck
+
+http://localhost:9090/healthcheck/docs
+
+
 ## Getting started
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.

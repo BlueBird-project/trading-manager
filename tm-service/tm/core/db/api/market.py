@@ -1,8 +1,6 @@
 from abc import abstractmethod
-from datetime import tzinfo, timezone
-from typing import List, Union, Optional, Dict, Any, Tuple
+from typing import List
 
-from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.db.dao import DAO
 
 from tm.models.market import EnergyMarket

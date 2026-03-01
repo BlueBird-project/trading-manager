@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from typing import List, Optional, Dict
 
-from effi_onto_tools.db import TimeSpan
+
 from effi_onto_tools.db.dao import DAO
 from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOffer
+from tm.utils import TimeSpan
 
 
 class MarketOfferAPI(DAO):

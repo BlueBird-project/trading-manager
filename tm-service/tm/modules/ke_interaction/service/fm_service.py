@@ -1,6 +1,6 @@
 from typing import List, Any
 
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 from ke_client import rdf_nil
 from rdflib import URIRef
 

@@ -2,7 +2,7 @@ from typing import Optional, Tuple, Union
 
 from ke_client import BindingsBase, rdf_nil, OptionalLiteral
 
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 from ke_client import ki_object, SplitURIBase, ki_split_uri
 from rdflib import URIRef, Literal
 

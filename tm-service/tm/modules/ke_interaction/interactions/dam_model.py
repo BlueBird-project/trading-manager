@@ -2,11 +2,11 @@ import math
 from typing import Optional, Union, Type
 
 from effi_onto_tools.db import TimeSpan
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 from isodate import parse_duration
 from ke_client import ki_object, is_nil, ki_split_uri, SplitURIBase, OptionalLiteral, rdf_nil
 from ke_client import BindingsBase
-from ke_client.utils.enum_utils import EnumUtils, BaseEnum, EnumItem
+from ke_client.utils.enum_utils import   BaseEnum, EnumItem
 from pydantic import BaseModel, ConfigDict
 from rdflib import URIRef, Literal
 from rdflib.util import from_n3

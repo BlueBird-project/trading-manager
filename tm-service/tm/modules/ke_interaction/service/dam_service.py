@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from typing import List, Dict, Optional
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 from rdflib import URIRef, Literal
 
 from tm.models.market import EnergyMarket

@@ -3,7 +3,7 @@ from typing import List, Union, Optional, Dict, Any, Tuple
 
 from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 
 from tm.core.db.api.day_ahead import DayAheadAPI
 

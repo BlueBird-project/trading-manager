@@ -8,7 +8,7 @@ router = APIRouter(prefix="")
 
 @router.get("/")
 async def status():
-    from effi_onto_tools.utils import time_utils
+    from ke_client.utils import time_utils 
     return time_utils.current_timestamp()
 
 @router.get("/state")

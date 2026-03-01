@@ -23,6 +23,5 @@ def on_price_info_request(ki_id: str, bindings: List[TOUPriceInfoQuery]):
 def on_price_request(ki_id: str, bindings: List[TOUPriceQuery]):
     print("tou-price")
     # print("on_price_request")
-    tou_bindings = bindings
     # tou_bindings = [TOUPriceQuery(**b) for b in bindings]
-    return tou_service.get_price(tou_bindings, kb_id=ki.get_kb_id())
+    return tou_service.get_price(bindings, kb_id=ki.get_kb_id())

@@ -5,7 +5,7 @@ from time import sleep
 
 from apscheduler.schedulers.base import BaseScheduler
 from effi_onto_tools.db import TimeSpan
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 
 _BASE_TIME_OFFSET_ = 60
 
@@ -101,12 +101,12 @@ def _dam_jobs(scheduler: BaseScheduler):
         from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
         # TODO: improve market management
         sleep(20)
-        #wait for client to register
+        # wait for client to register
         get_all_markets(True)
         scan_market()
 
-    # t = threading.Thread(target=_get_markets)
-    # t.start()
+    t = threading.Thread(target=_get_markets)
+    t.start()
 
 
 def add_jobs(service_job_scheduler: BaseScheduler):

@@ -1,7 +1,7 @@
 from typing import Optional, Union, Any
 
 from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 from rdflib import URIRef, Literal
 
 

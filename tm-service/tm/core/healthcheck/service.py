@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Any
 
-from effi_onto_tools.utils import time_utils
+from ke_client.utils import time_utils 
 
 __DAY_MS__ = 24 * 3600 * 1000
 

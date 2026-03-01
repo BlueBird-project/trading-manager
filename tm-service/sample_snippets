@@ -1,0 +1,52 @@
+
+        # minfo: Optional[dam_interactions.EnergyMarketBindings] = None
+        # while minfo is None:
+        #     try:
+        #         time.sleep(4)
+        #
+        #         r: List[dam_interactions.EnergyMarketBindings] = dam_interactions.get_all_markets()
+        #         print(r)
+        #         minfo: dam_interactions.EnergyMarketBindings = r[0]
+        #     except Exception as ex:
+        #         print(ex)
+        # market_uri = URIRef('http://tge.test.bluebird.com/market')
+        # oinfo: Optional[dam_interactions.MarketOfferInfoBindings] = None
+        # while oinfo is None:
+        #     try:
+        #         time.sleep(4)
+        #
+        #         r: List[dam_interactions.MarketOfferInfoBindings] = dam_interactions.get_market_offer_info(
+        #             market_uri=market_uri)
+        #         print(r)
+        #         oinfo = r[0]
+        #     # except psycopg2.errors.UniqueViolation as ex:
+        #
+        #     except Exception as ex:
+        #         print(ex)
+        # offer_uri=URIRef("http://tge.test.bluebird.com/dam/offer/2026-01-10/60")
+        # offer: Optional[dam_interactions.MarketOfferBindings] = None
+        # TODO dodac replace offer do bazy danych
+        # while offer is None:
+        #     try:
+        #         time.sleep(4)
+        #
+        #         r: List[dam_interactions.MarketOfferBindings] = dam_interactions.get_market_offer(
+        #             offer_uri=offer_uri)
+        #         print("OFFER")
+        #         print(r)
+        #         offer = r[0]
+        #     except Exception as ex:
+        #         print(ex)
+        # offers: List[dam_interactions.MarketOfferBindings] = []
+        # while len(offers) == 0:
+        #     try:
+        #         time.sleep(4)
+        #
+        #         r: List[dam_interactions.MarketOfferBindings] = dam_interactions.query_market_offer(
+        #             ts_from=1766219559000, ts_to=1767951179000, market_uri=market_uri)
+        #         print("OFFER LIST: ")
+        #         print(r)
+        #         offers = r
+        #     except Exception as ex:
+        #         print(ex)
+        print("ddddddddddd")

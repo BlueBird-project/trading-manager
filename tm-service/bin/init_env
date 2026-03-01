@@ -1,0 +1,38 @@
+
+env_path=$2
+env_name=$1
+service_name="bluebird_tm"
+#env with defaults
+env_default=$( dirname -- "$0"; )"/.env.default"
+#set env location
+out_path=$( dirname -- "$0"; )"/../runtime"
+resource_path=$( dirname -- "$0"; )"/../resources"
+if [ -z "${env_path}" ]; then
+    env_path=$resource_path
+fi
+
+if [ -z "${env_name}" ] || [ "$env_name" = "default" ]; then
+    env_name=""
+else
+    env_name=".env.${env_name}"
+fi
+env_custom="${env_path}/${env_name}"
+
+
+mkdir -p "${out_path}/usr/${service_name}"
+mkdir -p "${out_path}/etc/${service_name}"
+mkdir -p "${out_path}/var/log/${service_name}"
+mkdir -p "${out_path}/srv/${service_name}"
+
+base_path=`echo "$(cd -- "$(dirname -- "$out_path")"; pwd)/$(basename -- "$out_path")"`
+export SERVICE_BASE_PATH=$base_path
+export SERVICE_LOG_DIR="${base_path}/var/log/${service_name}"
+awk -F= '!a[$1]++' "${env_default}" "${env_custom}" > "${out_path}/usr/${service_name}/.env"
+#echo $base_path
+echo "SERVICE_BASE_PATH=$base_path" >> "${out_path}/usr/${service_name}/.env"
+set -a
+. "${out_path}/usr/${service_name}/.env"
+set +a
+#echo $SERVICE_BASE_PATH
+envsubst <  "${resource_path}/logging.ini"  > "${out_path}/etc/${service_name}/logging.ini"
+envsubst <  "${resource_path}/config.ini" > "${out_path}/etc/${service_name}/config.ini"

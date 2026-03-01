@@ -2,3 +2,11 @@
 compose/demo_pmb/images/
 compose/.idea/
 compose/demo_pmb/env/.env.secrets
+tm-service/dev_test.py
+tm-service/bin/.dev.env
+tm-service/compose/dev.yml
+tm-service/examples/__pycache__/__init__.cpython-312.pyc 
+tm-service/resources/.env.dev
+tm-service/resources/env/.env.entsoe.demo
+tm-service/resources/env/.env.tomekc  
+*.pyc

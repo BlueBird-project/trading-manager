@@ -7,6 +7,7 @@ services:
     depends_on:
       - tm-db
       - tm-ke-service
+      - demo-entsoe-service
     env_file:
       - path: ".env"
         required: true # default
@@ -14,7 +15,7 @@ services:
         required: true # default
     environment:
       - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
-
+    restart: on-failure:5
     volumes:
       - ./docker/trading-manager/config.yaml:/config/config.yaml
     networks:
@@ -34,6 +35,7 @@ services:
     depends_on:
       - tm-db
       - tm-ke-service
+    restart: on-failure:5
     env_file:
       - path: ".env"
         required: true # default
@@ -54,13 +56,13 @@ services:
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRESQL_DATABASE=${DB_NAME}
       - POSTGRES_DB=${DB_NAME}
+    restart: unless-stopped
     ports:
       - 5432:5432
     networks:
       - tm-net
   tm-db-adminer:
     image: adminer:latest
-    restart: always
     depends_on:
       - tm-db
     ports:
@@ -68,6 +70,7 @@ services:
     networks:
       - tm-net
   tm-ke-service:
+    restart: unless-stopped
     image: ghcr.io/tno/knowledge-engine/smart-connector:1.4.0
     environment:
       KE_RUNTIME_PORT: 8280

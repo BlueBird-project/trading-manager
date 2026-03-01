@@ -14,7 +14,10 @@ docker-compose -p local -f compose.yaml --env-file .env build
 docker-compose -p local -f compose.yaml --env-file .env create
 docker-compose -p local -f compose.yaml --env-file .env start 
 ```
-
+check consumed resources:
+```yaml
+ docker stats --no-stream --format "{{.Container}} cpu={{.CPUPerc}} mem={{.MemUsage}} net={{.NetIO}} name:{{.Name}}"
+```
 ## Services
 
 ### ENTSO-E

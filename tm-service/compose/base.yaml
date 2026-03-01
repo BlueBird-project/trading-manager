@@ -1,0 +1,24 @@
+services:
+  tm-service:
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/${REGISTRY_APPLICATION}:${IMAGE_TAG}"
+    build:
+      dockerfile: ./docker/app/Dockerfile
+      context: ..
+      tags:
+        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/${REGISTRY_APPLICATION}:latest"
+        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/${REGISTRY_APPLICATION}:${IMAGE_TAG}"
+    ports:
+      - "9090:8080"
+    depends_on:
+      - tm-db
+      - tm-ke-service
+    env_file:
+      - path: "./../resources/.env"
+        required: true # default
+      - path: "./../resources/env/.env.tm"
+        required: true # default
+    environment:
+      #      - KE_REST_ENDPOINT=https://bluebird:WVOvwb3glJIFy0@ke-test-bluebird.apps.bst2.paas.psnc.pl/ke-test-runtime/rest/
+      - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+    networks:
+      - tm-net

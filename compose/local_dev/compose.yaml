@@ -7,7 +7,7 @@ services:
     depends_on:
       - tm-db
       - tm-ke-service
-      - demo-entsoe-service
+      - entsoe-service
     env_file:
       - path: ".env"
         required: true # default
@@ -20,7 +20,7 @@ services:
       - ./docker/trading-manager/config.yaml:/config/config.yaml
     networks:
       - tm-net
-  demo-entsoe-service:
+  entsoe-service:
     image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-local-entsoe-service:latest"
     ports:
       - "11001:8080"
@@ -31,7 +31,7 @@ services:
         REGISTRY_PROJECT: ${REGISTRY_PROJECT}
         IMAGE_TAG: 0.4.10
       tags:
-        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-local-entsoe-service:latest"
+        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/local-entsoe-service:latest"
     depends_on:
       - tm-db
       - tm-ke-service

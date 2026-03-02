@@ -1,23 +1,4 @@
-## Docker
 
-Root directory: `local_dev`
-
-### Build
-
-```yaml
-docker-compose -p local -f compose.yaml --env-file .env build 
-```
-
-### Run
-
-```yaml
-docker-compose -p local -f compose.yaml --env-file .env create
-docker-compose -p local -f compose.yaml --env-file .env start 
-```
-check consumed resources:
-```yaml
- docker stats --no-stream --format "{{.Container}} cpu={{.CPUPerc}} mem={{.MemUsage}} net={{.NetIO}} name:{{.Name}}"
-```
 ## Services
 
 ### ENTSO-E
@@ -32,7 +13,7 @@ Market configuration is located in [./docker/entsoe-service/entsoe.yaml](./docke
 
 #### Additional information
 
-Service loads prices for 5 days for configured markets
+Service on start loads prices for last 5 days for configured markets
 
 ### Trading Manager
 
@@ -58,65 +39,54 @@ database: postgres
 schema: public
 ```
 
-##### sample FM URI:
+## Docker
 
-http://fm.bluebird.com/ts/1772215794840/1772302194840/15/2
+Root directory: `local_dev`
 
-## export image
+### Build
+
+```yaml
+docker-compose -p local -f compose.yaml --env-file .env build 
+```
+
+### Run
+
+```yaml
+docker-compose -p local -f compose.yaml --env-file .env create
+docker-compose -p local -f compose.yaml --env-file .env start 
+```
+check consumed resources:
+```yaml
+ docker stats --no-stream --format "{{.Container}} cpu={{.CPUPerc}} mem={{.MemUsage}} net={{.NetIO}} name:{{.Name}}"
+```
+
+### export image
 
 ```shell
 
-docker save -o ./images/trading-manager.0.3.0.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:0.3.0"
-docker save -o ./images/tm-demo-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-demo-entsoe-service:latest" 
+docker save -o ./images/trading-manager.0.4.3.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:0.4.3"
+docker save -o ./images/local-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-entsoe-service:latest" 
+docker save -o ./images/base-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:0.4.10" 
+ 
 
 ```
+### import image
+```shell
+docker load -i ./images/trading-manager.0.4.3.tar
+docker load -i ./images/local-entsoe-service.latest.tar 
+docker load -i ./images/base-entsoe-service.latest.tar
+```
 
-załadowanie obrazów:
-docker load -i ./images/trading-manager.0.3.0.tar
-docker load -i ./images/tm-demo-entsoe-service.latest.tar
+### Download images
+```shell
 
-stworzenie kontenerów:
-docker-compose -p bb_local -f demo.yaml --env-file .env create
+#configured  trading manager service
+https://box.pionier.net.pl/f/850de4ebd6f54d1b8613/?dl=1
+#configured entso-e service
+https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
+#base entso-e image for docker build
+https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
+```
 
-uruchomienie
-docker-compose -p pmb -f demo.yaml --env-file .env start
-
-uruchomienie pozostałych kontenerów ( kontenery uruchamiają się szybciej niż postgresql zacznie odpowiadać) :
-docker-compose -p pmb -f demo.yml --env-file .env start
-
-Odpytanie w konsoli o dane z rynku (dwa państwa do testów, data poczatku oferty - w formacie yyyy-mm-dd) :
-docker exec pmb-tm-service-1 python demo_ki.py --country {country_name} -d {date}
-
-docker exec pmb-tm-service-1 python demo_ki.py --country POLAND -d 2026-01-31
-docker exec pmb-tm-service-1 python demo_ki.py --country SPAIN -d 2026-01-31
-
-docker exec pmb-tm-service-1 python demo_ki.py --country SPAIN -d 2026-01-31 --type dayahead
-docker exec pmb-tm-service-1 python demo_ki.py --country SPAIN -d 2026-01-31 --type intraday
-w demie dostępne dane sa z ostatnich 30 dni  (docelowo bedzie trzeba zaimplementować pobieranie danych na żądanie :
-
-pgadmin (baza danych):
-http://localhost:9199/
-
-dane logowania
-system: postgresql
-server: pmb-tm-db-1
-Username: postgres
-password: postgres
-database: postgres
-
-Tabele, każdy serwis ma swój prefix:
-
-- 'bb_tm_' to trading manager
-- 'demo_entsoe_' serwis pobierajace dane z entsoe
-- 'demo_tm_' tabele ktore uzupełniane przez skrypt demo_ki.py
-
-market_details -> tabele dotyczace informacji o rynkacj
-offer_details -> tabele zawierające metadane o danej ofercie (np ceny z danego dnia )
-market_offer -> tabela z cenami w czasie
-
-ISP to jest w skrocie jednostka czasu dla ktorej jest wyznaczona cena (np 15 minut, 60 minut itp) -> te nazwy wziąłem z
-USEF framework , ponieważ opieramy sie bardziej o KE to pewnie to zmienie z czasem
-ISP_START - indeks (lub 'offset') początku przedziału czasu dla ceny ISP=1 - to po prostu poczatek pierwszego punktu
-oferty (np godzina 0:00 dla rynku dnia następnego) , ISP_START=95 to 23:45
-ISP_LEN - długość danego przedziału czasu ISP_LEN = 1 to dla nas 15 minut, ale czasami cena się powtarza, czyli
-ISP_LEN=4 oznacza te samą cene przez 60minut
+  
+ 

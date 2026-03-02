@@ -16,10 +16,10 @@ TM_KB_ID = ["http://demo.tm.bluebird.com", "http://tm.bluebird.com"]
 #
 @fm_ki.react("fm-ts-info-request")
 def on_request_ts_info(ki_id, bindings: List[FMTSRequest]):
-    print("REACT")
+    # respond with timeseries metadata
+    print("on_request_ts_info")
     for request in bindings:
         #      support only one request
-        # request = FMTSRequest(**b)
         ts_from: int = time_utils.xsd_to_ts(request.ts_date_from.value)
         ts_to = time_utils.xsd_to_ts(request.ts_date_to.value)
         #######
@@ -36,6 +36,26 @@ def on_request_ts_info(ki_id, bindings: List[FMTSRequest]):
             FMTSResponse(ts_uri=ts_uri2, ts_interval_uri=request.ts_interval_uri, ts_usage=ts_usage2,
                          time_create=time_create).n3()
         ]  #
+
+
+@fm_ki.answer("fm-ts")
+def on_fm_request(ki_id: str, bindings: List[FMPntQuery]):
+    # response with timeseries
+    print("received request for flexibility")
+    for ts_binding in bindings:
+        ts_uri = ts_binding.ts_uri
+        parsed_uri = FMTSSplitURI.parse(ts_uri)
+        ts_resp = [FMPnt(ts_uri=ts_uri,
+                         dp=
+                         DPSplitURI(ts_start=parsed_uri.ts_to, ts_usage=parsed_uri.ts_usage, isp_start=i).n3(),
+                         ts=Literal(time_utils.xsd_from_ts(parsed_uri.ts_from + i * 15 * 60 * 1000)),
+                         dpr=URIRef(
+                             DPSplitURI(ts_start=parsed_uri.ts_to, ts_usage=parsed_uri.ts_usage,
+                                        isp_start=i).uri + "/dpr"),
+                         value=random.random() * 200 + 50) for i in range(1, 24 * 4)]
+        # process just once timeseries
+        print(ts_resp)
+        return ts_resp
 
 
 @fm_ki.post("fm-ts-evaluate")
@@ -58,31 +78,6 @@ def _evaluate_request():
         response.append(FMEvaluateQuery(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
                                         value=value))
     return TargetedBindings(bindings=response, knowledge_bases=TM_KB_ID)
-
-
-# @fm_ki.ask("fm-ts-evaluate")
-# def _ask_evaluate_request():
-#     # return response
-#     return []
-
-
-@fm_ki.answer("fm-ts")
-def on_fm_request(ki_id: str, bindings: List[FMPntQuery]):
-    print("received request for flexibility")
-    for ts_binding in bindings:
-        ts_uri = ts_binding.ts_uri
-        parsed_uri = FMTSSplitURI.parse(ts_uri)
-        ts_resp = [FMPnt(ts_uri=ts_uri,
-                         dp=
-                         DPSplitURI(ts_start=parsed_uri.ts_to, ts_usage=parsed_uri.ts_usage, isp_start=i).n3(),
-                         ts=Literal(time_utils.xsd_from_ts(parsed_uri.ts_from + i * 15 * 60 * 1000)),
-                         dpr=URIRef(
-                             DPSplitURI(ts_start=parsed_uri.ts_to, ts_usage=parsed_uri.ts_usage,
-                                        isp_start=i).uri + "/dpr"),
-                         value=random.random() * 200 + 50) for i in range(1, 24 * 4)]
-        # process just once timeseries
-        print(ts_resp)
-        return ts_resp
 
 
 def evaluate_flexibility() -> List[FMEvaluateResponse]:

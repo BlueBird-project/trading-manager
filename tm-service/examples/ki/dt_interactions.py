@@ -2,7 +2,7 @@ import hashlib
 import random
 from typing import List
 
-from ke_client.utils import time_utils 
+from ke_client.utils import time_utils
 from ke_client import KIHolder
 from ke_client.ki_model import KIPostResponse
 from rdflib import URIRef, Literal
@@ -152,9 +152,15 @@ def post_forecast(market_uri: URIRef) -> List[DTTSACK]:
     global _current_forecast_uri
     ts_uri = _get_forecast_uri()
     _current_forecast_uri = ts_uri
+    ################################################
+    # post metadata
+    ################################################
     resp_bindings: KIPostResponse = _post_ts_info(market_uri, ts_uri)
     info_ack = [DTTSInfoACK(**b) for b in resp_bindings.result_binding_set]
     print("info ack")
     print(info_ack)
+    ################################################
+    # post timeseries
+    ################################################
     resp_bindings: KIPostResponse = _post_ts(ts_uri)
     return [DTTSACK(**b) for b in resp_bindings.result_binding_set]

@@ -11,12 +11,12 @@ TM_KB_ID = ["http://demo.tm.bluebird.com", "http://tm.bluebird.com"]
 
 
 @sample_ki.ask("market")
-def _request_market(query: List[EnergyMarketRequest]):
+def _get_markets(query: List[EnergyMarketRequest]):
     return TargetedBindings(
         bindings=query,
         knowledge_bases=TM_KB_ID)
 
 
-def request_market() -> List[EnergyMarketBindings]:
-    resp: KIAskResponse = _request_market(query=[])
+def get_markets() -> List[EnergyMarketBindings]:
+    resp: KIAskResponse = _get_markets(query=[])
     return [EnergyMarketBindings(**b) for b in resp.binding_set]

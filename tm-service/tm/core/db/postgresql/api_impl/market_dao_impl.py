@@ -3,7 +3,7 @@ from typing import List
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
 from tm.core.db.api.market import MarketAPI
-from tm.models.market import EnergyMarket
+from tm.models.market import EnergyMarket, LastOfferTS
 
 
 class MarketQueries:
@@ -30,6 +30,10 @@ class MarketQueries:
     # isp_len= EXCLUDED.isp_len,  cost_mwh= EXCLUDED.cost_mwh
     SET_MARKET_SUBSCRIBE = """UPDATE "${table_prefix}market_details"  set "subscribe" = :subscribe
      WHERE "market_id" = :market_id"""
+    SELECT_MAX_DATE = """SELECT md."market_id" ,md."market_uri" ,md."subscribe" , MAX(od."ts") as "ts" 
+        FROM  "${table_prefix}market_details" md 
+        LEFT JOIN "${table_prefix}offer_details" od on od."market_id" = md.market_id GROUP BY md.market_id
+    """
 
 
 class MarketAPIImpl(MarketAPI):
@@ -66,4 +70,10 @@ class MarketAPIImpl(MarketAPI):
 
     def set_subscribe(self, market_id: int, subscribe: bool) -> bool:
         with ConnectionWrapper() as conn:
-            return conn.update(self.queries.SET_MARKET_SUBSCRIBE, {'market_id': market_id, "subscribe": subscribe}) == 1
+            return conn.update(self.queries.SET_MARKET_SUBSCRIBE,
+                               {'market_id': market_id, "subscribe": subscribe}) == 1
+
+    def get_offer_last_ts(self, ) -> List[LastOfferTS]:
+        with ConnectionWrapper() as conn:
+            res = conn.select(q=self.queries.SELECT_MAX_DATE, args={}, obj_type=LastOfferTS)
+            return res

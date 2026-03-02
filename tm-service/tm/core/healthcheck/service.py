@@ -1,13 +1,12 @@
 import logging
 from typing import Dict, Any
 
-from ke_client.utils import time_utils 
+from ke_client.utils import time_utils
 
 __DAY_MS__ = 24 * 3600 * 1000
 
 
 def check_ke(report: Dict) -> Dict:
-
     from tm.core import app_settings
     report["knowledge_engine_api_available"] = app_settings.use_ke_api
     if app_settings.use_ke_api:
@@ -21,7 +20,7 @@ def ke_state() -> bool:
     from tm.core import app_settings
     if app_settings.use_ke_api:
         from tm.modules.ke_interaction.interactions.client import ki_client
-        return  ki_client.state()
+        return ki_client.state()
     else:
         return True
 
@@ -76,31 +75,34 @@ def db_state() -> Dict:
 def check_market(report: Dict) -> Dict:
     from tm.core.db.postgresql import dao_manager
     try:
-        last_ts = dao_manager.day_ahead_dao.get_offer_last_ts()
+        market_last_ts = dao_manager.market_api.get_offer_last_ts()
     except Exception as ex:
-        last_ts = None
+        market_last_ts = []
         logging.error(f"Market check failed {ex}")
-
-    report["db_market_last_ts"] = last_ts
-    if last_ts is None:
+    cur_ts = time_utils.current_timestamp()
+    report["db_market_last_ts"] = market_last_ts
+    if len(market_last_ts) == 0:
         report["db_market_state"] = False
     else:
-        report["db_market_state"] = (time_utils.current_timestamp() - last_ts) < (2 * __DAY_MS__)
+        report["db_market_state"] = all([(cur_ts - mts.ts) < (2 * __DAY_MS__)
+                                         for mts in market_last_ts
+                                         if mts.subscribe])
     return report
 
 
 def market_state() -> bool:
     from tm.core.db.postgresql import dao_manager
     try:
-        last_ts = dao_manager.day_ahead_dao.get_offer_last_ts()
+        market_last_ts = dao_manager.market_api.get_offer_last_ts()
     except Exception as ex:
-        last_ts = None
+        market_last_ts = []
         logging.error(f"Market check failed {ex}")
-
-    if last_ts is None:
+    cur_ts = time_utils.current_timestamp()
+    if len(market_last_ts) == 0:
         return False
     else:
-        return (time_utils.current_timestamp() - last_ts) < (2 * __DAY_MS__)
+        return all([(cur_ts - mts.ts) < (2 * __DAY_MS__)
+                    for mts in market_last_ts if mts.subscribe])
 
 
 def get_service_report() -> Dict[str, Any]:

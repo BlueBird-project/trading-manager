@@ -14,13 +14,7 @@ DB_INIT=True
 #DB_INIT_SCRIPT_LOCATION=./resources/db/pg_init.sql
 
 
-DB_PASS=postgres
-
-
-#KEYCLOAK_SERVER_URL=http://localhost:8080/auth
-#KEYCLOAK_REALM=energy-management
-#KEYCLOAK_CLIENT_ID=restapi
-#KEYCLOAK_CLIENT_SECRET=2IT2ToMkiN0jC9ZdDZzHM6l85FQuAXcS
+DB_HOST=localhost
 
 
 

@@ -15,3 +15,10 @@ class EnergyMarket(BaseModel):
     update_ts: Optional[int] = None
     subscribe: Optional[bool] = None
     ext: Optional[str] = None
+
+
+class LastOfferTS(BaseModel):
+    market_id: int
+    market_uri: str
+    subscribe: Optional[int]
+    ts: Optional[int]

@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from typing import List, Dict, Optional
-from ke_client.utils import time_utils 
+from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
 from tm.models.market import EnergyMarket
@@ -87,7 +87,8 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
                                        isp_len=binding.isp_len(offer_info.isp_unit))
 
                 market_offer_items[i] = mo
-            saved_bindings[offer_info.offer_uri]=dao_manager.offer_dao.add_offer(market_offer_items=market_offer_items)
+            saved_bindings[offer_info.offer_uri] = dao_manager.offer_dao.add_offer(
+                market_offer_items=market_offer_items)
     return saved_bindings
 
 
@@ -96,7 +97,7 @@ def get_all_markets() -> List[EnergyMarket]:
     return dao_manager.market_api.list_subscribed_market()
 
 
-def unsubscribe_markets()  :
+def unsubscribe_markets():
     from tm.core.db.postgresql import dao_manager
     for m in dao_manager.market_api.list_market():
         dao_manager.market_api.set_subscribe(market_id=m.market_id, subscribe=False)

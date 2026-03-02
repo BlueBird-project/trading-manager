@@ -3,7 +3,7 @@ from typing import List
 
 from effi_onto_tools.db.dao import DAO
 
-from tm.models.market import EnergyMarket
+from tm.models.market import EnergyMarket, LastOfferTS
 
 
 class MarketAPI(DAO):
@@ -28,4 +28,8 @@ class MarketAPI(DAO):
 
     @abstractmethod
     def set_subscribe(self, market_id: int, subscribe: bool) -> bool:
+        pass
+
+    @abstractmethod
+    def get_offer_last_ts(self, ) -> List[LastOfferTS]:
         pass

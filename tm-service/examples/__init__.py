@@ -1,12 +1,9 @@
-
 from ke_client.utils.enum_utils import BaseEnum
 
 
 class KIVars(BaseEnum):
     ISP_UNIT = "ISP_UNIT"
     DAY_DURATION = "DAY_DURATION"
-
-
 
 
 def setup_ke():

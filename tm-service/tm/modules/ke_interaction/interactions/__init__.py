@@ -18,9 +18,6 @@ def setup_ke():
         setattr(KIVars, k, ki_vars[k])
 
 
-
-
-
 def init_client() -> KEClient:
     from tm.modules.ke_interaction.interactions.dam_interactions import ki
     from tm.modules.ke_interaction.interactions.dt_interactions import ki as dt_ki
@@ -33,6 +30,3 @@ def init_client() -> KEClient:
     client.include(ki_holder=fm_ki)
     client.include(ki_holder=tou_ki)
     return client
-
-
-

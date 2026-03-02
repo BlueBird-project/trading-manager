@@ -43,7 +43,7 @@ def on_market_information(ki_id: str, bindings: List[EnergyMarketBindings]):
     return []
 
 
-def get_all_markets(reset_markets:bool=False) -> List[EnergyMarketBindings]:
+def get_all_markets(reset_markets: bool = False) -> List[EnergyMarketBindings]:
     bindings: KIAskResponse = _get_all_markets()
     market_bindings = [EnergyMarketBindings(**b) for b in bindings.binding_set]
     # TODO: unsubscribe all markets in the DB
@@ -58,7 +58,6 @@ def get_all_markets(reset_markets:bool=False) -> List[EnergyMarketBindings]:
 # region offer details (timeseries metadata)
 @ki.react("market-offer-info")
 def on_market_offer_info(ki_id: str, bindings: List[MarketOfferInfoBindings]):
-
     dam_service.save_offer_info(offer_bindings=bindings)
     return []
 

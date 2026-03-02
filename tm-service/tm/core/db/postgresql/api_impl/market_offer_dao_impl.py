@@ -107,9 +107,10 @@ class MarketOfferAPIImpl(MarketOfferAPI):
         with ConnectionWrapper() as conn:
             inserted = conn.insert_batch(q=self.queries.INSERT_MARKET_OFFER,
                                          arg_list=[vars(mo) for mo in market_offer_items],
-                                         return_id_col=["offer_id", "isp_start","cost_mwh","isp_len"], fail_safe=False)
+                                         return_id_col=["offer_id", "isp_start", "cost_mwh", "isp_len"],
+                                         fail_safe=False)
 
-            return [{k: v for k, v in zip(["offer_id", "isp_start","cost_mwh","isp_len"], r)} for r in inserted]
+            return [{k: v for k, v in zip(["offer_id", "isp_start", "cost_mwh", "isp_len"], r)} for r in inserted]
 
     def clear_market_offer(self, offer_id) -> int:
         with ConnectionWrapper() as conn:

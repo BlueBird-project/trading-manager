@@ -1,15 +1,14 @@
 from effi_onto_tools.db.app_settings_dao import AppSettingsDAO
 from effi_onto_tools.db.postgresql.init_db import DBMeta
 
-from tm.core.db.api.day_ahead import DayAheadAPI
+# from tm.core.db.api.day_ahead import DayAheadAPI
 from tm.core.db.api.dt_api import DTAPI
 from tm.core.db.api.job_api import JobAPI
 from tm.core.db.api.market import MarketAPI
 from tm.core.db.api.market_offer_dao import MarketOfferAPI
-from tm.core.db.postgresql.api_impl import day_ahead_impl, market_dao_impl, market_offer_dao_impl, job_api_impl, \
-    dt_api_impl
+from tm.core.db.postgresql.api_impl import   market_dao_impl, market_offer_dao_impl, job_api_impl , dt_api_impl
 
-day_ahead_dao: DayAheadAPI
+# day_ahead_dao: DayAheadAPI
 market_api: MarketAPI
 offer_dao: MarketOfferAPI
 app_settings_dao: AppSettingsDAO
@@ -21,8 +20,9 @@ def init_postgresql(db_meta: DBMeta):
     from effi_onto_tools.db.postgresql import dbconnection
     dbconnection.connection_manager.init(db_meta=db_meta)
 
-    global day_ahead_dao, app_settings_dao, market_api, offer_dao, job_api, dt_api
-    day_ahead_dao = day_ahead_impl.DayAheadAPIImpl(db_meta.db_table_prefix)
+    # global day_ahead_dao
+    global app_settings_dao, market_api, offer_dao, job_api, dt_api
+    # day_ahead_dao = day_ahead_impl.DayAheadAPIImpl(db_meta.db_table_prefix)
     market_api = market_dao_impl.MarketAPIImpl(db_meta.db_table_prefix)
     offer_dao = market_offer_dao_impl.MarketOfferAPIImpl(db_meta.db_table_prefix)
     job_api = job_api_impl.JobAPIImpl(db_meta.db_table_prefix)

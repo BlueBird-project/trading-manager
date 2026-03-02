@@ -16,8 +16,6 @@ class EnergyMarketOfferInfo(BaseModel):
     ext: Optional[str] = None
 
 
-
-
 # TODO: add offer range to graphs and ontology
 class EnergyMarketOffer(BaseModel):
     offer_id: int

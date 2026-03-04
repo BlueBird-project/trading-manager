@@ -1,11 +1,21 @@
 from typing import Optional, Union, Any
 
 from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
-from ke_client.utils import time_utils 
+from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
 
-@ki_object("fm-ts-info-request")
+# @ki_object("fm-ts-info-request")
+# class FMTSRequest(BindingsBase):
+#     ts_interval_uri: URIRef
+#     ts_date_from: Literal
+#     ts_date_to: Literal
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
+
+
+@ki_object("fm-ts-info-request", allow_partial=True)
 class FMTSRequest(BindingsBase):
     ts_interval_uri: URIRef
     ts_date_from: Literal
@@ -15,16 +25,30 @@ class FMTSRequest(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
-@ki_object("fm-ts-info-request", result=True)
-class FMTSResponse(BindingsBase):
+# @ki_object("fm-ts-info-request", result=True)
+# class FMTSResponse(BindingsBase):
+#     ts_uri: URIRef
+#     ts_interval_uri: URIRef
+#     # ts_usage: Union[Literal, URIRef]
+#     ts_usage: URIRef
+#     time_create: Literal
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
+
+
+@ki_object("fm-ts-info-request")
+class FMTSResponse(FMTSRequest):
     ts_uri: URIRef
-    ts_interval_uri: URIRef
-    # ts_usage: Union[Literal, URIRef]
-    ts_usage:  URIRef
+    # ts_interval_uri: URIRef
+    ts_usage: URIRef
     time_create: Literal
 
+    # ts_date_from: Literal
+    # ts_date_to: Literal
+
     def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
+        super().__init__(**kwargs)
 
 
 @ki_object("fm-ts", allow_partial=True)
@@ -35,8 +59,20 @@ class FMPntQuery(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
-@ki_object("fm-ts-evaluate")
-class FMEvaluateQuery(BindingsBase):
+# @ki_object("fm-ts-evaluate")
+# class FMEvaluateQuery(BindingsBase):
+#     ts_uri: URIRef
+#     dp: URIRef
+#     ts: Literal
+#     dpr: URIRef
+#     value: Literal
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
+
+
+@ki_object("fm-ts-evaluate-ask", allow_partial=True)
+class FMEvaluateQueryAsk(BindingsBase):
     ts_uri: URIRef
     dp: URIRef
     ts: Literal
@@ -47,14 +83,24 @@ class FMEvaluateQuery(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
-@ki_object("fm-ts-evaluate", result=True)
-class FMEvaluateResponse(BindingsBase):
+@ki_object("fm-ts-evaluate-ask")
+class FMEvaluateResponseAsk(FMEvaluateQueryAsk):
     cost_dp: URIRef
     cost_dpr: URIRef
     cost: OptionalLiteral
 
     def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
+        super().__init__(**kwargs)
+
+#
+# @ki_object("fm-ts-evaluate", result=True)
+# class FMEvaluateResponse(BindingsBase):
+#     cost_dp: URIRef
+#     cost_dpr: URIRef
+#     cost: OptionalLiteral
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
 
 
 @ki_object("fm-ts")
@@ -73,7 +119,7 @@ class FMPnt(BindingsBase):
         return time_utils.xsd_to_ts(self.ts)
 
     def get_value(self) -> Optional[float]:
-        return self.convert_value(self.value,float)
+        return self.convert_value(self.value, float)
 
 
 @ki_split_uri(uri_template=f"http://fm.bluebird.com/dp" + "/${ts_start}/${isp_start}/${ts_usage}")

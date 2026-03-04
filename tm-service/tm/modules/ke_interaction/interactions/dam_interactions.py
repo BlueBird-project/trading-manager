@@ -47,7 +47,7 @@ def get_all_markets(reset_markets: bool = False) -> List[EnergyMarketBindings]:
     bindings: KIAskResponse = _get_all_markets()
     market_bindings = [EnergyMarketBindings(**b) for b in bindings.binding_set]
     # TODO: unsubscribe all markets in the DB
-    if reset_markets:
+    if reset_markets and len(market_bindings) > 0:
         dam_service.unsubscribe_markets()
     dam_service.save_markets(market_bindings=market_bindings, subscribe=True)
     return market_bindings

@@ -44,6 +44,7 @@ def on_dt_info_request(ki_id, bindings):
     return [dt_info]
 
 
+#
 @dt_ki.post("dt-ts-info")
 def _post_ts_info(market_uri: URIRef, ts_uri: DTTSUri) -> List[DTTSInfo]:
     ts_start = time_utils.current_timestamp()
@@ -59,6 +60,7 @@ def _post_ts_info(market_uri: URIRef, ts_uri: DTTSUri) -> List[DTTSInfo]:
     return [dt_info]
 
 
+#
 @dt_ki.answer("dt-ts-info")
 def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     global _market_uri
@@ -84,11 +86,11 @@ def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
 
 #
 #
-def _generate_sample_ts(ts_uri: DTTSUri) -> List[DTPnt]:
+def _generate_sample_ts(ts_uri: DTTSUri, size=96) -> List[DTPnt]:
     cur_ts = ts_uri.ts_start
     isp = 0
     res = []
-    while cur_ts <= ts_uri.ts_end:
+    while cur_ts <= ts_uri.ts_end and isp < (size):
         isp += 1
         pnt = DTPnt(ts_uri=ts_uri.uri_ref,
                     dp=DTDPUri(prefix=dt_ki.get_kb_id(), **ts_uri.__dict__, isp=isp).uri_ref,
@@ -103,7 +105,7 @@ def _generate_sample_ts(ts_uri: DTTSUri) -> List[DTPnt]:
 @dt_ki.post("dt-ts")
 def _post_ts(ts_uri: DTTSUri) -> List[DTPnt]:
     # ts_interval_uri = URIRef(ts_uri.uri + "/interval")
-    sample_ts = _generate_sample_ts(ts_uri=ts_uri)
+    sample_ts = _generate_sample_ts(ts_uri=ts_uri, size=96)
 
     return sample_ts
 
@@ -162,5 +164,6 @@ def post_forecast(market_uri: URIRef) -> List[DTTSACK]:
     ################################################
     # post timeseries
     ################################################
+    print("info ts")
     resp_bindings: KIPostResponse = _post_ts(ts_uri)
-    return [DTTSACK(**b) for b in resp_bindings.result_binding_set]
+    return [DTTSACK(ts_uri=b.ts_uri) for b in resp_bindings.result_binding_set]

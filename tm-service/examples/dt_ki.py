@@ -3,6 +3,8 @@
 # ./resources/.env
 # ./resources/env/.env.fm
 ################################################
+from rdflib import URIRef
+
 import tm
 import logging
 from time import sleep
@@ -40,6 +42,9 @@ if __name__ == "__main__" and app_settings:
     from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings
 
     success = False
+    #####################################
+    # Set market
+    ##################################33
     market: EnergyMarketBindings = None
 
     while not success:
@@ -47,7 +52,7 @@ if __name__ == "__main__" and app_settings:
             from examples.ki.dt_interactions import set_market_uri
 
             print(f"tick: {client.state()}")
-            #set market which will be forecasted
+            # set market which will be forecasted
             markets = get_markets()
             market = markets[0]
             set_market_uri(market_uri=market.market_uri)
@@ -59,12 +64,14 @@ if __name__ == "__main__" and app_settings:
 
     print(f"Observed market : {market}")
     ################################################
-
+    #############################
+    # #publish information about digital twin
+    ##############################
     success = False
     while not success:
         try:
             from examples.ki.dt_interactions import post_dt_info
-            #publish information about digital twin
+
             print(f"tick: {client.state()}")
             print(f"Post dt")
             dt_info_ack = post_dt_info()
@@ -86,10 +93,12 @@ if __name__ == "__main__" and app_settings:
             print(f"tick: {client.state()}")
             print(f"Post ts")
             ts_ack = post_forecast(market_uri=market.market_uri)
+            # ts_ack = post_forecast(market_uri=URIRef("http://market.uri.com.pl"))
             print(len(ts_ack))
             if len(ts_ack) > 0:
                 print(ts_ack[0])
-            sleep(30)
+            print(f"END Post ts")
+            sleep(5)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

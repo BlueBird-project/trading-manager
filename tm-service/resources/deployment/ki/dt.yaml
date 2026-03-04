@@ -4,7 +4,7 @@ knowledge_engine:
   graph_patterns:
     dt-info:
       name: "dt-info"
-      description: "Digital Twin info"
+      description: "Digital Twin info. Used in ANSWER,ASK,POST,REACT."
       prefixes:
         s4city: "https://saref.etsi.org/s4city/"
         foaf: "http://xmlns.com/foaf/0.1/"
@@ -17,7 +17,7 @@ knowledge_engine:
         - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
     dt-ts-info:
       name: "dt-ts-info"
-      description: "DT's timeseries's metadata, model's , model's parameters, error rates"
+      description: "DT's timeseries's metadata, model's , model's parameters, error rates. Used in ANSWER,ASK,POST,REACT."
       required_bindings:
         - "command_uri"
       prefixes:
@@ -35,7 +35,7 @@ knowledge_engine:
         - ' ?command_uri  saref:hasOutput ?ts_uri .'
     dt-ts:
       name: "dt-ts"
-      description: "DT's timeseries's "
+      description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."
       prefixes:
         xsd: "http://www.w3.org/2001/XMLSchema#"
         saref: "https://saref.etsi.org/core/"
@@ -47,4 +47,4 @@ knowledge_engine:
         - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
       result_pattern:
-        - ' ?ts_uri rdf:type s4ener:TimeSeries .'
+        - ' ?ts_uri rdf:type ubmarket:Forecast .'

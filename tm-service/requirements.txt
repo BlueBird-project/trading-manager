@@ -25,5 +25,5 @@ effi_onto_tools==0.19.13
 ###########################
 #git+https://github.com/BlueBird-project/ke-pyclient.git@v0.22.8
 git+https://github.com/BlueBird-project/ke-pyclient.git@dev
-ke_client==0.25.17
+ke_client==0.25.20
 

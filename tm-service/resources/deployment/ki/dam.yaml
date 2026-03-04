@@ -4,7 +4,7 @@ knowledge_engine:
   graph_patterns:
     market:
       name: "market"
-      description: "Basic information about the market"
+      description: "Basic information about the market. Used in ANSWER,ASK,POST,REACT. "
       prefixes:
         s4city: "https://saref.etsi.org/s4city/"
         foaf: "http://xmlns.com/foaf/0.1/"
@@ -16,7 +16,7 @@ knowledge_engine:
         - ' ?market_type rdf:type ubmarket:MarketType .'
     market-offer-info-filtered:
       name: "market-offer-info-filtered"
-      description: "Information about new offer with time filter"
+      description: "Information about new offer with time filter. Used in ANSWER,ASK ."
       required_bindings:
         - "market_uri"
       prefixes:
@@ -34,7 +34,7 @@ knowledge_engine:
         - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
     market-offer-info:
       name: "market-offer-info"
-      description: "Information about new offer"
+      description: "Information about new offer. Used in ANSWER,ASK,POST,REACT."
       required_bindings:
         - "market_uri"
       prefixes:
@@ -64,7 +64,7 @@ knowledge_engine:
 #        - ' ?offer_uri s4ener:hasEffectivePeriod  "PT1440M"^^xsd:duration .'
     market-offer:
       name: "market-offer"
-      description: "Daily offer of the market"
+      description: "Daily offer of the market. Used in ANSWER,ASK,POST,REACT."
       prefixes:
         xsd: "http://www.w3.org/2001/XMLSchema#"
         saref: "https://saref.etsi.org/core/"

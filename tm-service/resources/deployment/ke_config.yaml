@@ -16,20 +16,21 @@ knowledge_engine:
   graph_patterns:
     tou-price:
       name: "tou-price"
-      description: "Data points for TOU (tou_uri) timeseries. "
+      description: "Data points for TOU (tou_uri) timeseries. . Used in ANSWER,ASK ."
       prefixes:
         xsd: "http://www.w3.org/2001/XMLSchema#"
         saref: "https://saref.etsi.org/core/"
       required_bindings:
         - "tou_uri"
       pattern:
+        - ' ?tou_uri rdf:type s4ener:TimeSeries .'
         - ' ?tou_uri s4ener:producedBy <http://tm.bluebird.com>  .'
         - ' ?dp s4ener:belongsToTimeSeries ?tou_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
         - '     s4ener:hasEffectivePeriod ${ISP_UNIT}; saref:hasResult ?dpr.'
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
     tou-price-info:
       name: "tou-price-info"
-      description: "TOU metadata - find TOU timeseries (tou_uri) "
+      description: "TOU metadata - find TOU timeseries (tou_uri). Used in ANSWER,ASK  . "
       prefixes:
         xsd: "http://www.w3.org/2001/XMLSchema#"
         saref: "https://saref.etsi.org/core/"

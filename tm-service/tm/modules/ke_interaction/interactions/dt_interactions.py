@@ -48,7 +48,8 @@ def on_dt_ts(ki_id, bindings: List[DTPnt]):
     # print(dt_ts)
     if len(bindings) > 0:
         #     TODO: check if ack binding can have different length
-
+        # return [DTTSACK(ts_uri=b.ts_uri) for b in bindings]
+        # return []
         return [DTTSACK(ts_uri=bindings[0].ts_uri)]
     return []
 

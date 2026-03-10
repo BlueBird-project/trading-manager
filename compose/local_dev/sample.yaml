@@ -1,11 +1,10 @@
+include:
+  - "compose.yaml"
 services:
   dt-service:
-    #    todo    todo copy dt_ki.py
-    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-local-entsoe-service:latest"
-    ports:
-      - "11001:8080"
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/local-dt-service:latest"
     build:
-      dockerfile: ./docker/entsoe-service/Dockerfile
+      dockerfile: ./docker/dt-service/Dockerfile
       args:
         REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
         REGISTRY_PROJECT: ${REGISTRY_PROJECT}
@@ -16,7 +15,6 @@ services:
       - tm-db
       - tm-service
       - tm-ke-service
-    restart: on-failure:5
     env_file:
       - path: ".env"
         required: true
@@ -24,5 +22,34 @@ services:
         required: true
     environment:
       - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+#    volumes:
+#      - ./input/dt_ki.py:/app/examples/dt_ki.py
+    networks:
+      - tm-net
+
+  fm-service:
+    #    todo    todo copy dt_ki.py
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/local-fm-service:latest"
+    build:
+      dockerfile: ./docker/fm-service/Dockerfile
+      args:
+        REGISTRY_DOMAIN: ${REGISTRY_DOMAIN}
+        REGISTRY_PROJECT: ${REGISTRY_PROJECT}
+        IMAGE_TAG: ${TM_TAG}
+      tags:
+        - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/local-fm-service:latest"
+    depends_on:
+      - tm-db
+      - tm-service
+      - tm-ke-service
+    env_file:
+      - path: ".env"
+        required: true
+      - path: "./env/.env.fm"
+        required: true
+    environment:
+      - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+#    volumes:
+#      - ./input/dt_ki.py:/app/examples/fm_ki.py
     networks:
       - tm-net

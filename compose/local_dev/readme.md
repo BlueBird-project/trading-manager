@@ -59,6 +59,14 @@ check consumed resources:
 ```yaml
  docker stats --no-stream --format "{{.Container}} cpu={{.CPUPerc}} mem={{.MemUsage}} net={{.NetIO}} name:{{.Name}}"
 ```
+### Samples DT/FM
+todo write documentation
+```
+#    volumes:
+#      - ./input/dt_ki.py:/app/examples/dt_ki.py
+```
+docker exec local-dt-service-1 cat /var/log/service.log
+docker exec local-fm-service-1 cat /var/log/service.log
 
 ### export image
 

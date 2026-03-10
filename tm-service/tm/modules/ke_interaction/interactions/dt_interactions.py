@@ -4,7 +4,6 @@ from ke_client import KIHolder
 from ke_client.ki_model import KIAskResponse
 
 from tm.modules.ke_interaction.interactions.dt_model import *
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfoACK
 from tm.modules.ke_interaction.service import dt_service
 
 ki = KIHolder()
@@ -12,10 +11,10 @@ ki = KIHolder()
 
 # region digital twin service details
 @ki.react("dt-info")
-def on_dt_info(ki_id, bindings: List[DigitalTwinInfo]) -> List[DigitalTwinInfoACK]:
+def on_dt_info(ki_id, bindings: List[DigitalTwinInfo]):
     print("on dt-info")
     ack = dt_service.process(bindings)
-    return ack
+    return []
 
 
 @ki.ask("dt-info")
@@ -34,10 +33,9 @@ def _request_dt_ts_info(req: List[DTTSInfoRequest]):
 def on_dt_ts_info(ki_id, bindings: List[DTTSInfo]):
     print("on new digital twin timeseries info")
     print(bindings)
-    # TODO  save
+    # TODO  save dt ts metadata
     # ack = dt_service.process_timeseries_info(bindings)
-    ack = [DTTSInfoACK(command_uri=d.command_uri, ts_uri=d.ts_uri) for d in bindings]
-    return ack
+    return []
 
 
 @ki.react("dt-ts")
@@ -46,11 +44,6 @@ def on_dt_ts(ki_id, bindings: List[DTPnt]):
     # TODO  save
     # ack = dt_service.process_timeseries(bindings)
     # print(dt_ts)
-    if len(bindings) > 0:
-        #     TODO: check if ack binding can have different length
-        # return [DTTSACK(ts_uri=b.ts_uri) for b in bindings]
-        # return []
-        return [DTTSACK(ts_uri=bindings[0].ts_uri)]
     return []
 
 
@@ -59,12 +52,10 @@ def _request_dt_ts(ts_uri_ref: URIRef):
     return [DTPntRequest(ts_uri=ts_uri_ref)]
 
 
-def request_dt_info() -> list[DigitalTwinInfoACK]:
+def request_dt_info()  :
     bindings: KIAskResponse = _request_dt_info()
     dts = [DigitalTwinInfo(**b) for b in bindings.binding_set]
-    ack = dt_service.process(dts)
-    return ack
-
+    dt_service.process(dts)
 
 def request_dt_ts_info(req: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     bindings: KIAskResponse = _request_dt_ts_info(req)

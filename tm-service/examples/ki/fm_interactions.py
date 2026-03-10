@@ -3,6 +3,8 @@ from typing import List
 
 from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIPostResponse, KIAskResponse
+
+from tm.modules.ke_interaction.interactions.dt_model import DTPnt
 from tm.modules.ke_interaction.interactions.fm_model import *
 
 fm_ki = KIHolder()
@@ -89,26 +91,26 @@ def on_fm_request(ki_id: str, bindings: List[FMPntQuery]):
         return ts_resp
 
 
-# @fm_ki.post("fm-ts-evaluate")
-# def _evaluate_request():
-#     # ask TM to evaluate
-#     hour_ms = 3600000
-#     current_ts = int(time_utils.current_timestamp() / hour_ms) * hour_ms
-#     ts_end = current_ts + 24 * hour_ms
-#     ts_usage = URIRef("s4ener:Consumption")
-#     # ts_usage2 = URIRef("s4ener:Production")
-#     ts_uri = FMTSSplitURI(ts_from=current_ts, ts_to=ts_end, period_minutes=15, ts_usage=ts_usage)
-#     response: List[FMEvaluateQuery] = []
-#     # return response
-#     for i in range(0, 24 * 4):
-#         ts = i * hour_ms + current_ts
-#         xsd_ts = time_utils.xsd_from_ts(ts)
-#         dp_uri = DPSplitURI(ts_start=ts, ts_usage=FMTSSplitURI.convert_ts_usage(ts_usage), isp_start=i)
-#         dpr_uri_ref = URIRef(dp_uri.uri + "/dpr")
-#         value = Literal(random.randrange(400, 1200))
-#         response.append(FMEvaluateQuery(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
-#                                         value=value))
-#     return TargetedBindings(bindings=response, knowledge_bases=TM_KB_ID)
+@fm_ki.post("fm-ts-evaluate")
+def _evaluate_request():
+    # ask TM to evaluate
+    hour_ms = 3600000
+    current_ts = int(time_utils.current_timestamp() / hour_ms) * hour_ms
+    ts_end = current_ts + 24 * hour_ms
+    ts_usage = URIRef("s4ener:Consumption")
+    # ts_usage2 = URIRef("s4ener:Production")
+    ts_uri = FMTSSplitURI(ts_from=current_ts, ts_to=ts_end, period_minutes=15, ts_usage=ts_usage)
+    response: List[FMEvaluateQuery] = []
+    # return response
+    for i in range(0, 24 * 4):
+        ts = i * hour_ms + current_ts
+        xsd_ts = time_utils.xsd_from_ts(ts)
+        dp_uri = DPSplitURI(ts_start=ts, ts_usage=FMTSSplitURI.convert_ts_usage(ts_usage), isp_start=i)
+        dpr_uri_ref = URIRef(dp_uri.uri + "/dpr")
+        value = Literal(random.randrange(400, 1200))
+        response.append(FMEvaluateQuery(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
+                                        value=value))
+    return TargetedBindings(bindings=response, knowledge_bases=TM_KB_ID)
 
 
 @fm_ki.ask("fm-ts-evaluate-ask")
@@ -134,17 +136,29 @@ def _evaluate_request_ask():
     return TargetedBindings(bindings=response, knowledge_bases=TM_KB_ID)
 
 
-# def evaluate_flexibility() -> List[FMEvaluateResponse]:
-#     """
-#     slow interaction
-#     :return:
-#     """
-#     resp: KIPostResponse = _evaluate_request()
-#     print(resp)
-#     evaluated_resp: List[FMEvaluateResponse] = [FMEvaluateResponse(**b) for b in resp.result_binding_set]
-#     # resp: KIAskResponse = _ask_evaluate_request()
-#     # evaluated_resp: List[FMEvaluateQuery] = [FMEvaluateQuery(**b) for b in resp.binding_set]
-#     return evaluated_resp
+def evaluate_flexibility() -> List[FMEvaluateResponse]:
+    """
+    slow interaction
+    :return:
+    """
+    resp: KIPostResponse = _evaluate_request()
+    print(resp)
+    evaluated_resp: List[FMEvaluateResponse] = [FMEvaluateResponse(**b) for b in resp.result_binding_set]
+    # resp: KIAskResponse = _ask_evaluate_request()
+    # evaluated_resp: List[FMEvaluateQuery] = [FMEvaluateQuery(**b) for b in resp.binding_set]
+    return evaluated_resp
+
+@fm_ki.react("dt-ts")
+def on_dt_ts(ki_id, bindings: List[DTPnt]):
+    print(f"on new digital twin timeseries data: {len(bindings)}")
+    # TODO  save
+    # ack = dt_service.process_timeseries(bindings)
+    # print(dt_ts)
+    if len(bindings) > 0:
+        #     TODO: check if ack binding can have different length
+        # return [DTTSACK(ts_uri=b.ts_uri) for b in bindings]
+        return []
+    return []
 
 
 def evaluate_flexibility_ask() -> List[FMEvaluateResponseAsk]:

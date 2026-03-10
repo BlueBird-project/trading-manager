@@ -15,13 +15,13 @@ class DigitalTwinInfo(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
-@ki_object("dt-info", result=True)
-class DigitalTwinInfoACK(BindingsBase):
-    dt_uri: URIRef
-    command_uri: URIRef
-
-    def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
+# @ki_object("dt-info", result=True)
+# class DigitalTwinInfoACK(BindingsBase):
+#     dt_uri: URIRef
+#     command_uri: URIRef
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
 
 
 @ki_object("dt-ts-info")
@@ -57,15 +57,15 @@ class DTTSInfo(BindingsBase):
 class DTTSInfoRequest(BindingsBase):
     command_uri: URIRef
 
+#
+# @ki_object("dt-ts-info", result=True)
+# class DTTSInfoACK(BindingsBase):
+#     command_uri: URIRef
+#     ts_uri: URIRef
 
-@ki_object("dt-ts-info", result=True)
-class DTTSInfoACK(BindingsBase):
-    command_uri: URIRef
-    ts_uri: URIRef
-
-@ki_object("dt-ts", result=True)
-class DTTSACK(BindingsBase):
-    ts_uri: URIRef
+# @ki_object("dt-ts", result=True)
+# class DTTSACK(BindingsBase):
+#     ts_uri: URIRef
 
 
 # @ki_object("dt-ts-info", allow_partial=True)

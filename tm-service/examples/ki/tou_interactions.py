@@ -39,7 +39,6 @@ def get_tou_info(ts: TimeSpan) -> list[TOUPriceInfo]:
     return [TOUPriceInfo(**b) for b in price_info_bindings.binding_set]
 
 
-
 def get_tou_price(tou_uris: List[str]) -> List[TOUPrice]:
     tou_uris_refs = [URIRef(tou_uri) for tou_uri in tou_uris]
     bindings: KIAskResponse = _get_tou_price(tou_uris=tou_uris_refs)

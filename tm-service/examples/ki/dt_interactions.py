@@ -4,10 +4,10 @@ from typing import List
 
 from ke_client.utils import time_utils
 from ke_client import KIHolder
-from ke_client.ki_model import KIPostResponse
+from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus
 from rdflib import URIRef, Literal
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfoACK, DigitalTwinInfo, DTTSUri, DTTSInfo, \
-    DTPnt, DTDPUri, DTDPRUri, DTPntRequest, DTTSInfoACK, DTTSACK, DTTSInfoRequest
+from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSUri, DTTSInfo, \
+    DTPnt, DTDPUri, DTDPRUri, DTPntRequest, DTTSInfoRequest
 
 dt_ki = KIHolder()
 _market_uri: URIRef = None
@@ -28,7 +28,6 @@ def _post_dt_info(market_uri: URIRef) -> List[DigitalTwinInfo]:
     dt_info = DigitalTwinInfo(dt_uri=URIRef(dt_ki.get_kb_id()),
                               command_uri=_init_command_uri(market_uri=str(_market_uri)),
                               market_uri=market_uri)
-
     return [dt_info]
 
 
@@ -137,10 +136,12 @@ def set_market_uri(market_uri: URIRef):
         raise Exception(f"Market has been already set: {_market_uri}")
 
 
-def post_dt_info() -> List[DigitalTwinInfoACK]:
+def post_dt_info():
     global _market_uri
     resp_bindings: KIPostResponse = _post_dt_info(market_uri=_market_uri)
-    return [DigitalTwinInfoACK(**b) for b in resp_bindings.result_binding_set]
+    info_ack = [{"status": b.status == ExchangeInfoStatus.SUCCEEDED, "kb_id": b.knowledgeBaseId}
+                for b in resp_bindings.exchangeInfo]
+    return info_ack
 
 
 def _get_forecast_uri() -> DTTSUri:
@@ -150,7 +151,7 @@ def _get_forecast_uri() -> DTTSUri:
     return ts_uri
 
 
-def post_forecast(market_uri: URIRef) -> List[DTTSACK]:
+def post_forecast(market_uri: URIRef):
     global _current_forecast_uri
     ts_uri = _get_forecast_uri()
     _current_forecast_uri = ts_uri
@@ -158,12 +159,16 @@ def post_forecast(market_uri: URIRef) -> List[DTTSACK]:
     # post metadata
     ################################################
     resp_bindings: KIPostResponse = _post_ts_info(market_uri, ts_uri)
-    info_ack = [DTTSInfoACK(**b) for b in resp_bindings.result_binding_set]
+    info_ack = resp_bindings.get_ack()
     print("info ack")
     print(info_ack)
     ################################################
     # post timeseries
     ################################################
     print("info ts")
+    cur_ts = time_utils.current_timestamp()
     resp_bindings: KIPostResponse = _post_ts(ts_uri)
-    return [DTTSACK(ts_uri=b.ts_uri) for b in resp_bindings.result_binding_set]
+    duration_sec = (time_utils.current_timestamp() - cur_ts) / 1000
+    print(f"POST ts forecast duration {duration_sec}s")
+    ts_ack = resp_bindings.get_ack()
+    return ts_ack

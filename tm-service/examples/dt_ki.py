@@ -73,7 +73,8 @@ if __name__ == "__main__" and app_settings:
             from examples.ki.dt_interactions import post_dt_info
 
             print(f"tick: {client.state()}")
-            print(f"Post dt")
+            # inform TM that there is DT in the network
+            print(f"Post Digital Twin metadata ")
             dt_info_ack = post_dt_info()
             print(len(dt_info_ack))
             print(dt_info_ack)
@@ -94,11 +95,14 @@ if __name__ == "__main__" and app_settings:
             print(f"Post ts")
             ts_ack = post_forecast(market_uri=market.market_uri)
             # ts_ack = post_forecast(market_uri=URIRef("http://market.uri.com.pl"))
-            print(len(ts_ack))
+            print("ack: " + str(len(ts_ack)))
             if len(ts_ack) > 0:
-                print(ts_ack[0])
-            print(f"END Post ts")
-            sleep(5)
+                print("ack: " + str(len(ts_ack)) + " " + str(ts_ack[0]))
+            else:
+                print("ack: " + str(len(ts_ack)))
+
+            print(f"tock")
+            sleep(30)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

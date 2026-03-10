@@ -59,16 +59,16 @@ class FMPntQuery(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
-# @ki_object("fm-ts-evaluate")
-# class FMEvaluateQuery(BindingsBase):
-#     ts_uri: URIRef
-#     dp: URIRef
-#     ts: Literal
-#     dpr: URIRef
-#     value: Literal
-#
-#     def __init__(self, **kwargs):
-#         super().__init__(bindings=kwargs)
+@ki_object("fm-ts-evaluate")
+class FMEvaluateQuery(BindingsBase):
+    ts_uri: URIRef
+    dp: URIRef
+    ts: Literal
+    dpr: URIRef
+    value: Literal
+
+    def __init__(self, **kwargs):
+        super().__init__(bindings=kwargs)
 
 
 @ki_object("fm-ts-evaluate-ask", allow_partial=True)
@@ -93,14 +93,14 @@ class FMEvaluateResponseAsk(FMEvaluateQueryAsk):
         super().__init__(**kwargs)
 
 #
-# @ki_object("fm-ts-evaluate", result=True)
-# class FMEvaluateResponse(BindingsBase):
-#     cost_dp: URIRef
-#     cost_dpr: URIRef
-#     cost: OptionalLiteral
-#
-#     def __init__(self, **kwargs):
-#         super().__init__(bindings=kwargs)
+@ki_object("fm-ts-evaluate", result=True)
+class FMEvaluateResponse(BindingsBase):
+    dp: URIRef
+    cost_dpr: URIRef
+    cost: OptionalLiteral
+
+    def __init__(self, **kwargs):
+        super().__init__(bindings=kwargs)
 
 
 @ki_object("fm-ts")

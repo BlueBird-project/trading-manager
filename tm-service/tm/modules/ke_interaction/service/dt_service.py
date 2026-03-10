@@ -2,15 +2,14 @@ import logging
 from typing import List
 
 from ke_client.utils import to_json
-from rdflib import URIRef
 
 from tm.models.digital_twin import DigitalTwinDAO
 from tm.models.job_dao import JobDAO
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DigitalTwinInfoACK
+from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo
 
 
-def process(dt_info_list: List[DigitalTwinInfo]) -> List[DigitalTwinInfoACK]:
-    response: List[DigitalTwinInfoACK] = []
+def process(dt_info_list: List[DigitalTwinInfo]):
+    # response: List[] = []
     # TODO: update all dt metadata ?
     for dt_info in dt_info_list:
         from tm.core.db.postgresql import dao_manager
@@ -29,6 +28,7 @@ def process(dt_info_list: List[DigitalTwinInfo]) -> List[DigitalTwinInfoACK]:
                 dt = dao_manager.dt_api.save(
                     DigitalTwinDAO(dt_uri=dt_info.dt_uri, market_id=market.market_id, job_id=job.job_id))
             else:
+                # TODO: dt_api.update(....)
                 dt = db_dt
-            response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
-    return response
+            # response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
+    # return response

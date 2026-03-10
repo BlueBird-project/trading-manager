@@ -44,37 +44,33 @@ if __name__ == "__main__" and app_settings:
 
     while True:
         try:
-            from examples.ki.fm_interactions import evaluate_flexibility_ask
+            from examples.ki.fm_interactions import evaluate_flexibility_ask, evaluate_flexibility
             from examples.ki.tou_interactions import get_tou_info, get_tou_price
 
             print(f"tick: {client.state()}")
             ################################################
             # get prices
             ################################################
+            # timeseries metadata
             res = get_tou_info(ts=TimeSpan.last_day())
             print(res)
             for ts_info in res:
                 ################################################
-                # get timeseries for each uri
+                # get timeseries data points for each uri
                 ################################################
+                print("get prices for: " + ts_info.tou_uri)
                 prices = get_tou_price(tou_uris=[ts_info.tou_uri])
                 print(prices)
             sleep(15)
             ###########################
-            # send power plan and receive prices
-            # print(f"Evaluate power plan")
-            # tick()
-            # this is low
-            # response = evaluate_flexibility()
-            # tock()
-            # print(f"Evaluate power plan2")
-            # print(len(response))
             tick()
             print(f"Evaluate power plan")
+            # get prices for power demand
             response = evaluate_flexibility_ask()
             tock()
+            # print(len(response))
             print(len(response))
-            # print(response)
+            print(response)
             sleep(45)
         except Exception as ex:
             print("Some issue occurred: ")

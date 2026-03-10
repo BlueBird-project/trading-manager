@@ -45,4 +45,18 @@ knowledge_engine:
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "Megawatt" .'
         - ' ?cost_dp   saref:hasResult ?cost_dpr .'
         - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "PLN" .'
+    fm-ts-evaluate:
+      name: "fm-ts-evaluate"
+      description: "Evaluate power demand"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+      pattern:
+        - ' ?ts_uri rdf:type s4ener:TimeSeries ;  s4ener:producedBy  <http://fm.bluebird.com> . '
+        - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "Megawatt" .'
+      result_pattern:
+        - ' ?dp   saref:hasResult ?cost_dpr .'
+        - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "PLN" .'
 

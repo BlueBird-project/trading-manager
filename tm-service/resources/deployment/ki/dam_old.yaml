@@ -2,33 +2,6 @@ knowledge_engine:
   kb_name: ""
   kb_description: ""
   graph_patterns:
-    dam-service:
-      name: "dam-service"
-      description: "Information about service"
-      pattern:
-        - ' ?dam_service rdf:type saref:Device  ; saref:hasFunctionOfInterest ?dam_function . '
-        - ' ?dam_function rdf:type saref:FunctionOfInterest; saref:hasCommandOfInterest  ?dam_data_command  . '
-        - ' ?dam_data_command rdf:type saref:CommandOfInterest;  saref:hasCommandKind ubmarket:get_data_command ; '
-        - '           saref:observes  ubmarket:MarketType .'
-    dam-start-command:
-      name: "dam-start-command"
-      description: "Graph pattern for starting data acquisition task"
-      prefixes:
-        time: "http://www.w3.org/2006/time#"
-      pattern:
-        - ' ?dam_data_command  saref:observes ?market . '
-        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
-      result_pattern:
-        - ' ?procedure_execution rdf:type saref:ProcedureExecution; saref:isExecutionOf ?dam_data_command ; '
-        - '    saref:hasStartTime ?time_start. '
-    dam-state-command:
-      name: "dam-state-command"
-      description: "State service-command"
-      prefixes:
-        time: "http://www.w3.org/2006/time#"
-      pattern:
-        - ' ?procedure_execution rdf:type saref:ProcedureExecution; saref:isExecutionOf  ?dam_data_command;'
-        - '    saref:hasStartTime ?time_start; saref:hasEndTime ?end_time .'
     market:
       name: "market"
       description: "Basic information about the market. Used in ANSWER,ASK,POST,REACT. "
@@ -68,13 +41,27 @@ knowledge_engine:
         xsd: "http://www.w3.org/2001/XMLSchema#"
       pattern:
         - ' ?market_uri rdf:type ?market_type .'
-        - ' ?market_type rdf:type ubmarket:MarketType .'
         - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
-        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
         - ' ?offer_uri s4ener:producedBy ?market_uri .'
-        - ' ?offer_uri s4ener:hasUpdateRate  ?update_rate.'
+        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
+        - ' ?offer_uri s4ener:hasUpdateRate ?update_rate .'
         - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
-        - ' ?offer_uri s4ener:hasEffectivePeriod  ?duration .'
+        - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
+#    market-offer-info-query:
+#      name: "market-offer-info-query"
+#      description: "Information about new offer"
+#      prefixes:
+#        time: "http://www.w3.org/2006/time#"
+#        xsd: "http://www.w3.org/2001/XMLSchema#"
+#      pattern:
+#        - ' ?market_uri rdf:type ubmarket:DayAheadMarket .'
+#        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+#      result_pattern:
+#        - ' ?offer_uri rdf:type s4ener:TimeSeries .'
+#        - ' ?offer_uri s4ener:producedBy kb:market .'
+#        - ' ?offer_uri s4ener:hasUpdateRate "PT60M"^^xsd:duration .'
+#        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+#        - ' ?offer_uri s4ener:hasEffectivePeriod  "PT1440M"^^xsd:duration .'
     market-offer:
       name: "market-offer"
       description: "Daily offer of the market. Used in ANSWER,ASK,POST,REACT."
@@ -88,19 +75,16 @@ knowledge_engine:
         - ' ?dp s4ener:belongsToTimeSeries ?offer_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
         - '   s4ener:hasEffectivePeriod ?duration ; saref:hasResult ?dpr.'
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn ?is_measured_in.'
-
-
-#    market-offer-info-query:
-#      name: "market-offer-info-query"
-#      description: "Information about new offer"
+#    market-offer2:
+#      name: "market-offer2"
+#      description: "Daily offer of the market"
 #      prefixes:
-#        time: "http://www.w3.org/2006/time#"
 #        xsd: "http://www.w3.org/2001/XMLSchema#"
+#        saref: "https://saref.etsi.org/core/"
+#      required_bindings:
+#        - "offer_uri"
 #      pattern:
-#        - ' ?market_uri rdf:type ubmarket:DayAheadMarket .'
-#        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
-#        - ' ?offer_uri rdf:type s4ener:TimeSeries .'
-#        - ' ?offer_uri s4ener:producedBy kb:market .'
-#        - ' ?offer_uri s4ener:hasUpdateRate "PT60M"^^xsd:duration .'
-#        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
-#        - ' ?offer_uri s4ener:hasEffectivePeriod  "PT1440M"^^xsd:duration .'
+#        - ' ?dp s4ener:belongsToTimeSeries ?offer_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+#        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+#        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
+

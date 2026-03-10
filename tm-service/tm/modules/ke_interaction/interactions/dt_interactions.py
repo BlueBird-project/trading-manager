@@ -52,10 +52,12 @@ def _request_dt_ts(ts_uri_ref: URIRef):
     return [DTPntRequest(ts_uri=ts_uri_ref)]
 
 
-def request_dt_info()  :
+def request_dt_info() -> List[DigitalTwinInfo]:
     bindings: KIAskResponse = _request_dt_info()
     dts = [DigitalTwinInfo(**b) for b in bindings.binding_set]
     dt_service.process(dts)
+    return dts
+
 
 def request_dt_ts_info(req: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     bindings: KIAskResponse = _request_dt_ts_info(req)

@@ -10,8 +10,8 @@ FROM ${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/trading-manager:$IMAGE_TAG
 #ENV APP_LOGGING_CONF_PATH="/app/resources/deployment/logging.ini"
 ENV SERVICE_LOG_DIR=/var/log/
 RUN #mkdir /app/examples
-COPY /docker/dt-service/examples /app/examples
-COPY /docker/dt-service/examples/fm_ki.py /app/fm_ki.py
+COPY /docker/fm-service/examples /app/examples
+COPY /docker/fm-service/examples/fm_ki.py /app/fm_ki.py
 EXPOSE 8080
 WORKDIR /app
 CMD ["python", "fm_ki.py" ,"-c" ,"/config/config.yaml"    ]

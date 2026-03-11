@@ -1,4 +1,3 @@
-
 ## Services
 
 ### ENTSO-E
@@ -13,7 +12,7 @@ Market configuration is located in [./docker/entsoe-service/entsoe.yaml](./docke
 
 #### Additional information
 
-Service on start loads prices for last 5 days for configured markets
+Service on start loads prices for the last 5 days for the configured markets
 
 ### Trading Manager
 
@@ -43,6 +42,8 @@ schema: public
 
 Root directory: `local_dev`
 
+Download & import docker images [here](#download-images)
+
 ### Build
 
 ```yaml
@@ -55,37 +56,24 @@ docker-compose -p local -f compose.yaml --env-file .env build
 docker-compose -p local -f compose.yaml --env-file .env create
 docker-compose -p local -f compose.yaml --env-file .env start 
 ```
+
 check consumed resources:
+
 ```yaml
  docker stats --no-stream --format "{{.Container}} cpu={{.CPUPerc}} mem={{.MemUsage}} net={{.NetIO}} name:{{.Name}}"
 ```
-### Samples DT/FM
-todo write documentation
-```
-#    volumes:
-#      - ./input/dt_ki.py:/app/examples/dt_ki.py
-```
-docker exec local-dt-service-1 cat /var/log/service.log
-docker exec local-fm-service-1 cat /var/log/service.log
-
-### export image
-
-```shell
-
-docker save -o ./images/trading-manager.0.4.3.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:0.4.3"
-docker save -o ./images/local-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-entsoe-service:latest" 
-docker save -o ./images/base-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:0.4.10" 
- 
-
-```
-### import image
-```shell
-docker load -i ./images/trading-manager.0.4.3.tar
-docker load -i ./images/local-entsoe-service.latest.tar 
-docker load -i ./images/base-entsoe-service.latest.tar
-```
 
 ### Download images
+
+```shell
+
+#download images from:
+https://box.pionier.net.pl/d/2782022c45ce4360a8c5/
+
+```
+
+old links:
+
 ```shell
 
 #configured  trading manager service
@@ -96,5 +84,63 @@ https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
 https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
 ```
 
-  
+### import image
+
+```shell
+docker load -i ./images/trading-manager.0.5.1.tar
+docker load -i ./images/local-entsoe-service.latest.tar 
+docker load -i ./images/base-entsoe-service.latest.tar
+```
+
+### export image
+
+```shell
+
+docker save -o ./images/trading-manager.0.5.1.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:0.5.1"
+docker save -o ./images/local-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-entsoe-service:latest" 
+docker save -o ./images/base-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:0.5.0" 
  
+
+```
+
+## Samples Digital Twin and Flexibility Manager clients
+
+### Build
+
+```yaml
+docker-compose -p local -f sample.yaml --env-file .env build 
+```
+
+### Override main script with custom script
+ 
+in sample.yaml
+```yaml
+
+...
+  volumes:
+      - ./input/dt_ki.py:/app/examples/dt_ki.py
+...
+...
+  volumes:
+      - ./input/fm_ki.py:/app/examples/fm_ki.py
+...
+```
+
+### Logs
+```shell
+
+#DT docker:
+docker exec local-dt-service-1 cat /var/log/service.log
+docker cp local-dt-service-1:/var/log/service.log dt.service.log
+
+#FM docker
+docker exec local-fm-service-1 cat /var/log/service.log
+docker cp local-fm-service-1:/var/log/service.log fm.service.log
+
+```
+
+```shell
+
+docker logs local-fm-service-1
+
+```

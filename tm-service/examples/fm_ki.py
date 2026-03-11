@@ -60,7 +60,10 @@ if __name__ == "__main__" and app_settings:
                 ################################################
                 print("get prices for: " + ts_info.tou_uri)
                 prices = get_tou_price(tou_uris=[ts_info.tou_uri])
-                print(prices)
+                if len(prices) > 0:
+                    print(f"{len(prices)}: {prices[0]}")
+                else:
+                    print(f"empty price response")
             sleep(15)
             ###########################
             tick()
@@ -69,8 +72,11 @@ if __name__ == "__main__" and app_settings:
             response = evaluate_flexibility_ask()
             tock()
             # print(len(response))
-            print(len(response))
-            print(response)
+            if len(response) > 0:
+                print(f"{len(response)}: {response[0]}")
+            else:
+                print(f"empty response")
+            # print(response)
             sleep(45)
         except Exception as ex:
             print("Some issue occurred: ")

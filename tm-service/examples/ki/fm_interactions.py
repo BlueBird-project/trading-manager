@@ -142,7 +142,7 @@ def evaluate_flexibility() -> List[FMEvaluateResponse]:
     :return:
     """
     resp: KIPostResponse = _evaluate_request()
-    print(resp)
+    # print(resp)
     evaluated_resp: List[FMEvaluateResponse] = [FMEvaluateResponse(**b) for b in resp.result_binding_set]
     # resp: KIAskResponse = _ask_evaluate_request()
     # evaluated_resp: List[FMEvaluateQuery] = [FMEvaluateQuery(**b) for b in resp.binding_set]

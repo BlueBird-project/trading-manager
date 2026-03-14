@@ -20,6 +20,7 @@ services:
       - ./docker/trading-manager/config.yaml:/config/config.yaml
     networks:
       - tm-net
+
   entsoe-service:
     image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-local-entsoe-service:latest"
     ports:
@@ -42,6 +43,23 @@ services:
       - path: "./env/.env.entsoe"
         required: true # default
       - path: "./env/.env.secrets"
+        required: true # default
+    environment:
+      - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+    networks:
+      - tm-net
+  tge-service:
+    image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:latest"
+    ports:
+      - "11002:8080"
+    depends_on:
+      - tm-db
+      - tm-ke-service
+    restart: on-failure:5
+    env_file:
+      - path: ".env"
+        required: true # default
+      - path: "./env/.env.tge"
         required: true # default
     environment:
       - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/

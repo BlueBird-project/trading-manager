@@ -80,6 +80,13 @@ services:
       - 5432:5432
     networks:
       - tm-net
+    env_file:
+      - path: ".env"
+        required: true # default
+      - path: "./env/.env.secrets"
+        required: false # default
+    volumes:
+      - ${PG_PATH}:/var/lib/postgresql/data
   tm-db-adminer:
     image: adminer:latest
     depends_on:

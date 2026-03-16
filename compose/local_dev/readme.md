@@ -96,9 +96,9 @@ docker load -i ./images/base-entsoe-service.latest.tar
 
 ```shell
 
-docker save -o ./images/trading-manager.0.5.1.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:0.5.1"
+docker save -o "./images/trading-manager.$Env:TM_TAG.tar" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:$Env:TM_TAG"
 docker save -o ./images/local-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-entsoe-service:latest" 
-docker save -o ./images/base-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:0.5.0" 
+docker save -o ./images/base-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:latest" 
  
 
 ```

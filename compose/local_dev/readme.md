@@ -10,6 +10,10 @@ Put token in [./env/.env.secrets](./env/.env.secrets)
 
 Market configuration is located in [./docker/entsoe-service/entsoe.yaml](./docker/entsoe-service/entsoe.yaml)
 
+Market codes to extend the service with other regions are [here](https://transparencyplatform.zendesk.com/hc/en-us/articles/15885757676308-Area-List-with-Energy-Identification-Code-EIC)
+
+Service documentation is [here](https://github.com/BlueBird-project/tm-market-plugins/blob/main/entso-e/README.md)
+
 #### Additional information
 
 Service on start loads prices for the last 5 days for the configured markets
@@ -112,21 +116,23 @@ docker-compose -p local -f sample.yaml --env-file .env build
 ```
 
 ### Override main script with custom script
- 
+
 in sample.yaml
+
 ```yaml
 
 ...
-  volumes:
-      - ./input/dt_ki.py:/app/examples/dt_ki.py
+volumes:
+  - ./input/dt_ki.py:/app/examples/dt_ki.py
 ...
 ...
-  volumes:
-      - ./input/fm_ki.py:/app/examples/fm_ki.py
+volumes:
+  - ./input/fm_ki.py:/app/examples/fm_ki.py
 ...
 ```
 
 ### Logs
+
 ```shell
 
 #DT docker:

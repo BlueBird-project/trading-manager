@@ -13,6 +13,7 @@
      "ext" character varying(10000),
      CONSTRAINT "${table_prefix}service_jobs_key" PRIMARY KEY ("job_id")
  )
+
  WITH (oids = false);
 
  CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (command_uri);
@@ -58,14 +59,17 @@ CREATE SEQUENCE ${table_prefix}forecast_details_forecast_id_seq INCREMENT 1 MINV
 
 CREATE TABLE "public"."${table_prefix}forecast_details" (
     "forecast_id" bigint DEFAULT nextval('${table_prefix}forecast_details_forecast_id_seq') NOT NULL,
-    "offer_id" bigint NOT NULL,
-    "model_id" bigint NOT NULL,
+    "forecast_uri" character varying(250),
+    "sequence" character varying(10),
+    "offer_id" bigint  ,
+    "model_id" bigint   ,
     "ts" bigint NOT NULL,
     "isp_len" integer DEFAULT '1' NOT NULL,
     "isp_unit" integer NOT NULL,
     "update_ts" bigint NOT NULL,
     CONSTRAINT "${table_prefix}forecast_details_forecast_id" PRIMARY KEY ("forecast_id")
 )
+
 WITH (oids = false);
 
 CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,offer_id);
@@ -80,8 +84,6 @@ CREATE SEQUENCE ${table_prefix}forecast_model_model_id_seq INCREMENT 1 MINVALUE 
 
 CREATE TABLE "public"."${table_prefix}forecast_model" (
     "model_id" integer DEFAULT nextval('${table_prefix}forecast_model_model_id_seq') NOT NULL,
-    "market_id" bigint NOT NULL,
-    "job_id" bigint NOT NULL,
     "model_uri" character varying(300),
     "model_name" character varying(30),
     "model_description" character varying(1000),
@@ -137,7 +139,6 @@ CREATE INDEX ${table_prefix}market_offer_offer_id ON public.${table_prefix}marke
 DROP TABLE IF EXISTS "${table_prefix}market_offer_forecast";
 CREATE TABLE "public"."${table_prefix}market_offer_forecast" (
     "forecast_id" bigint NOT NULL,
-    "model_id" bigint NOT NULL,
     "isp_start" integer NOT NULL,
     "range_id" integer NOT NULL,
     "cost_mwh" double precision,

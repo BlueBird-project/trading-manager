@@ -30,7 +30,6 @@ db:
   db_schema_name: "public"
   db_init: true
 ke:
-  #  knowledge_base_id: TODO:
   #  rest_endpoint:
   allow_partial_ki: true
   ki_config_path: ./resources/deployment/ke_config.yaml

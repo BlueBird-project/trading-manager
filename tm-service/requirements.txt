@@ -23,7 +23,9 @@ setuptools==80.10.2
 --extra-index-url https://__token__:glpat-ImK7hy9M8LSfcyRsGTCbi286MQp1OjFmNAk.01.0z15f6qqh@gitlab.pcss.pl/api/v4/projects/2735/packages/pypi/simple
 effi_onto_tools==0.19.13
 ###########################
-#git+https://github.com/BlueBird-project/ke-pyclient.git@v0.22.8
-git+https://github.com/BlueBird-project/ke-pyclient.git@dev
-ke_client==0.26.1
+#git+https://github.com/BlueBird-project/ke-pyclient.git@v0.26.3
+#git+https://github.com/BlueBird-project/ke-pyclient.git@dev
+git+https://github.com/BlueBird-project/ke-pyclient.git@reconnect_register_updates
+#ke_client==0.26.3
+ke_client==0.27.4
 

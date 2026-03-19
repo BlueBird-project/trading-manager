@@ -40,7 +40,7 @@ class DTForecastInfoDAO:
 
 
 @dataclass
-class DTForecastDAO:
+class DTForecastOfferDAO:
     forecast_id: int
     isp_start: int
     range_id: int

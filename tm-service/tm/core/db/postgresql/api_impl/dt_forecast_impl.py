@@ -1,11 +1,18 @@
 from abc import abstractmethod
 from typing import List, Optional
 
+from tm.core.db.api.dt_forecast import DTForecastAPI
+from tm.core.db.postgresql.api_impl import QueryObject
 from tm.models.digital_twin import DTForecastInfoDAO, DTForecastOfferDAO
 from tm.utils import TimeSpan
 
 
-class DTForecastAPI:
+class DTForecastAPIQueries(QueryObject):
+    # todo: queries
+    pass
+
+
+class DTForecastAPImpl(DTForecastAPI):
 
     @abstractmethod
     def save(self, forecast_info: DTForecastInfoDAO) -> DTForecastInfoDAO:
@@ -16,7 +23,7 @@ class DTForecastAPI:
         pass
 
     @abstractmethod
-    def find_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int], model_id: Optional[int]) \
+    def find_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int], model_id: Optional[int], ) \
             -> List[DTForecastInfoDAO]:
         pass
 

@@ -27,7 +27,7 @@ class DTModelDAO(BaseModel):
 @dataclass
 class DTForecastInfoDAO:
     ts: int
-    dt_id: int
+    job_id: int
     isp_len: int
     isp_unit: int
     update_ts: Optional[int] = None

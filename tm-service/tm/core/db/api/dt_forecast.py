@@ -12,11 +12,11 @@ class DTForecastAPI:
         pass
 
     @abstractmethod
-    def list_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int]) -> List[DTForecastInfoDAO]:
+    def list_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int]) -> List[DTForecastInfoDAO]:
         pass
 
     @abstractmethod
-    def find_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int], model_id: Optional[int]) \
+    def find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int]) \
             -> List[DTForecastInfoDAO]:
         pass
 

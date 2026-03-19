@@ -10,16 +10,16 @@ from tm.utils import TimeSpan
 
 
 class DTForecastInfoQueries(QueryObject):
-    __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
+    __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"job_id","sequence" ,"offer_id" ,"model_id" ,"ts" , 
     "isp_len"  ,"isp_unit"  ,"update_ts" """
     __TABLE_NAME__ = "forecast_details"
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" 
-      WHERE  COALESCE( dt_id = :dt_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )
+      WHERE  COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )
       AND   ("ts" BETWEEN :ts_from and :ts_to)  """
 
     GET_BY_URI = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE   forecast_uri = :forecast_uri """
     GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" 
-        WHERE COALESCE( dt_id = :dt_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
+        WHERE COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
     GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE  forecast_id = :forecast_id """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
@@ -46,6 +46,7 @@ class DTForecastQueries(QueryObject):
 
     DELETE_FORECAST_OFFER = """ DELETE FROM "${table_prefix}${table_name}" WHERE forecast_id=:forecast_id  """
 
+
 class DTForecastAPImpl(DTForecastAPI):
     q_dt_info: DTForecastInfoQueries
     q_dt_offer: DTForecastQueries
@@ -58,25 +59,25 @@ class DTForecastAPImpl(DTForecastAPI):
     def save(self, forecast_info: DTForecastInfoDAO) -> DTForecastInfoDAO:
         with ConnectionWrapper() as conn:
             inserted_id = conn.insert(q=self.q_dt_info.INSERT, args=vars(forecast_info),
-                                      return_id_col="dt_id")
+                                      return_id_col="forecast_id")
             if inserted_id is None:
                 raise ValueError(f"ForecastInfo not saved: {forecast_info.__dict__}")
-            forecast_info.forecast_uri = inserted_id
+            forecast_info.forecast_id = inserted_id
             return forecast_info
 
-    def list_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int]) -> List[DTForecastInfoDAO]:
-        return self.find_forecasts(ts=ts, dt_id=dt_id, model_id=None)
+    def list_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int]) -> List[DTForecastInfoDAO]:
+        return self.find_forecasts(ts=ts, job_id=job_id, model_id=None)
 
-    def find_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int], model_id: Optional[int], ) \
+    def find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int], ) \
             -> List[DTForecastInfoDAO]:
         with ConnectionWrapper() as conn:
             if ts is None:
-                t = conn.get(q=self.q_dt_info.GET_MAX_TS, args={"dt_id": dt_id, "model_id": model_id}, raw=True)
+                t = conn.get(q=self.q_dt_info.GET_MAX_TS, args={"job_id": job_id, "model_id": model_id}, raw=True)
                 if t is None:
                     return []
-                args = {"ts_from": t[0], "ts_to": t[0], "dt_id": dt_id, "model_id": model_id}
+                args = {"ts_from": t[0], "ts_to": t[0], "job_id": job_id, "model_id": model_id}
             else:
-                args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "dt_id": dt_id, "model_id": model_id}
+                args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "job_id": job_id, "model_id": model_id}
             return conn.select(q=self.q_dt_info.LIST, args=args, obj_type=DTForecastInfoDAO)
 
     def get(self, forecast_id: int) -> Optional[DTForecastInfoDAO]:
@@ -88,11 +89,9 @@ class DTForecastAPImpl(DTForecastAPI):
             return conn.get(q=self.q_dt_info.GET_BY_URI, args={"forecast_uri": forecast_uri},
                             obj_type=DTForecastInfoDAO)
 
-
     def get_offer(self, forecast_id: int) -> List[DTForecastOfferDAO]:
         with ConnectionWrapper() as conn:
             return conn.select(q=self.q_dt_offer.GET, args={"forecast_id": forecast_id}, obj_type=DTForecastOfferDAO)
-
 
     def get_offers(self, forecast_ids: List[int]) -> List[DTForecastOfferDAO]:
         with ConnectionWrapper() as conn:
@@ -107,7 +106,6 @@ class DTForecastAPImpl(DTForecastAPI):
                                          fail_safe=False)
 
             return [{k: v for k, v in zip(["offer_id", "isp_start", "cost_mwh", "isp_len"], r)} for r in inserted]
-
 
     def clear_forecast_offer(self, forecast_id) -> int:
         with ConnectionWrapper() as conn:

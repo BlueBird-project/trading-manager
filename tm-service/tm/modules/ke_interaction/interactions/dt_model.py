@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object
+from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
@@ -31,6 +31,7 @@ class DTTSInfo(BindingsBase):
     time_create: Literal
     ts_interval_uri: URIRef
     ts_date_from: Literal
+    sequence: OptionalLiteral = None
     ts_date_to: Literal
 
     def __init__(self, **kwargs):
@@ -56,6 +57,7 @@ class DTTSInfo(BindingsBase):
 @ki_object("dt-ts-info", allow_partial=True)
 class DTTSInfoRequest(BindingsBase):
     command_uri: URIRef
+
 
 #
 # @ki_object("dt-ts-info", result=True)

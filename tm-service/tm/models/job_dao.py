@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class JobDAO(BaseModel):
     job_id: Optional[int] = None
+    market_id: int
     command_uri: str
     job_name: str
     job_description:Optional[str] = None

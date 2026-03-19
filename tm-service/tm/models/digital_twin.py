@@ -6,7 +6,6 @@ from pydantic import BaseModel
 
 class DigitalTwinDAO(BaseModel):
     dt_id: Optional[int] = None
-    market_id: Optional[int] = None
     job_id: Optional[int] = None
     dt_uri: str
     update_ts: Optional[int] = None
@@ -15,8 +14,8 @@ class DigitalTwinDAO(BaseModel):
 
 @dataclass
 class DTModelDAO(BaseModel):
-    isp_len:  int
-    isp_unit:  int
+    isp_len: int
+    isp_unit: int
     model_id: Optional[int] = None
     model_uri: Optional[int] = None
     model_name: Optional[int] = None
@@ -25,11 +24,10 @@ class DTModelDAO(BaseModel):
     ext: Optional[str] = None
 
 
-
 @dataclass
 class DTForecastInfoDAO:
     ts: int
-    dt_id:  int
+    dt_id: int
     isp_len: int
     isp_unit: int
     update_ts: Optional[int] = None
@@ -38,7 +36,6 @@ class DTForecastInfoDAO:
     sequence: Optional[str] = None
     offer_id: Optional[int] = None
     model_id: Optional[int] = None
-
 
 
 @dataclass

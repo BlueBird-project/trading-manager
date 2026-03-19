@@ -7,6 +7,7 @@
  CREATE TABLE "public"."${table_prefix}service_jobs" (
      "job_id" bigint DEFAULT nextval('${table_prefix}service_jobs_job_id_seq') NOT NULL,
      "command_uri" character varying(250) NOT NULL,
+      "market_id" bigint,
      "job_name" character varying(50) NOT NULL,
      "job_description" character varying(50),
      "update_ts" bigint NOT NULL,
@@ -16,7 +17,8 @@
 
  WITH (oids = false);
 
- CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (command_uri);
+ CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (command_uri,market_id);
+ CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (market_id);
 
 
 DROP TABLE IF EXISTS "${table_prefix}dt_info";
@@ -27,14 +29,13 @@ CREATE TABLE "public"."${table_prefix}dt_info" (
     "dt_id" bigint DEFAULT nextval('${table_prefix}dt_info_id_seq') NOT NULL,
     "dt_uri" character varying(250) NOT NULL,
     "job_id" bigint,
-    "market_id" bigint,
     "update_ts" bigint NOT NULL,
     "ext" character varying(10000),
     CONSTRAINT "${table_prefix}dt_info_key" PRIMARY KEY ("dt_id")
 )
 WITH (oids = false);
 
-CREATE UNIQUE INDEX ${table_prefix}dt_info_dt_uri ON public.${table_prefix}dt_info USING btree (dt_uri,market_id);
+CREATE UNIQUE INDEX ${table_prefix}dt_info_dt_uri ON public.${table_prefix}dt_info USING btree (dt_uri);
 
 
 
@@ -190,6 +191,6 @@ ALTER TABLE ONLY "public"."${table_prefix}offer_details" ADD CONSTRAINT "${table
 
 INSERT INTO   "public"."${table_prefix}consumption_range" ("min_value" , "max_value"  ) VALUES (NULL,NULL);
 
-ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_market_details_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}service_jobs" ADD CONSTRAINT "${table_prefix}job_market_details_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_service_jobs_fkey" FOREIGN KEY (job_id) REFERENCES ${table_prefix}service_jobs(job_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 -- 2025-11-28 12:49:20 UTC

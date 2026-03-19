@@ -13,6 +13,11 @@ class JobAPI:
     @abstractmethod
     def list(self, ) -> List[JobDAO]:
         pass
+
     @abstractmethod
     def get(self, command_uri: str) -> Optional[JobDAO]:
+        pass
+
+    @abstractmethod
+    def get_by_market(self, market_id: int) -> Optional[JobDAO]:
         pass

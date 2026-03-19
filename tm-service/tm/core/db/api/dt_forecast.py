@@ -25,6 +25,10 @@ class DTForecastAPI:
         pass
 
     @abstractmethod
+    def get_by_uri(self, forecast_uri: str) -> Optional[DTForecastInfoDAO]:
+        pass
+
+    @abstractmethod
     def get_offer(self, forecast_id: int) -> List[DTForecastOfferDAO]:
         pass
 

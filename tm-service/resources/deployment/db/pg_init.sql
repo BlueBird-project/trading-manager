@@ -59,6 +59,7 @@ CREATE SEQUENCE ${table_prefix}forecast_details_forecast_id_seq INCREMENT 1 MINV
 
 CREATE TABLE "public"."${table_prefix}forecast_details" (
     "forecast_id" bigint DEFAULT nextval('${table_prefix}forecast_details_forecast_id_seq') NOT NULL,
+    "dt_id" bigint NOT NULL  ,
     "forecast_uri" character varying(250),
     "sequence" character varying(10),
     "offer_id" bigint  ,
@@ -176,6 +177,7 @@ CREATE UNIQUE INDEX ${table_prefix}offer_details_offer_uri ON public.${table_pre
 
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_model_id_fkey" FOREIGN KEY (model_id) REFERENCES ${table_prefix}forecast_model(model_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
+ALTER TABLE "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_dt_id_fkey" ADD FOREIGN KEY ("dt_id") REFERENCES "${table_prefix}dt_info" ("dt_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
 
 
 ALTER TABLE ONLY "public"."${table_prefix}market_offer" ADD CONSTRAINT "${table_prefix}market_offer_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
@@ -187,8 +189,6 @@ ALTER TABLE ONLY "public"."${table_prefix}market_offer_forecast" ADD CONSTRAINT 
 ALTER TABLE ONLY "public"."${table_prefix}offer_details" ADD CONSTRAINT "${table_prefix}offer_details_market_id_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 
 INSERT INTO   "public"."${table_prefix}consumption_range" ("min_value" , "max_value"  ) VALUES (NULL,NULL);
-
-
 
 ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_market_details_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_service_jobs_fkey" FOREIGN KEY (job_id) REFERENCES ${table_prefix}service_jobs(job_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;

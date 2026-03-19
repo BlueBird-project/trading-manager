@@ -29,14 +29,16 @@ class DTModelDAO(BaseModel):
 @dataclass
 class DTForecastInfoDAO:
     ts: int
+    dt_id:  int
     isp_len: int
     isp_unit: int
     update_ts: Optional[int] = None
-    dt_id: Optional[int] = None
+    forecast_id: Optional[int] = None
     forecast_uri: Optional[str] = None
     sequence: Optional[str] = None
     offer_id: Optional[int] = None
     model_id: Optional[int] = None
+
 
 
 @dataclass

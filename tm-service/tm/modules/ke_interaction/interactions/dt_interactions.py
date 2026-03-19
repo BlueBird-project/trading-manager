@@ -31,7 +31,9 @@ def _request_dt_ts_info(req: List[DTTSInfoRequest]):
 
 @ki.react("dt-ts-info")
 def on_dt_ts_info(ki_id, bindings: List[DTTSInfo]):
+
     print("on new digital twin timeseries info")
+    ack = dt_service.process_forecast(bindings)
     print(bindings)
     # TODO  save dt ts metadata
     # ack = dt_service.process_timeseries_info(bindings)

@@ -93,7 +93,7 @@ https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
 ```shell
 docker load -i ./images/trading-manager.0.5.1.tar
 docker load -i ./images/local-entsoe-service.latest.tar 
-docker load -i ./images/base-entsoe-service.latest.tar
+docker load -i ./images/tm-entsoe-service-latest-0.5.2.tar
 ```
 
 ### export image

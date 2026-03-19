@@ -10,7 +10,7 @@ from tm.utils import TimeSpan
 
 
 class DTForecastInfoQueries(QueryObject):
-    __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"job_id","sequence" ,"offer_id" ,"model_id" ,"ts" , 
+    __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"range_id" ,"job_id","sequence" ,"offer_id" ,"model_id" ,"ts" , 
     "isp_len"  ,"isp_unit"  ,"update_ts" """
     __TABLE_NAME__ = "forecast_details"
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" 
@@ -23,14 +23,14 @@ class DTForecastInfoQueries(QueryObject):
     GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE  forecast_id = :forecast_id """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
-     ( "forecast_id", "forecast_uri" ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
+     ( "forecast_id", "forecast_uri","range_id"  ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
     "isp_len"  ,"isp_unit"  ,"update_ts"  )
-     VALUES (:forecast_id, :forecast_uri,:sequence, :offer_id, :model_id, :ts ,
+     VALUES (:forecast_id, :forecast_uri, :range_id, :sequence, :offer_id, :model_id, :ts ,
       :isp_len , :isp_unit , extract(epoch from now()) * 1000) """
 
 
 class DTForecastQueries(QueryObject):
-    __PROJECTION__ = """ "forecast_id", "isp_start" ,"range_id" ,"cost_mwh" ,"ts" ,"isp_len" """
+    __PROJECTION__ = """ "forecast_id", "isp_start" ,"cost_mwh" ,"ts" ,"isp_len" """
     __TABLE_NAME__ = "market_offer_forecast"
 
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}"  WHERE forecast_id in :forecast_ids """
@@ -41,8 +41,8 @@ class DTForecastQueries(QueryObject):
      VALUES (:dt_uri, :market_id,:job_id, :ext,extract(epoch from now()) * 1000) """
 
     INSERT_FORECAST_OFFER = """ INSERT INTO "${table_prefix}${table_name}"
-        ("forecast_id", "isp_start", "range_id", "cost_mwh", "ts", "isp_len")
-        VALUES (:forecast_id, :isp_start, :range_id, :cost_mwh, :ts, :isp_len)   """
+        ("forecast_id", "isp_start",  "cost_mwh", "ts", "isp_len")
+        VALUES (:forecast_id, :isp_start,   :cost_mwh, :ts, :isp_len)   """
 
     DELETE_FORECAST_OFFER = """ DELETE FROM "${table_prefix}${table_name}" WHERE forecast_id=:forecast_id  """
 

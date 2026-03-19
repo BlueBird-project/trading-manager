@@ -10,18 +10,18 @@ from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarke
 class MarketOfferQueries:
     # TODO add override option for market offer , real offer > forecast offer
     LIST_OFFER_INFO = """SELECT "offer_id","market_id", "ts", "date_str",
-     "offer_uri","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
+     "offer_uri","range_id","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
       FROM "${table_prefix}offer_details" 
        WHERE  ("ts" BETWEEN :ts_from and :ts_to) and COALESCE("isp_unit"=:isp_unit,TRUE  )
        AND COALESCE(market_id = :market_id,TRUE)
         """
     SELECT_MARKET_OFFER_INFO_BY_URI = """SELECT "offer_id","market_id", "ts", "date_str",
-     "offer_uri","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
+     "offer_uri","range_id","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
       FROM "${table_prefix}offer_details"  WHERE offer_uri = :offer_uri   """
 
     INSERT_MARKET_OFFER_DETAILS = """  INSERT INTO "${table_prefix}offer_details" 
-    ("market_id", "ts", "date_str", "offer_uri","sequence", "isp_unit", "isp_len", "update_ts", "ext")
-    VALUES (:market_id, :ts, :date_str, :offer_uri,:sequence, :isp_unit, :isp_len,
+    ("market_id", "ts", "date_str", "offer_uri","range_id","sequence", "isp_unit", "isp_len", "update_ts", "ext")
+    VALUES (:market_id, :ts, :date_str, :offer_uri,:range_id,:sequence, :isp_unit, :isp_len,
      extract(epoch from now()) * 1000, NULL)   """
     # TODO: on conflixt
     # ON CONFLICT ("market_uri" ) DO UPDATE
@@ -41,7 +41,7 @@ class MarketOfferQueries:
     GET_MARKET_OFFER_BY_OFFER_ID = """SELECT "offer_id", "isp_start", "range_id", "cost_mwh", "ts", "isp_len"
       FROM "${table_prefix}market_offer"  WHERE offer_id = :offer_id
        """
-    LIST_MARKET_OFFER = """SELECT offer."offer_id", offer."isp_start", offer."range_id", 
+    LIST_MARKET_OFFER = """SELECT offer."offer_id", offer."isp_start", 
       offer."cost_mwh", offer."ts", offer."isp_len"
       FROM "${table_prefix}market_offer" offer  
       JOIN "${table_prefix}offer_details"  offer_info  on offer.offer_id = offer_info.offer_id 
@@ -49,8 +49,8 @@ class MarketOfferQueries:
            (offer."ts" BETWEEN :ts_from and :ts_to) and COALESCE(offer_info."isp_unit"=:isp_unit,TRUE )  """
 
     INSERT_MARKET_OFFER = """ INSERT INTO "${table_prefix}market_offer" 
-        ("offer_id", "isp_start", "range_id", "cost_mwh", "ts", "isp_len")
-        VALUES (:offer_id, :isp_start, :range_id, :cost_mwh, :ts, :isp_len)   """
+        ("offer_id", "isp_start",  "cost_mwh", "ts", "isp_len")
+        VALUES (:offer_id, :isp_start,  :cost_mwh, :ts, :isp_len)   """
 
     DELETE_MARKET_OFFER = """ DELETE FROM "${table_prefix}market_offer"  WHERE offer_id=:offer_id  """
 

@@ -62,6 +62,7 @@ CREATE TABLE "public"."${table_prefix}forecast_details" (
     "forecast_id" bigint DEFAULT nextval('${table_prefix}forecast_details_forecast_id_seq') NOT NULL,
     "dt_id" bigint NOT NULL  ,
     "forecast_uri" character varying(250),
+    "range_id" integer NOT NULL,
     "sequence" character varying(10),
     "offer_id" bigint  ,
     "model_id" bigint   ,
@@ -74,7 +75,8 @@ CREATE TABLE "public"."${table_prefix}forecast_details" (
 
 WITH (oids = false);
 
-CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,offer_id);
+CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_offer_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,offer_id);
+CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_range_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,range_id);
 
 CREATE INDEX ${table_prefix}forecast_details_model_id ON public.${table_prefix}forecast_details USING btree (model_id);
 CREATE INDEX ${table_prefix}forecast_details_offer_id ON public.${table_prefix}forecast_details USING btree (offer_id);
@@ -127,11 +129,10 @@ DROP TABLE IF EXISTS "${table_prefix}market_offer";
 CREATE TABLE "public"."${table_prefix}market_offer" (
     "offer_id" bigint NOT NULL,
     "isp_start" integer NOT NULL,
-    "range_id" integer NOT NULL,
     "cost_mwh" double precision,
     "ts" bigint NOT NULL,
     "isp_len" integer NOT NULL,
-    CONSTRAINT "${table_prefix}market_offer_market_id_offer_id_isp_start_range_id" PRIMARY KEY (  "offer_id", "isp_start", "range_id")
+    CONSTRAINT "${table_prefix}market_offer_market_id_offer_id_isp_start" PRIMARY KEY (  "offer_id", "isp_start" )
 )
 WITH (oids = false);
 
@@ -142,11 +143,10 @@ DROP TABLE IF EXISTS "${table_prefix}market_offer_forecast";
 CREATE TABLE "public"."${table_prefix}market_offer_forecast" (
     "forecast_id" bigint NOT NULL,
     "isp_start" integer NOT NULL,
-    "range_id" integer NOT NULL,
     "cost_mwh" double precision,
     "ts" bigint NOT NULL,
     "isp_len" integer NOT NULL,
-    CONSTRAINT "${table_prefix}market_offer_forecast_market_id_forecast_id_isp_start_rang" PRIMARY KEY (  "forecast_id", "isp_start", "range_id")
+    CONSTRAINT "${table_prefix}market_offer_forecast_market_id_forecast_id_isp_start" PRIMARY KEY (  "forecast_id", "isp_start" )
 )
 WITH (oids = false);
 
@@ -160,6 +160,7 @@ CREATE TABLE "public"."${table_prefix}offer_details" (
     "offer_id" bigint DEFAULT nextval('${table_prefix}offer_details_offer_id_seq') NOT NULL,
     "market_id" bigint NOT NULL,
     "ts" bigint NOT NULL,
+    "range_id" integer NOT NULL,
 	"date_str"  character varying(10) NOT NULL,
     "offer_uri" character varying(250),
     "sequence" character varying(10),
@@ -171,23 +172,23 @@ CREATE TABLE "public"."${table_prefix}offer_details" (
 )
 WITH (oids = false);
 
-CREATE UNIQUE INDEX ${table_prefix}offer_details_market_id_ts ON public.${table_prefix}offer_details USING btree (market_id,sequence, ts);
+CREATE UNIQUE INDEX ${table_prefix}offer_details_market_id_ts_range_id ON public.${table_prefix}offer_details USING btree (market_id,sequence, ts,range_id);
 CREATE UNIQUE INDEX ${table_prefix}offer_details_offer_uri ON public.${table_prefix}offer_details USING btree (offer_uri);
 
 
 
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_model_id_fkey" FOREIGN KEY (model_id) REFERENCES ${table_prefix}forecast_model(model_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
-ALTER TABLE "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_dt_id_fkey" ADD FOREIGN KEY ("dt_id") REFERENCES "${table_prefix}dt_info" ("dt_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_dt_id_fkey" ADD FOREIGN KEY ("dt_id") REFERENCES "${table_prefix}dt_info" ("dt_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
 
 
 ALTER TABLE ONLY "public"."${table_prefix}market_offer" ADD CONSTRAINT "${table_prefix}market_offer_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."${table_prefix}market_offer" ADD CONSTRAINT "${table_prefix}market_offer_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."${table_prefix}market_offer_forecast" ADD CONSTRAINT "${table_prefix}market_offer_forecast_forecast_id_fkey" FOREIGN KEY (forecast_id) REFERENCES ${table_prefix}forecast_details(forecast_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."${table_prefix}market_offer_forecast" ADD CONSTRAINT "${table_prefix}market_offer_forecast_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE SET NULL ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."${table_prefix}offer_details" ADD CONSTRAINT "${table_prefix}offer_details_market_id_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}offer_details" ADD CONSTRAINT "${table_prefix}offer_details_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 
 INSERT INTO   "public"."${table_prefix}consumption_range" ("min_value" , "max_value"  ) VALUES (NULL,NULL);
 

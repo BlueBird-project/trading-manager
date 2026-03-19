@@ -30,6 +30,7 @@ class DTForecastInfoDAO:
     job_id: int
     isp_len: int
     isp_unit: int
+    range_id:int
     update_ts: Optional[int] = None
     forecast_id: Optional[int] = None
     forecast_uri: Optional[str] = None
@@ -42,7 +43,6 @@ class DTForecastInfoDAO:
 class DTForecastOfferDAO:
     forecast_id: int
     isp_start: int
-    range_id: int
     cost_mwh: Optional[float]
     ts: int
     isp_len: int = 1

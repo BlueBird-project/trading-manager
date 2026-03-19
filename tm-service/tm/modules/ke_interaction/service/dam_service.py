@@ -40,8 +40,10 @@ def save_offer_info(offer_bindings: List[MarketOfferInfoBindings]):
         if market is None:
             logging.warning(f"Market not registered: {binding.market_uri}")
         else:
+            unlimited_range = dao_manager.offer_dao.get_range(None, None)
+            range_id = unlimited_range.range_id
             offer_info = EnergyMarketOfferInfo(**vars(binding), market_id=market.market_id, ts=binding.create_ts,
-                                               isp_unit=binding.update_rate_min, date_str=date_str,
+                                               isp_unit=binding.update_rate_min, date_str=date_str, range_id=range_id,
                                                isp_len=binding.isp_len)
             db_offer = dao_manager.offer_dao.get_offer_info(offer_uri=str(binding.offer_uri))
             if db_offer is not None:
@@ -62,7 +64,7 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
         grouped_bindings[str(ob.offer_uri)].append(ob)
 
     unlimited_range = dao_manager.offer_dao.get_range(None, None)
-    range_id = unlimited_range.range_id
+    # range_id = unlimited_range.range_id
 
     for offer_uri, market_offer in grouped_bindings.items():
         offer_info = dao_manager.offer_dao.get_offer_info(offer_uri=offer_uri)
@@ -83,7 +85,7 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
             for i, binding in enumerate(market_offer):
                 isp_start = (binding.ts_ms - ts_start) / isp_len_ms
                 mo = EnergyMarketOffer(offer_id=offer_info.offer_id, ts=offer_info.ts,
-                                       isp_start=isp_start, range_id=range_id, cost_mwh=binding.get_value(),
+                                       isp_start=isp_start, cost_mwh=binding.get_value(),
                                        isp_len=binding.isp_len(offer_info.isp_unit))
 
                 market_offer_items[i] = mo

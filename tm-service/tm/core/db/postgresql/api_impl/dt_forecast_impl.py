@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
@@ -13,10 +13,13 @@ class DTForecastInfoQueries(QueryObject):
     __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
     "isp_len"  ,"isp_unit"  ,"update_ts" """
     __TABLE_NAME__ = "forecast_details"
-    LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE :ts """
+    LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" 
+      WHERE  COALESCE( dt_id = :dt_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )
+      AND   ("ts" BETWEEN :ts_from and :ts_to)  """
 
     GET_BY_URI = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE   forecast_uri = :forecast_uri """
-    GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" WHERE  """
+    GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" 
+        WHERE COALESCE( dt_id = :dt_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
     GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE  forecast_id = :forecast_id """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
@@ -29,15 +32,19 @@ class DTForecastInfoQueries(QueryObject):
 class DTForecastQueries(QueryObject):
     __PROJECTION__ = """ "forecast_id", "isp_start" ,"range_id" ,"cost_mwh" ,"ts" ,"isp_len" """
     __TABLE_NAME__ = "market_offer_forecast"
-    LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" """
-    GET_BY_URI = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE 
-    dt_uri = :dt_uri and (( market_id is NULL and :market_id is NULL) or market_id=:market_id )"""
+
+    LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}"  WHERE forecast_id in :forecast_ids """
+    GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE forecast_id=:forecast_id"""
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
      ( "dt_uri","market_id","job_id","ext" ,"update_ts"  )
      VALUES (:dt_uri, :market_id,:job_id, :ext,extract(epoch from now()) * 1000) """
-    pass
 
+    INSERT_FORECAST_OFFER = """ INSERT INTO "${table_prefix}${table_name}"
+        ("forecast_id", "isp_start", "range_id", "cost_mwh", "ts", "isp_len")
+        VALUES (:forecast_id, :isp_start, :range_id, :cost_mwh, :ts, :isp_len)   """
+
+    DELETE_FORECAST_OFFER = """ DELETE FROM "${table_prefix}${table_name}" WHERE forecast_id=:forecast_id  """
 
 class DTForecastAPImpl(DTForecastAPI):
     q_dt_info: DTForecastInfoQueries
@@ -48,7 +55,6 @@ class DTForecastAPImpl(DTForecastAPI):
         self.q_dt_info: DTForecastInfoQueries = DTForecastInfoQueries.build(table_prefix=table_prefix)
         self.q_dt_offer: DTForecastQueries = DTForecastQueries.build(table_prefix=table_prefix)
 
-    @abstractmethod
     def save(self, forecast_info: DTForecastInfoDAO) -> DTForecastInfoDAO:
         with ConnectionWrapper() as conn:
             inserted_id = conn.insert(q=self.q_dt_info.INSERT, args=vars(forecast_info),
@@ -58,31 +64,54 @@ class DTForecastAPImpl(DTForecastAPI):
             forecast_info.forecast_uri = inserted_id
             return forecast_info
 
-    @abstractmethod
     def list_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int]) -> List[DTForecastInfoDAO]:
-        with ConnectionWrapper() as conn:
-            if ts is None:
+        return self.find_forecasts(ts=ts, dt_id=dt_id, model_id=None)
 
-            conn.get(q=self.)
-            return conn.select(q=self.queries.LIST, args={}, obj_type=DigitalTwinDAO)
-        pass
-
-    @abstractmethod
     def find_forecasts(self, ts: Optional[TimeSpan], dt_id: Optional[int], model_id: Optional[int], ) \
             -> List[DTForecastInfoDAO]:
-        pass
+        with ConnectionWrapper() as conn:
+            if ts is None:
+                t = conn.get(q=self.q_dt_info.GET_MAX_TS, args={"dt_id": dt_id, "model_id": model_id}, raw=True)
+                if t is None:
+                    return []
+                args = {"ts_from": t[0], "ts_to": t[0], "dt_id": dt_id, "model_id": model_id}
+            else:
+                args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "dt_id": dt_id, "model_id": model_id}
+            return conn.select(q=self.q_dt_info.LIST, args=args, obj_type=DTForecastInfoDAO)
 
-    @abstractmethod
     def get(self, forecast_id: int) -> Optional[DTForecastInfoDAO]:
-        pass
+        with ConnectionWrapper() as conn:
+            return conn.get(q=self.q_dt_info.GET, args={"forecast_id": forecast_id}, obj_type=DTForecastInfoDAO)
 
     def get_by_uri(self, forecast_uri: str) -> Optional[DTForecastInfoDAO]:
-        pass
+        with ConnectionWrapper() as conn:
+            return conn.get(q=self.q_dt_info.GET_BY_URI, args={"forecast_uri": forecast_uri},
+                            obj_type=DTForecastInfoDAO)
 
-    @abstractmethod
+
     def get_offer(self, forecast_id: int) -> List[DTForecastOfferDAO]:
-        pass
+        with ConnectionWrapper() as conn:
+            return conn.select(q=self.q_dt_offer.GET, args={"forecast_id": forecast_id}, obj_type=DTForecastOfferDAO)
+
+
+    def get_offers(self, forecast_ids: List[int]) -> List[DTForecastOfferDAO]:
+        with ConnectionWrapper() as conn:
+            return conn.select(q=self.q_dt_offer.LIST, args={"forecast_ids": forecast_ids}, obj_type=DTForecastOfferDAO)
 
     @abstractmethod
-    def get_offers(self, forecast_id: List[int]) -> List[DTForecastOfferDAO]:
-        pass
+    def save_offer(self, forecast_offers: List[DTForecastOfferDAO]) -> List[Dict]:
+        with ConnectionWrapper() as conn:
+            inserted = conn.insert_batch(q=self.q_dt_offer.INSERT_FORECAST_OFFER,
+                                         arg_list=[vars(fo) for fo in forecast_offers],
+                                         return_id_col=["offer_id", "isp_start", "cost_mwh", "isp_len"],
+                                         fail_safe=False)
+
+            return [{k: v for k, v in zip(["offer_id", "isp_start", "cost_mwh", "isp_len"], r)} for r in inserted]
+
+
+    def clear_forecast_offer(self, forecast_id) -> int:
+        with ConnectionWrapper() as conn:
+            deleted = conn.update(q=self.q_dt_offer.DELETE_FORECAST_OFFER,
+                                  args={"offer_id": forecast_id})
+
+            return deleted

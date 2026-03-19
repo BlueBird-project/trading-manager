@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from tm.models.digital_twin import DTForecastInfoDAO, DTForecastOfferDAO
 from tm.utils import TimeSpan
@@ -34,4 +34,12 @@ class DTForecastAPI:
 
     @abstractmethod
     def get_offers(self, forecast_id: List[int]) -> List[DTForecastOfferDAO]:
+        pass
+
+    @abstractmethod
+    def save_offer(self, forecast_offers: List[DTForecastOfferDAO]) -> List[Dict]:
+        pass
+
+    @abstractmethod
+    def clear_forecast_offer(self, forecast_id) -> int:
         pass

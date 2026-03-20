@@ -17,7 +17,7 @@
 
  WITH (oids = false);
 
- CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (command_uri,market_id);
+ CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri_market_id ON public.${table_prefix}service_jobs USING btree (command_uri,market_id);
  CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (market_id);
 
 
@@ -180,7 +180,7 @@ CREATE UNIQUE INDEX ${table_prefix}offer_details_offer_uri ON public.${table_pre
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_model_id_fkey" FOREIGN KEY (model_id) REFERENCES ${table_prefix}forecast_model(model_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_dt_id_fkey" ADD FOREIGN KEY ("dt_id") REFERENCES "${table_prefix}dt_info" ("dt_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_dt_id_fkey"  FOREIGN KEY ("dt_id") REFERENCES "${table_prefix}dt_info" ("dt_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
 
 
 ALTER TABLE ONLY "public"."${table_prefix}market_offer" ADD CONSTRAINT "${table_prefix}market_offer_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;

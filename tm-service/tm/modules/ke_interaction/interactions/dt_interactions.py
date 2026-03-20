@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from ke_client import KIHolder
 from ke_client.ki_model import KIAskResponse
@@ -31,9 +31,8 @@ def _request_dt_ts_info(req: List[DTTSInfoRequest]):
 
 @ki.react("dt-ts-info")
 def on_dt_ts_info(ki_id, bindings: List[DTTSInfo]):
-
     print("on new digital twin timeseries info")
-    ack = dt_service.process_forecast(bindings)
+    ack = dt_service.process_forecast_info(bindings)
     print(bindings)
     # TODO  save dt ts metadata
     # ack = dt_service.process_timeseries_info(bindings)
@@ -43,7 +42,7 @@ def on_dt_ts_info(ki_id, bindings: List[DTTSInfo]):
 @ki.react("dt-ts")
 def on_dt_ts(ki_id, bindings: List[DTPnt]):
     print(f"on new digital twin timeseries data: {len(bindings)}")
-    # TODO  save
+    dt_service.process_forecast(forecast=bindings)
     # ack = dt_service.process_timeseries(bindings)
     # print(dt_ts)
     return []
@@ -63,20 +62,21 @@ def request_dt_info() -> List[DigitalTwinInfo]:
 
 def request_dt_ts_info(req: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     bindings: KIAskResponse = _request_dt_ts_info(req)
-    # TODO: store response
-    return [DTTSInfo(**b) for b in bindings.binding_set]
+    forecast_info = [DTTSInfo(**b) for b in bindings.binding_set]
+    ack = dt_service.process_forecast_info(bindings=forecast_info)
+    return ack
 
 
-def request_dt_data(dt_uri: str, ts_from: int, ts_to: int) -> List[DTPnt]:
+def request_dt_data(dt_uri: str, ts_from: int, ts_to: int) -> Dict[str, List]:
     ts_uri_ref: URIRef = DTTSUri(prefix=dt_uri, ts_start=ts_from, ts_end=ts_to).uri_ref
     # noinspection PyTypeChecker
     bindings: KIAskResponse = _request_dt_ts(ts_uri_ref=ts_uri_ref)
-    # TODO: store response
-    return [DTPnt(**b) for b in bindings.binding_set]
+    stored_forecasts = dt_service.process_forecast(forecast=[DTPnt(**b) for b in bindings.binding_set])
+    return stored_forecasts
 
 
-def request_dt_data_by_id(ts_uri_ref: URIRef) -> List[DTPnt]:
+def request_dt_data_by_id(ts_uri_ref: URIRef) -> Dict[str, List]:
     # noinspection PyTypeChecker
     bindings: KIAskResponse = _request_dt_ts(ts_uri_ref=ts_uri_ref)
-    # TODO: store response
-    return [DTPnt(**b) for b in bindings.binding_set]
+    stored_forecasts = dt_service.process_forecast(forecast=[DTPnt(**b) for b in bindings.binding_set])
+    return stored_forecasts

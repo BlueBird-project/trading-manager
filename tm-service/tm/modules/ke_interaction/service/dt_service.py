@@ -1,11 +1,14 @@
 import logging
-from typing import List
+from collections import defaultdict
+from typing import List, Dict
 
 from ke_client.utils import to_json
 
-from tm.models.digital_twin import DigitalTwinDAO, DTForecastInfoDAO
+from tm.models.digital_twin import DigitalTwinDAO, DTForecastInfoDAO, DTForecastOfferDAO
 from tm.models.job_dao import JobDAO
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo
+from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt
+
+__MINUTE_MS__ = 60 * 1000
 
 
 def process(dt_info_list: List[DigitalTwinInfo]):
@@ -35,9 +38,11 @@ def process(dt_info_list: List[DigitalTwinInfo]):
     # return response
 
 
-def process_forecast(bindings: List[DTTSInfo]):
+def process_forecast_info(bindings: List[DTTSInfo]):
     from tm.core.db.postgresql import dao_manager
     added_ts = []
+    unlimited_range = dao_manager.offer_dao.get_range(None, None)
+    range_id = unlimited_range.range_id
     for b in bindings:
         job = dao_manager.job_api.get(command_uri=b.command_uri)
         if job is None:
@@ -45,13 +50,54 @@ def process_forecast(bindings: List[DTTSInfo]):
         else:
             db_ts = dao_manager.forecast_api.get_by_uri(forecast_uri=b.ts_uri)
             if db_ts is not None:
+                print(f"Forecast {b.ts_uri} have already been added")
                 logging.info(f"Forecast {b.ts_uri} have already been added")
                 #     TODO: update current instance in Db?
                 # added_ts.append(new_ts)
             else:
                 new_ts = DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.create_ts,
                                            isp_unit=b.update_rate_min, sequence=b.sequence,
-                                           isp_len=b.isp_len)
+                                           isp_len=b.isp_len, range_id=range_id)
                 logging.info(f"Forecast {b.ts_uri}:{new_ts.forecast_id} have been added")
                 added_ts.append(new_ts)
     return added_ts
+
+
+def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
+    from tm.core.db.postgresql import dao_manager
+    grouped_bindings: Dict[str, List[DTPnt]] = defaultdict(list)
+    saved_bindings = defaultdict(list)
+    for f in forecast:
+        grouped_bindings[str(f.ts_uri)].append(f)
+
+    for ts_uri, forecast in grouped_bindings.items():
+        forecast_info = dao_manager.forecast_api.get_by_uri(forecast_uri=ts_uri)
+        if forecast_info is None:
+            #     TODO:
+            # raise Exception(f"Init offer info {offer_uri}")
+            # TODO: add bg task to ask KE for offer details
+            logging.error(f"Offer not registered {forecast_info}")
+            # del grouped_bindings[offer_uri]
+        else:
+            if clear:
+                # print(f"Updating with new offer {offer_uri}")
+                logging.info(f"Removing old offer for {forecast_info}")
+                dao_manager.forecast_api.clear_forecast_offer(forecast_id=forecast_info.forecast_uri)
+            isp_len_ms = forecast_info.isp_unit * __MINUTE_MS__
+            ts_start = forecast_info.ts
+            forecast_dao: list = [None] * len(grouped_bindings[forecast_info.forecast_uri])
+            for i, dp in enumerate(forecast):
+                isp_start = (dp.ts_ms - ts_start) / isp_len_ms
+                dp_dao = DTForecastOfferDAO(forecast_id=forecast_info.forecast_id, ts=forecast_info.ts,
+                                        isp_start=isp_start,   cost_mwh=dp.get_value(),
+                                        isp_len=dp.isp_len(forecast_info.isp_unit))
+
+                forecast_dao[i] = dp_dao
+            saved_bindings[forecast_info.forecast_uri]=dao_manager.forecast_api.save_offer(forecast_offers=forecast_dao)
+
+    return saved_bindings
+    # forecast_id: int
+    # isp_start: int
+    # cost_mwh: Optional[float]
+    # ts: int
+    # isp_len: int = 1

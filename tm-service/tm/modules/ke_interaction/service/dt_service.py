@@ -38,9 +38,9 @@ def process(dt_info_list: List[DigitalTwinInfo]):
     # return response
 
 
-def process_forecast_info(bindings: List[DTTSInfo]):
+def process_forecast_info(bindings: List[DTTSInfo])->List[DTForecastInfoDAO]:
     from tm.core.db.postgresql import dao_manager
-    added_ts = []
+    added_ts :List[DTForecastInfoDAO]= []
     unlimited_range = dao_manager.offer_dao.get_range(None, None)
     range_id = unlimited_range.range_id
     for b in bindings:

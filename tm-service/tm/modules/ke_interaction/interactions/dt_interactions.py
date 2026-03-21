@@ -3,6 +3,7 @@ from typing import List, Dict
 from ke_client import KIHolder
 from ke_client.ki_model import KIAskResponse
 
+from tm.models.digital_twin import DTForecastInfoDAO
 from tm.modules.ke_interaction.interactions.dt_model import *
 from tm.modules.ke_interaction.service import dt_service
 
@@ -60,7 +61,7 @@ def request_dt_info() -> List[DigitalTwinInfo]:
     return dts
 
 
-def request_dt_ts_info(req: List[DTTSInfoRequest]) -> List[DTTSInfo]:
+def request_dt_ts_info(req: List[DTTSInfoRequest]) -> List[DTForecastInfoDAO]:
     bindings: KIAskResponse = _request_dt_ts_info(req)
     forecast_info = [DTTSInfo(**b) for b in bindings.binding_set]
     ack = dt_service.process_forecast_info(bindings=forecast_info)

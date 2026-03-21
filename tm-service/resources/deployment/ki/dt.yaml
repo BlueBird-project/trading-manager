@@ -27,7 +27,7 @@ knowledge_engine:
       pattern:
         - ' ?command_uri  saref:hasOutput ?ts_uri; rdf:type saref:CommandOfInterest .'
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
-        - ' ?ts_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
+        - ' ?ts_uri s4ener:hasUpdateRate  ?update_rate.'
         - ' ?ts_uri s4ener:hasCreationTime ?time_create .'
         - ' ?ts_uri s4ener:hasEffectivePeriod  ?ts_interval_uri .'
         - ' ?ts_uri ubmarket:hasMarketSequence ?sequence .'

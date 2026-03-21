@@ -133,18 +133,20 @@ class MarketOfferInfoBindings(BindingsBase):
     #     return int(day_duration / isp_unit) + 1
 
 
-@ki_object("market-offer-info-filtered")
-class MarketOfferInfoFilteredBindings(MarketOfferInfoBindings):
-    ts_interval_uri: URIRef
-    ts_date_from: Literal
-    ts_date_to: Literal
-
 
 @ki_object("market-offer-info", allow_partial=True)
 class MarketOfferInfoRequest(BindingsBase):
     market_uri: URIRef
     # market_type: Optional[URIRef]
     # sequence: Optional[Literal]
+
+# todo duplicate obj
+@ki_object("market-offer-info-filtered")
+class MarketOfferInfoFilteredBindings(MarketOfferInfoBindings):
+    ts_interval_uri: URIRef
+    ts_date_from: Literal
+    ts_date_to: Literal
+
 
 
 @ki_object("market-offer-info-filtered", allow_partial=True)

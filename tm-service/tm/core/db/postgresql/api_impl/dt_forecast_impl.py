@@ -5,22 +5,38 @@ from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
 from tm.core.db.api.dt_forecast import DTForecastAPI
 from tm.core.db.postgresql.api_impl import QueryObject
+from tm.core.db.postgresql.api_impl.dt_api_impl import DTAPIQueries
 from tm.models.digital_twin import DTForecastInfoDAO, DTForecastOfferDAO
 from tm.utils import TimeSpan
 
 
 class DTForecastInfoQueries(QueryObject):
-    __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"range_id" ,"job_id","sequence" ,"offer_id" ,"model_id" ,"ts" , 
-    "isp_len"  ,"isp_unit"  ,"update_ts" """
+    # __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"range_id" ,"job_id","sequence" ,"offer_id" ,"model_id" ,"ts" ,
+    # "isp_len"  ,"isp_unit"  ,"update_ts" """
     __TABLE_NAME__ = "forecast_details"
-    LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" 
-      WHERE  COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )
-      AND   ("ts" BETWEEN :ts_from and :ts_to)  """
 
-    GET_BY_URI = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE   forecast_uri = :forecast_uri """
+    __PROJECTION__ = """ ${table_alias}."forecast_id",  ${table_alias}."forecast_uri" ,
+        ${table_alias}."range_id" ,  ${table_alias}."sequence" ,  ${table_alias}."offer_id" ,
+         ${table_alias}."model_id" , ${table_alias}."ts" ,  ${table_alias}."isp_len"  ,
+        ${table_alias}."isp_unit"  ,${table_alias}."update_ts" """
+
+    # LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}"
+    #   WHERE  COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )
+    #   AND   ("ts" BETWEEN :ts_from and :ts_to)  """
+    LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}"  as ${table_alias}
+        JOIN  "${table_prefix}""" + DTAPIQueries.__TABLE_NAME__ + """" as dt_info 
+      WHERE COALESCE( dt_info.job_id = :job_id , TRUE ) AND
+        COALESCE( model_id = :model_id , TRUE )  AND   ("ts" BETWEEN :ts_from and :ts_to)  """
+
+    GET_BY_URI = """SELECT ${projection} FROM "${table_prefix}${table_name}" as ${table_alias} 
+     WHERE   forecast_uri = :forecast_uri """
+    # GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}"
+    #     WHERE COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
     GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" 
-        WHERE COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
-    GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE  forecast_id = :forecast_id """
+        JOIN  "${table_prefix}""" + DTAPIQueries.__TABLE_NAME__ + """" as dt_info 
+        WHERE  COALESCE( dt_info.job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
+    GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" as ${table_alias}
+     WHERE  forecast_id = :forecast_id """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
      ( "forecast_id", "forecast_uri","range_id"  ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
@@ -36,10 +52,6 @@ class DTForecastQueries(QueryObject):
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}"  WHERE forecast_id in :forecast_ids """
     GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE forecast_id=:forecast_id"""
 
-    INSERT = """INSERT INTO "${table_prefix}${table_name}"
-     ( "dt_uri","market_id","job_id","ext" ,"update_ts"  )
-     VALUES (:dt_uri, :market_id,:job_id, :ext,extract(epoch from now()) * 1000) """
-
     INSERT_FORECAST_OFFER = """ INSERT INTO "${table_prefix}${table_name}"
         ("forecast_id", "isp_start",  "cost_mwh", "ts", "isp_len")
         VALUES (:forecast_id, :isp_start,   :cost_mwh, :ts, :isp_len)   """
@@ -53,7 +65,8 @@ class DTForecastAPImpl(DTForecastAPI):
 
     def __init__(self, table_prefix: str):
         super().__init__()
-        self.q_dt_info: DTForecastInfoQueries = DTForecastInfoQueries.build(table_prefix=table_prefix)
+        self.q_dt_info: DTForecastInfoQueries = DTForecastInfoQueries.build(table_prefix=table_prefix,
+                                                                            table_alias="dtf_info")
         self.q_dt_offer: DTForecastQueries = DTForecastQueries.build(table_prefix=table_prefix)
 
     def save(self, forecast_info: DTForecastInfoDAO) -> DTForecastInfoDAO:

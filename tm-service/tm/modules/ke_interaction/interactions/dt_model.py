@@ -1,5 +1,6 @@
 from typing import Optional
 
+from isodate import parse_duration
 from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
@@ -33,10 +34,13 @@ class DTTSInfo(BindingsBase):
     ts_date_from: Literal
     sequence: OptionalLiteral = None
     ts_date_to: Literal
+    update_rate: Literal
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)
-
+    @property
+    def update_rate_min(self) -> int:
+        return int(parse_duration(self.update_rate, as_timedelta_if_possible=True).total_seconds() / 60)
     @property
     def create_ts(self):
         return time_utils.xsd_to_ts(self.time_create)
@@ -51,6 +55,13 @@ class DTTSInfo(BindingsBase):
 
     @property
     def interval_ts(self) -> int:
+        return self.to_ts - self.from_ts
+
+    @property
+    def isp_len(self) -> int:
+        ms_diff=self.to_ts - self.from_ts
+        min_diff= ms_diff/(60000)/self.update_rate_min
+        print(f"TODO: remove , isp_len {ms_diff}")
         return self.to_ts - self.from_ts
 
 

@@ -38,7 +38,7 @@ class MarketOfferQueries:
     WHERE ( (:max_value is NULL) or  ( "min_value" is NULL or "min_value" < :max_value) )
      AND  ( (:min_value is NULL) or ( "max_value" is NULL or "max_value" > :min_value) )  """
 
-    GET_MARKET_OFFER_BY_OFFER_ID = """SELECT "offer_id", "isp_start", "range_id", "cost_mwh", "ts", "isp_len"
+    GET_MARKET_OFFER_BY_OFFER_ID = """SELECT "offer_id", "isp_start",    "cost_mwh", "ts", "isp_len"
       FROM "${table_prefix}market_offer"  WHERE offer_id = :offer_id
        """
     LIST_MARKET_OFFER = """SELECT offer."offer_id", offer."isp_start", 

@@ -52,13 +52,18 @@ Download & import docker images [here](#download-images)
 
 ```yaml
 docker-compose -p local -f compose.yaml --env-file .env build 
+docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  build 
+
 ```
 
 ### Run
 
 ```yaml
 docker-compose -p local -f compose.yaml --env-file .env create
-docker-compose -p local -f compose.yaml --env-file .env start 
+docker-compose -p local -f compose.yaml --env-file .env start
+
+docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  create 
+docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  start 
 ```
 
 check consumed resources:
@@ -92,8 +97,8 @@ https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
 
 ```shell
 docker load -i ./images/trading-manager.0.5.1.tar
-docker load -i ./images/local-entsoe-service.latest.tar 
-docker load -i ./images/tm-entsoe-service-latest-0.5.2.tar
+docker load -i ./images/tge-dayahead-service:0.5.2.tar
+docker load -i ./images/tm-entsoe-service-latest-0.5.3.tar
 ```
 
 ### export image

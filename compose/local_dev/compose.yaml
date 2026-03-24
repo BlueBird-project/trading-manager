@@ -69,7 +69,7 @@ services:
       - path: "./env/.env.secrets"
         required: false # default
     volumes:
-      - ${PG_PATH}:/var/lib/postgresql/data
+      - ${PG_PATH}:/var/lib/postgresql
   tm-db-adminer:
     image: adminer:latest
     depends_on:

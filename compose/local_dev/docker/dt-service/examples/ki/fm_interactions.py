@@ -4,7 +4,6 @@ from typing import List
 from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIPostResponse, KIAskResponse
 
-from tm.modules.ke_interaction.interactions.dt_model import DTPnt
 from tm.modules.ke_interaction.interactions.fm_model import *
 
 fm_ki = KIHolder()
@@ -149,18 +148,7 @@ def evaluate_flexibility() -> List[FMEvaluateResponse]:
     return evaluated_resp
 
 
-# @fm_ki.react("dt-ts")
-# def on_dt_ts(ki_id, bindings: List[DTPnt]):
-#     print(f"on new digital twin timeseries data: {len(bindings)}")
-#     # TODO  save
-#     # ack = dt_service.process_timeseries(bindings)
-#     # print(dt_ts)
-#     if len(bindings) > 0:
-#         #     TODO: check if ack binding can have different length
-#         # return [DTTSACK(ts_uri=b.ts_uri) for b in bindings]
-#         return []
-#     return []
-#
+
 
 def evaluate_flexibility_ask() -> List[FMEvaluateResponseAsk]:
     resp: KIAskResponse = _evaluate_request_ask()

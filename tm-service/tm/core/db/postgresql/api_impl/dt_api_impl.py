@@ -18,7 +18,7 @@ class DTAPIQueries(QueryObject):
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
      ( "dt_uri",  "job_id", "ext" ,"update_ts"  )
-     VALUES (:dt_uri,  :job_id,:  :ext,extract(epoch from now()) * 1000) """
+     VALUES (:dt_uri,  :job_id,   :ext,extract(epoch from now()) * 1000) """
 
 
 class DTAPIImpl(DTAPI):

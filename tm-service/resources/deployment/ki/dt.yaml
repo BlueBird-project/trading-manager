@@ -45,7 +45,7 @@ knowledge_engine:
       pattern:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
         - ' ?dp s4ener:belongsToForecast ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasForecastResult ?dpr.'
+        - '   s4ener:hasEffectivePeriod ?duration ; saref:hasForecastResult ?dpr.'
         - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
 #      result_pattern:
 #        - ' ?ts_uri rdf:type ubmarket:Forecast .'

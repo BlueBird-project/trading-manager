@@ -6,7 +6,7 @@ from isodate import parse_duration
 from ke_client import is_nil
 from rdflib.util import from_n3
 
-from tm.models.market_offer import EnergyMarketOffer, RangeInfo
+from tm.models.market_offer import EnergyMarketOfferDAO, RangeInfo, EnergyMarketOffer
 from tm.modules.ke_interaction import KIVars
 
 from tm.modules.ke_interaction.interactions.tou_model import *
@@ -80,7 +80,6 @@ def get_price(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
         market_id = dao_manager.market_api.list_subscribed_market()[0].market_id
         isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)
         offers = dao_manager.offer_dao.list_market_offer(ts=ts, market_id=market_id, isp_unit=isp_unit)
-
         def converter(o: EnergyMarketOffer):
             tou_uri = q.tou_uri
             # tou_uri_parser.n3(TOUSplitURI(range_id=o.range_id, period_minutes=o.isp_len, ts=o.ts))

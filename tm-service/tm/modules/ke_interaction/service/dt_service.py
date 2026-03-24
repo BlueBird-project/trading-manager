@@ -38,9 +38,9 @@ def process(dt_info_list: List[DigitalTwinInfo]):
     # return response
 
 
-def process_forecast_info(bindings: List[DTTSInfo])->List[DTForecastInfoDAO]:
+def process_forecast_info(bindings: List[DTTSInfo]) -> List[DTForecastInfoDAO]:
     from tm.core.db.postgresql import dao_manager
-    added_ts :List[DTForecastInfoDAO]= []
+    added_ts: List[DTForecastInfoDAO] = []
     unlimited_range = dao_manager.offer_dao.get_range(None, None)
     range_id = unlimited_range.range_id
     for b in bindings:
@@ -53,11 +53,13 @@ def process_forecast_info(bindings: List[DTTSInfo])->List[DTForecastInfoDAO]:
                 print(f"Forecast {b.ts_uri} have already been added")
                 logging.info(f"Forecast {b.ts_uri} have already been added")
                 #     TODO: update current instance in Db?
-                # added_ts.append(new_ts)
+                added_ts.append(db_ts)
             else:
-                new_ts = DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.create_ts,
-                                           isp_unit=b.update_rate_min, sequence=b.sequence,
-                                           isp_len=b.isp_len, range_id=range_id)
+                new_ts = dao_manager.forecast_api.save(
+                    # b.n3()
+                    forecast_info=DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.create_ts,
+                                                    isp_unit=b.update_rate_min, sequence=b.get_sequence(),
+                                                    isp_len=b.isp_len, range_id=range_id))
                 logging.info(f"Forecast {b.ts_uri}:{new_ts.forecast_id} have been added")
                 added_ts.append(new_ts)
     return added_ts
@@ -82,18 +84,19 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
             if clear:
                 # print(f"Updating with new offer {offer_uri}")
                 logging.info(f"Removing old offer for {forecast_info}")
-                dao_manager.forecast_api.clear_forecast_offer(forecast_id=forecast_info.forecast_uri)
+                dao_manager.forecast_api.clear_forecast_offer(forecast_id=forecast_info.forecast_id)
             isp_len_ms = forecast_info.isp_unit * __MINUTE_MS__
             ts_start = forecast_info.ts
             forecast_dao: list = [None] * len(grouped_bindings[forecast_info.forecast_uri])
             for i, dp in enumerate(forecast):
                 isp_start = (dp.ts_ms - ts_start) / isp_len_ms
                 dp_dao = DTForecastOfferDAO(forecast_id=forecast_info.forecast_id, ts=forecast_info.ts,
-                                        isp_start=isp_start,   cost_mwh=dp.get_value(),
-                                        isp_len=dp.isp_len(forecast_info.isp_unit))
+                                            isp_start=isp_start, cost_mwh=dp.get_value(),
+                                            isp_len=dp.isp_len(forecast_info.isp_unit))
 
                 forecast_dao[i] = dp_dao
-            saved_bindings[forecast_info.forecast_uri]=dao_manager.forecast_api.save_offer(forecast_offers=forecast_dao)
+            saved_bindings[forecast_info.forecast_uri] = dao_manager.forecast_api.save_offer(
+                forecast_offers=forecast_dao)
 
     return saved_bindings
     # forecast_id: int

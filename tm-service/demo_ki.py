@@ -6,7 +6,7 @@ from typing import List
 from ke_client.utils import time_utils
 
 import tm
-from tm.models.market_offer import EnergyMarketOffer
+from tm.models.market_offer import EnergyMarketOfferDAO
 from tm.utils import TimeSpan
 
 # os.environ['APP_USE_REST_API'] = "True"
@@ -99,7 +99,7 @@ if __name__ == "__main__" and app_settings:
         for offer in offers:
             print(f"offer for  {time_utils.from_timestamp(offer.create_ts)}:")
             offer_dict = dam_interactions.get_market_offer(offer_uris=[offer.offer_uri])
-            mo: EnergyMarketOffer
+            mo: EnergyMarketOfferDAO
             for market_offers in offer_dict[str(offer.offer_uri)]:
                 market_offers = sorted(market_offers, key=lambda item: item["isp_start"])
                 for mo in market_offers:

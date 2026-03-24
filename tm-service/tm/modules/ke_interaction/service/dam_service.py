@@ -5,7 +5,7 @@ from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
 from tm.models.market import EnergyMarket
-from tm.models.market_offer import EnergyMarketOfferInfo, EnergyMarketOffer
+from tm.models.market_offer import EnergyMarketOfferInfo, EnergyMarketOfferDAO
 
 from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings, MarketOfferInfoBindings, \
     MarketOfferBindings, UBEFLEX_MARKET_BASE, CountryUri, MarketType, EnergyMarketRequest
@@ -84,9 +84,9 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
             market_offer_items: list = [None] * len(grouped_bindings[offer_info.offer_uri])
             for i, binding in enumerate(market_offer):
                 isp_start = (binding.ts_ms - ts_start) / isp_len_ms
-                mo = EnergyMarketOffer(offer_id=offer_info.offer_id, ts=offer_info.ts,
-                                       isp_start=isp_start, cost_mwh=binding.get_value(),
-                                       isp_len=binding.isp_len(offer_info.isp_unit))
+                mo = EnergyMarketOfferDAO(offer_id=offer_info.offer_id, ts=offer_info.ts,
+                                          isp_start=isp_start, cost_mwh=binding.get_value(),
+                                          isp_len=binding.isp_len(offer_info.isp_unit))
 
                 market_offer_items[i] = mo
             saved_bindings[offer_info.offer_uri] = dao_manager.offer_dao.add_offer(

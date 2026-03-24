@@ -4,7 +4,6 @@ from typing import List
 from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIPostResponse, KIAskResponse
 
-from tm.modules.ke_interaction.interactions.dt_model import DTPnt
 from tm.modules.ke_interaction.interactions.fm_model import *
 
 fm_ki = KIHolder()

@@ -1,3 +1,4 @@
+import math
 from typing import Optional
 
 from isodate import parse_duration
@@ -49,6 +50,7 @@ class DTTSInfo(BindingsBase):
     def from_ts(self) -> int:
         return time_utils.xsd_to_ts(self.ts_date_from)
 
+
     @property
     def to_ts(self) -> int:
         return time_utils.xsd_to_ts(self.ts_date_to)
@@ -64,6 +66,8 @@ class DTTSInfo(BindingsBase):
         print(f"TODO: remove , isp_len {ms_diff}")
         return self.to_ts - self.from_ts
 
+    def get_sequence(self)->str:
+        return self.convert_value(self.sequence)
 
 @ki_object("dt-ts-info", allow_partial=True)
 class DTTSInfoRequest(BindingsBase):
@@ -109,6 +113,7 @@ class DTPnt(BindingsBase):
     dp: URIRef
     ts: Literal
     dpr: URIRef
+    duration: Literal
     value: Optional[Literal]
 
     def __init__(self, **kwargs):
@@ -120,6 +125,11 @@ class DTPnt(BindingsBase):
 
     def get_value(self) -> Optional[float]:
         return self.convert_value(self.value, float)
+
+    def isp_len(self, isp_unit: int):
+        period_minutes = int(parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() / 60)
+        return math.ceil(period_minutes / isp_unit)
+
 
 
 @ki_object("dt-ts", allow_partial=True)

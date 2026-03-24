@@ -1,7 +1,7 @@
 import hashlib
 import random
 from datetime import timedelta
-from typing import List
+from typing import List, Optional
 
 from isodate import duration_isoformat, parse_duration
 from ke_client.utils import time_utils
@@ -9,7 +9,7 @@ from ke_client import KIHolder, BindingsBase, OptionalLiteral, ki_object
 from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus
 from rdflib import URIRef, Literal
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSUri, \
-    DTPnt, DTDPUri, DTDPRUri, DTPntRequest, DTTSInfoRequest
+    DTDPUri, DTDPRUri,  DTTSInfoRequest
 
 
 @ki_object("dt-ts-info")
@@ -44,6 +44,36 @@ class DTTSInfo(BindingsBase):
     @property
     def interval_ts(self) -> int:
         return self.to_ts - self.from_ts
+
+
+@ki_object("dt-ts")
+class DTPnt(BindingsBase):
+    ts_uri: URIRef
+    dp: URIRef
+    ts: Literal
+    dpr: URIRef
+    value: Optional[Literal]
+
+    def __init__(self, **kwargs):
+        super().__init__(bindings=kwargs)
+
+    @property
+    def ts_ms(self) -> int:
+        return time_utils.xsd_to_ts(self.ts)
+
+    def get_value(self) -> Optional[float]:
+        return self.convert_value(self.value, float)
+
+
+@ki_object("dt-ts", allow_partial=True)
+class DTPntRequest(BindingsBase):
+    ts_uri: URIRef
+
+    # def __init__(self, **kwargs):
+    #     super().__init__(bindings=kwargs)
+
+    def get_ts_uri(self) -> 'DTTSUri':
+        return DTTSUri.parse(uri=self.ts_uri)
 
 
 dt_ki = KIHolder()

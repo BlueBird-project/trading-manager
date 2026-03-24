@@ -15,7 +15,7 @@ class DTForecastInfoQueries(QueryObject):
     # "isp_len"  ,"isp_unit"  ,"update_ts" """
     __TABLE_NAME__ = "forecast_details"
 
-    __PROJECTION__ = """ ${table_alias}."forecast_id",  ${table_alias}."forecast_uri" ,
+    __PROJECTION__ = """ ${table_alias}."forecast_id", ${table_alias}."job_id",  ${table_alias}."forecast_uri" ,
         ${table_alias}."range_id" ,  ${table_alias}."sequence" ,  ${table_alias}."offer_id" ,
          ${table_alias}."model_id" , ${table_alias}."ts" ,  ${table_alias}."isp_len"  ,
         ${table_alias}."isp_unit"  ,${table_alias}."update_ts" """
@@ -39,9 +39,9 @@ class DTForecastInfoQueries(QueryObject):
      WHERE  forecast_id = :forecast_id """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
-     ( "forecast_id", "forecast_uri","range_id"  ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
+     ( "job_id", "forecast_uri","range_id"  ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
     "isp_len"  ,"isp_unit"  ,"update_ts"  )
-     VALUES (:forecast_id, :forecast_uri, :range_id, :sequence, :offer_id, :model_id, :ts ,
+     VALUES (:job_id, :forecast_uri, :range_id, :sequence, :offer_id, :model_id, :ts ,
       :isp_len , :isp_unit , extract(epoch from now()) * 1000) """
 
 
@@ -110,19 +110,19 @@ class DTForecastAPImpl(DTForecastAPI):
         with ConnectionWrapper() as conn:
             return conn.select(q=self.q_dt_offer.LIST, args={"forecast_ids": forecast_ids}, obj_type=DTForecastOfferDAO)
 
-    @abstractmethod
+
     def save_offer(self, forecast_offers: List[DTForecastOfferDAO]) -> List[Dict]:
         with ConnectionWrapper() as conn:
             inserted = conn.insert_batch(q=self.q_dt_offer.INSERT_FORECAST_OFFER,
                                          arg_list=[vars(fo) for fo in forecast_offers],
-                                         return_id_col=["offer_id", "isp_start", "cost_mwh", "isp_len"],
+                                         return_id_col=["forecast_id","isp_start", "cost_mwh", "isp_len"],
                                          fail_safe=False)
 
-            return [{k: v for k, v in zip(["offer_id", "isp_start", "cost_mwh", "isp_len"], r)} for r in inserted]
+            return [{k: v for k, v in zip(["forecast_id", "isp_start", "cost_mwh", "isp_len"], r)} for r in inserted]
 
     def clear_forecast_offer(self, forecast_id) -> int:
         with ConnectionWrapper() as conn:
             deleted = conn.update(q=self.q_dt_offer.DELETE_FORECAST_OFFER,
-                                  args={"offer_id": forecast_id})
+                                  args={"forecast_id": forecast_id})
 
             return deleted

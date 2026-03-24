@@ -60,7 +60,7 @@ CREATE SEQUENCE ${table_prefix}forecast_details_forecast_id_seq INCREMENT 1 MINV
 
 CREATE TABLE "public"."${table_prefix}forecast_details" (
     "forecast_id" bigint DEFAULT nextval('${table_prefix}forecast_details_forecast_id_seq') NOT NULL,
-    "dt_id" bigint NOT NULL  ,
+    "job_id" bigint NOT NULL  ,
     "forecast_uri" character varying(250),
     "range_id" integer NOT NULL,
     "sequence" character varying(10),
@@ -180,7 +180,7 @@ CREATE UNIQUE INDEX ${table_prefix}offer_details_offer_uri ON public.${table_pre
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_model_id_fkey" FOREIGN KEY (model_id) REFERENCES ${table_prefix}forecast_model(model_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_dt_id_fkey"  FOREIGN KEY ("dt_id") REFERENCES "${table_prefix}dt_info" ("dt_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_job_id_fkey"  FOREIGN KEY ("job_id") REFERENCES "${table_prefix}service_jobs" ("job_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
 
 
 ALTER TABLE ONLY "public"."${table_prefix}market_offer" ADD CONSTRAINT "${table_prefix}market_offer_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;

@@ -3,7 +3,7 @@ from typing import List, Optional
 from effi_onto_tools.db import TimeSpan
 
 from tm.models.market import EnergyMarket
-from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOffer
+from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
 
 
 def list_markets() -> List[EnergyMarket]:
@@ -21,7 +21,7 @@ def list_offer(market_id: int, ts: TimeSpan, granularity: Optional[int] = None) 
     return dao_manager.offer_dao.list_market_offer(ts=ts, market_id=market_id, isp_unit=granularity)
 
 
-def get_offer(offer_id: int) -> List[EnergyMarketOffer]:
+def get_offer(offer_id: int) -> List[EnergyMarketOfferDAO]:
     from tm.core.db.postgresql import dao_manager
     return dao_manager.offer_dao.get_market_offer(offer_id=offer_id)
 

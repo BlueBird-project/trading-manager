@@ -4,7 +4,7 @@ from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
 from tm.core.db.api.market_offer_dao import MarketOfferAPI
-from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOffer
+from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
 
 
 class MarketOfferQueries:
@@ -42,7 +42,7 @@ class MarketOfferQueries:
       FROM "${table_prefix}market_offer"  WHERE offer_id = :offer_id
        """
     LIST_MARKET_OFFER = """SELECT offer."offer_id", offer."isp_start", 
-      offer."cost_mwh", offer."ts", offer."isp_len"
+      offer."cost_mwh", offer."ts", offer."isp_len", offer_info.range_id
       FROM "${table_prefix}market_offer" offer  
       JOIN "${table_prefix}offer_details"  offer_info  on offer.offer_id = offer_info.offer_id 
       WHERE offer_info.market_id =:market_id AND
@@ -103,7 +103,7 @@ class MarketOfferAPIImpl(MarketOfferAPI):
             range_info = conn.select(q=self.queries.SELECT_RANGE, args=args, obj_type=RangeInfo)
             return range_info
 
-    def add_offer(self, market_offer_items: List[EnergyMarketOffer]) -> List[Dict]:
+    def add_offer(self, market_offer_items: List[EnergyMarketOfferDAO]) -> List[Dict]:
         with ConnectionWrapper() as conn:
             inserted = conn.insert_batch(q=self.queries.INSERT_MARKET_OFFER,
                                          arg_list=[vars(mo) for mo in market_offer_items],
@@ -127,8 +127,8 @@ class MarketOfferAPIImpl(MarketOfferAPI):
 
             return offers
 
-    def get_market_offer(self, offer_id: int) -> List[EnergyMarketOffer]:
+    def get_market_offer(self, offer_id: int) -> List[EnergyMarketOfferDAO]:
         with ConnectionWrapper() as conn:
             args = {"offer_id": offer_id}
-            offer = conn.select(q=self.queries.GET_MARKET_OFFER_BY_OFFER_ID, args=args, obj_type=EnergyMarketOffer)
+            offer = conn.select(q=self.queries.GET_MARKET_OFFER_BY_OFFER_ID, args=args, obj_type=EnergyMarketOfferDAO)
             return offer

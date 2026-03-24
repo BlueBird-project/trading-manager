@@ -81,7 +81,7 @@ if __name__ == "__main__" and app_settings:
             if len(dt_info_ack) > 0:
                 success = True
             else:
-                sleep(10)
+                sleep(30)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)
@@ -102,7 +102,7 @@ if __name__ == "__main__" and app_settings:
                 print("ack: " + str(len(ts_ack)))
 
             print(f"tock")
-            sleep(30)
+            sleep(60)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

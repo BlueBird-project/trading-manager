@@ -1,8 +1,8 @@
 import math
-from typing import Optional
+from typing import Optional, Tuple
 
 from isodate import parse_duration
-from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
+from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral, rdf_nil
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
@@ -36,12 +36,23 @@ class DTTSInfo(BindingsBase):
     sequence: OptionalLiteral = None
     ts_date_to: Literal
     update_rate: Literal
+    # range section
+
+    power_range: Optional[URIRef] = rdf_nil
+    power_range_max: Optional[URIRef] = rdf_nil
+    max_value: OptionalLiteral = rdf_nil
+    power_range_min: Optional[URIRef] = rdf_nil
+    min_value: OptionalLiteral = rdf_nil
+
+    # range
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)
+
     @property
     def update_rate_min(self) -> int:
         return int(parse_duration(self.update_rate, as_timedelta_if_possible=True).total_seconds() / 60)
+
     @property
     def create_ts(self):
         return time_utils.xsd_to_ts(self.time_create)
@@ -49,7 +60,6 @@ class DTTSInfo(BindingsBase):
     @property
     def from_ts(self) -> int:
         return time_utils.xsd_to_ts(self.ts_date_from)
-
 
     @property
     def to_ts(self) -> int:
@@ -61,13 +71,19 @@ class DTTSInfo(BindingsBase):
 
     @property
     def isp_len(self) -> int:
-        ms_diff=self.to_ts - self.from_ts
-        min_diff= ms_diff/(60000)/self.update_rate_min
+        ms_diff = self.to_ts - self.from_ts
+        min_diff = ms_diff / (60000) / self.update_rate_min
         print(f"TODO: remove , isp_len {ms_diff}")
         return self.to_ts - self.from_ts
 
-    def get_sequence(self)->str:
+    def get_sequence(self) -> str:
         return self.convert_value(self.sequence)
+
+    def get_power_limit(self) -> Tuple[float, float]:
+        min_value =self.convert_value(self.min_value, float)
+        max_value =self.convert_value(self.max_value, float)
+        return min_value, max_value
+
 
 @ki_object("dt-ts-info", allow_partial=True)
 class DTTSInfoRequest(BindingsBase):
@@ -130,6 +146,28 @@ class DTPnt(BindingsBase):
         period_minutes = int(parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() / 60)
         return math.ceil(period_minutes / isp_unit)
 
+
+# @ki_object("dt-ts2")
+# class DTPnt2(BindingsBase):
+#     ts_uri: URIRef
+#     dp: URIRef
+#     ts: Literal
+#     dpr: URIRef
+#     value: Optional[Literal]
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
+#
+#     @property
+#     def ts_ms(self) -> int:
+#         return time_utils.xsd_to_ts(self.ts)
+#
+#     def get_value(self) -> Optional[float]:
+#         return self.convert_value(self.value, float)
+#
+#     def isp_len(self, isp_unit: int):
+#         period_minutes = int(parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() / 60)
+#         return math.ceil(period_minutes / isp_unit)
 
 
 @ki_object("dt-ts", allow_partial=True)

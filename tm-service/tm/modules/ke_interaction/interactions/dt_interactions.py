@@ -49,6 +49,25 @@ def on_dt_ts(ki_id, bindings: List[DTPnt]):
     return []
 
 
+# @ki.react("forecast-test")
+# def on_dt_ts(ki_id, bindings):
+#     print(f"forecast-test data: {len(bindings)}")
+#     print(bindings)
+#     return []
+# @ki.ask("forecast-test")
+# def _ask_test(ts_uri_ref: URIRef):
+#     return [DTPntRequest(ts_uri=ts_uri_ref)]
+
+
+# @ki.react("dt-ts2")
+# def on_dt_ts(ki_id, bindings: List[DTPnt2]):
+#     print(f"test new digital twin timeseries data: {len(bindings)}")
+#     # dt_service.process_forecast(forecast=bindings)
+#     # ack = dt_service.process_timeseries(bindings)
+#     # print(dt_ts)
+#     return []
+
+
 @ki.ask("dt-ts")
 def _request_dt_ts(ts_uri_ref: URIRef):
     return [DTPntRequest(ts_uri=ts_uri_ref)]
@@ -74,6 +93,14 @@ def request_dt_data(dt_uri: str, ts_from: int, ts_to: int) -> Dict[str, List]:
     bindings: KIAskResponse = _request_dt_ts(ts_uri_ref=ts_uri_ref)
     stored_forecasts = dt_service.process_forecast(forecast=[DTPnt(**b) for b in bindings.binding_set])
     return stored_forecasts
+
+
+# def ask_test(ts_uri_ref: URIRef)  :
+#     # noinspection PyTypeChecker
+#     print("ASK test")
+#     bindings: KIAskResponse = _ask_test(ts_uri_ref=ts_uri_ref)
+#
+#     print(bindings)
 
 
 def request_dt_data_by_id(ts_uri_ref: URIRef) -> Dict[str, List]:

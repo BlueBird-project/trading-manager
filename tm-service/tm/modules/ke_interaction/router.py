@@ -44,6 +44,7 @@ async def scan_forecast() -> Dict[str, Any]:
     res["ts_info"] = ts_info
     for uri in ts_info:
         ts = request_dt_data_by_id(ts_uri_ref=URIRef( uri.forecast_uri))
+        # ask_test(ts_uri_ref=URIRef( uri.forecast_uri))
         res[uri.forecast_uri] = [ts[uri.forecast_uri]]
         # res[uri.ts_uri] = [ts[uri.ts_uri]]
 

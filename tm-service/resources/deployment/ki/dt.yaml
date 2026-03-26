@@ -24,6 +24,7 @@ knowledge_engine:
         xsd: "http://www.w3.org/2001/XMLSchema#"
         saref: "https://saref.etsi.org/core/"
         time: "http://www.w3.org/2006/time#"
+        om: "http://www.ontology-of-units-of-measure.org/resource/om-2/"
       pattern:
         - ' ?command_uri  saref:hasOutput ?ts_uri; rdf:type saref:CommandOfInterest .'
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
@@ -31,7 +32,13 @@ knowledge_engine:
         - ' ?ts_uri s4ener:hasCreationTime ?time_create .'
         - ' ?ts_uri s4ener:hasEffectivePeriod  ?ts_interval_uri .'
         - ' ?ts_uri ubmarket:hasMarketSequence ?sequence .'
-        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to'
+        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+        - ' ?ts_uri ubmarket:hasPowerRange  ?power_range .'
+        - ' ?power_range s4ener:endOfRange ?power_range_max ; s4ener:startOfRange ?power_range_min . '
+        - '	?power_range_max rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+        - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
+        - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+        - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
 #      result_pattern:
 #        - ' ?command_uri  saref:hasOutput ?ts_uri .'
     dt-ts:
@@ -45,7 +52,14 @@ knowledge_engine:
       pattern:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
         - ' ?dp s4ener:belongsToForecast ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-        - '   s4ener:hasEffectivePeriod ?duration ; saref:hasForecastResult ?dpr.'
+        - '   s4ener:hasEffectivePeriod ?duration ; saref:hasForecastResult ?dpr .'
         - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
-#      result_pattern:
+#    forecast-test:
+#      name: "forecast-test"
+#      description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."
+#      prefixes:
+#        xsd: "http://www.w3.org/2001/XMLSchema#"
+#        saref: "https://saref.etsi.org/core/"
+#      pattern:
 #        - ' ?ts_uri rdf:type ubmarket:Forecast .'
+#        - ' ?dp s4ener:belongsToForecast ?ts_uri .'

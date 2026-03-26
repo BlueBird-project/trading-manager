@@ -6,6 +6,7 @@ from ke_client.utils import to_json
 
 from tm.models.digital_twin import DigitalTwinDAO, DTForecastInfoDAO, DTForecastOfferDAO
 from tm.models.job_dao import JobDAO
+from tm.models.market_offer import RangeInfo
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt
 
 __MINUTE_MS__ = 60 * 1000
@@ -41,9 +42,17 @@ def process(dt_info_list: List[DigitalTwinInfo]):
 def process_forecast_info(bindings: List[DTTSInfo]) -> List[DTForecastInfoDAO]:
     from tm.core.db.postgresql import dao_manager
     added_ts: List[DTForecastInfoDAO] = []
-    unlimited_range = dao_manager.offer_dao.get_range(None, None)
-    range_id = unlimited_range.range_id
+    # unlimited_range = dao_manager.offer_dao.get_range(None, None)
+    # range_id = unlimited_range.range_id
     for b in bindings:
+        min_power, max_power = b.get_power_limit()
+        power_range = dao_manager.offer_dao.get_range(min_power, max_power)
+        if power_range is None:
+            logging.warning("Adding new power range")
+            # TODO: prohibit autmatic range generation ?
+            range_id = dao_manager.offer_dao.add_range(RangeInfo(min_value=min_power, max_value=max_power)).range_id
+        else:
+            range_id = power_range.range_id
         job = dao_manager.job_api.get(command_uri=b.command_uri)
         if job is None:
             logging.error(f"Job(Command) not found: {b.command_uri}")

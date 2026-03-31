@@ -148,8 +148,6 @@ def evaluate_flexibility() -> List[FMEvaluateResponse]:
     return evaluated_resp
 
 
-
-
 def evaluate_flexibility_ask() -> List[FMEvaluateResponseAsk]:
     resp: KIAskResponse = _evaluate_request_ask()
     print(resp)

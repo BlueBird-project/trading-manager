@@ -1,5 +1,5 @@
 service:
-  port: 8081
+  port: 8080
   host: "0.0.0.0"
   root_path: ""
   name: "local-service"

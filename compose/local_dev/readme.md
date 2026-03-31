@@ -10,7 +10,8 @@ Put token in [./env/.env.secrets](./env/.env.secrets)
 
 Market configuration is located in [./docker/entsoe-service/entsoe.yaml](./docker/entsoe-service/entsoe.yaml)
 
-Market codes to extend the service with other regions are [here](https://transparencyplatform.zendesk.com/hc/en-us/articles/15885757676308-Area-List-with-Energy-Identification-Code-EIC)
+Market codes to extend the service with other regions
+are [here](https://transparencyplatform.zendesk.com/hc/en-us/articles/15885757676308-Area-List-with-Energy-Identification-Code-EIC)
 
 Service documentation is [here](https://github.com/BlueBird-project/tm-market-plugins/blob/main/entso-e/README.md)
 
@@ -22,7 +23,9 @@ Service on start loads prices for the last 5 days for the configured markets
 
 #### Configuration
 
-Sample TM configuration with subscribed country markets can be found [here (configuration used in compose.yaml)](./docker/trading-manager/app_config.yaml)  and  [here](./docker/trading-manager/config.yaml)
+Sample TM configuration with subscribed country markets can be
+found [here (configuration used in compose.yaml)](./docker/trading-manager/app_config.yaml)
+and  [here](./docker/trading-manager/config.yaml)
 
 ### PGAdmin (DB viewer)
 
@@ -51,8 +54,13 @@ Download & import docker images [here](#download-images)
 ### Build
 
 ```yaml
-docker-compose -p local -f compose.yaml --env-file .env build 
-docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  build 
+docker-compose -p local -f compose.yaml --env-file .env build
+
+#with samples:
+docker-compose -p local -f sample_compose.yaml --env-file .env build
+
+#samples + tge
+docker-compose -p local -f all_compose.yaml --env-file .env --env-file ./env/.env.secrets  build
 
 ```
 
@@ -62,7 +70,12 @@ docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secret
 docker-compose -p local -f compose.yaml --env-file .env create
 docker-compose -p local -f compose.yaml --env-file .env start
 
-docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  create 
+#with samples:
+docker-compose -p local -f sample_compose.yaml --env-file .env create
+docker-compose -p local -f sample_compose.yaml --env-file .env start
+
+
+docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  create
 docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  start 
 ```
 
@@ -80,25 +93,13 @@ check consumed resources:
 https://box.pionier.net.pl/d/2782022c45ce4360a8c5/
 
 ```
-
-old links:
-
-```shell
-
-#configured  trading manager service
-https://box.pionier.net.pl/f/850de4ebd6f54d1b8613/?dl=1
-#configured entso-e service
-https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
-#base entso-e image for docker build
-https://box.pionier.net.pl/f/617f3569a0f244de9af6/?dl=1
-```
-
+ 
 ### import image
 
 ```shell
-docker load -i ./images/trading-manager.0.5.1.tar
-docker load -i ./images/tge-dayahead-service:0.5.2.tar
-docker load -i ./images/tm-entsoe-service-latest-0.5.3.tar
+docker load -i .\images\bluebird.tge-dayahead-service_0.5.3.tar
+docker load -i .\images\bluebird.tm-entsoe-service_0.5.4.tar
+docker load -i .\images\bluebird.trading-manager_0.5.3.tar 
 ```
 
 ### export image

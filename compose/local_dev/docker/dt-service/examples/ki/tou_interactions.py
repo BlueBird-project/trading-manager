@@ -1,17 +1,16 @@
 from typing import List, Union
 
-from effi_onto_tools.db import TimeSpan
 from ke_client import KIHolder
 from ke_client.ki_model import KIAskResponse
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
+from tm.utils import TimeSpan
+
 tou_ki = KIHolder()
 from tm.modules.ke_interaction.interactions.tou_model import TOUPrice, TOUPriceInfoQuery, \
     TOUPriceInfo, TOUPriceQuery
 
-
-# todo przetestować
 
 @tou_ki.ask("tou-price")
 def _get_tou_price(tou_uris: List[URIRef]):

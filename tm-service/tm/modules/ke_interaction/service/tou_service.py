@@ -9,7 +9,7 @@ from tm.models.market_offer import RangeInfo, EnergyMarketOffer
 from tm.modules.ke_interaction import KIVars
 
 from tm.modules.ke_interaction.interactions.tou_model import *
-from tm.utils import TimeSpan
+from tm.utils import TimeSpan, isp_unit_to_ms
 
 
 # def get_all_tou(binding_query: List[TOUPriceInfoSimpleQuery]) -> List[TOUPriceInfoSimpleResponse]:
@@ -73,7 +73,7 @@ def get_price(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
     # TODO: we support only one first binding query
     for q in binding_query:
         split_uri = TOUSplitURI.parse(uri=q.tou_uri, prefix=kb_id)
-        ts = TimeSpan(ts_from=split_uri.ts, ts_to=split_uri.ts + split_uri.period_minutes * 60 * 1000)
+        ts = TimeSpan(ts_from=split_uri.ts, ts_to=split_uri.ts + isp_unit_to_ms(isp_unit=split_uri.period_minutes))
         # time_span_ms =  from_n3(KIVars.DAY_DURATION)
         # TODO  use all suybscribed markets
         if len(dao_manager.market_api.list_subscribed_market()) == 0:

@@ -9,7 +9,7 @@ from tm.models.job_dao import JobDAO
 from tm.models.market_offer import RangeInfo
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt
 
-__MINUTE_MS__ = 60 * 1000
+from tm.utils import isp_unit_to_ms
 
 
 def process(dt_info_list: List[DigitalTwinInfo]):
@@ -94,7 +94,7 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
                 # print(f"Updating with new offer {offer_uri}")
                 logging.info(f"Removing old offer for {forecast_info}")
                 dao_manager.forecast_api.clear_forecast_offer(forecast_id=forecast_info.forecast_id)
-            isp_len_ms = forecast_info.isp_unit * __MINUTE_MS__
+            isp_len_ms = isp_unit_to_ms(isp_unit=forecast_info.isp_unit)
             ts_start = forecast_info.ts
             forecast_dao: list = [None] * len(grouped_bindings[forecast_info.forecast_uri])
             for i, dp in enumerate(forecast):

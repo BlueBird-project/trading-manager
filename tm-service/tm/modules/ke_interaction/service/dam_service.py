@@ -9,9 +9,7 @@ from tm.models.market_offer import EnergyMarketOfferInfo, EnergyMarketOfferDAO
 
 from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings, MarketOfferInfoBindings, \
     MarketOfferBindings, UBEFLEX_MARKET_BASE, CountryUri, MarketType, EnergyMarketRequest
-
-# TODO: make isp unit configurable (minutes, seconds etc)
-__ISP_LEN_MS__ = 60 * 1000  # MINUTES as MILISECONDS
+from tm.utils import isp_unit_to_ms
 
 
 def save_markets(market_bindings: List[EnergyMarketBindings], subscribe: bool = False):
@@ -76,7 +74,7 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
                 # print(f"Updating with new offer {offer_uri}")
                 logging.info(f"Removing old offer for {offer_uri}")
                 dao_manager.offer_dao.clear_market_offer(offer_id=offer_info.offer_id)
-            isp_len_ms = offer_info.isp_unit * __ISP_LEN_MS__
+            isp_len_ms = isp_unit_to_ms(isp_unit=offer_info.isp_unit)
             ts_start = offer_info.ts
             market_offer_items: list = [None] * len(grouped_bindings[offer_info.offer_uri])
             for i, binding in enumerate(market_offer):

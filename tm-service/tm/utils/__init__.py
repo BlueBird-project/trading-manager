@@ -1,3 +1,4 @@
+import math
 from typing import Optional
 
 from pydantic import BaseModel
@@ -34,3 +35,23 @@ class TimeSpan(BaseModel):
         ts_to = time_utils.current_timestamp()
         ts_from = ts_to - DAY_MS
         return TimeSpan(ts_from=ts_from, ts_to=ts_to)
+
+
+def ms_to_isp_unit(ms: int) -> int:
+    """
+    milliseconds to isp unit
+    :param ms:  milliseconds
+    :return:
+    """
+    _minute_ms = 60 * 1000
+    return math.ceil(ms / _minute_ms)
+
+
+def isp_unit_to_ms(isp_unit: int) -> int:
+    """
+    isp unit to milliseconds
+    :param isp_unit - isp len in minutes
+    :return:
+    """
+    _minute_ms = 60 * 1000
+    return isp_unit * _minute_ms

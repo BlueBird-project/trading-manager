@@ -10,3 +10,4 @@ tm-service/resources/.env.dev
 tm-service/resources/env/.env.entsoe.demo
 tm-service/resources/env/.env.tomekc  
 *.pyc
+tm-service/resources/deployment/ki.zip

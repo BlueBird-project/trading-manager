@@ -41,4 +41,4 @@ ENV APP_LOGGING_CONF_PATH="/app/resources/deployment/logging.ini"
 #ENV APP_USE_KE_API=True
 ENV SERVICE_LOG_DIR=/var/log/
 EXPOSE 8080
-CMD ["python", "manage.py","-c" ,"/config/config.yaml"  ]
+CMD ["python", "manage.py","-c" ,"/config/app_config.yaml"  ]

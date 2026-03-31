@@ -92,7 +92,7 @@ class FMEvaluateResponseAsk(FMEvaluateQueryAsk):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-#
+
 @ki_object("fm-ts-evaluate", result=True)
 class FMEvaluateResponse(BindingsBase):
     dp: URIRef

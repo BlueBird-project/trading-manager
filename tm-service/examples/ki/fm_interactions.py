@@ -4,7 +4,6 @@ from typing import List
 from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIPostResponse, KIAskResponse
 
-from tm.modules.ke_interaction.interactions.dt_model import DTPnt
 from tm.modules.ke_interaction.interactions.fm_model import *
 
 fm_ki = KIHolder()
@@ -147,8 +146,6 @@ def evaluate_flexibility() -> List[FMEvaluateResponse]:
     # resp: KIAskResponse = _ask_evaluate_request()
     # evaluated_resp: List[FMEvaluateQuery] = [FMEvaluateQuery(**b) for b in resp.binding_set]
     return evaluated_resp
-
-
 
 
 def evaluate_flexibility_ask() -> List[FMEvaluateResponseAsk]:

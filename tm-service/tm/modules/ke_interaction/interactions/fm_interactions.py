@@ -1,11 +1,11 @@
 from typing import List
 
-from effi_onto_tools.db import TimeSpan
 from ke_client import KIHolder
-from ke_client.ki_model import   KIAskResponse
+from ke_client.ki_model import KIAskResponse
 
 from tm.modules.ke_interaction.interactions.fm_model import *
 from tm.modules.ke_interaction.service import fm_service
+from tm.utils import TimeSpan
 
 ki = KIHolder()
 

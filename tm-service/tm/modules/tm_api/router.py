@@ -1,10 +1,10 @@
 from typing import List, Optional
 
-from effi_onto_tools.db import TimeSpan
 from fastapi import APIRouter
 
 from tm.models.market import EnergyMarket
-from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOffer
+from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
+from tm.utils import TimeSpan
 
 router = APIRouter(prefix="")
 
@@ -40,7 +40,7 @@ async def list_offer(ts_from: Optional[int] = None, ts_to: Optional[int] = None,
 
 
 @router.get("/offer/{offer_id}")
-async def get_offer(offer_id: int) -> List[EnergyMarketOffer]:
+async def get_offer(offer_id: int) -> List[EnergyMarketOfferDAO]:
     from tm.modules.tm_api import service
     return service.get_offer(offer_id=offer_id)
 

@@ -1,13 +1,109 @@
 import hashlib
+import math
 import random
-from typing import List
+from datetime import timedelta
+from typing import List, Optional, Tuple
 
+from isodate import duration_isoformat, parse_duration
 from ke_client.utils import time_utils
-from ke_client import KIHolder
+from ke_client import KIHolder, BindingsBase, OptionalLiteral, ki_object, rdf_nil
 from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus
 from rdflib import URIRef, Literal
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSUri, DTTSInfo, \
-    DTPnt, DTDPUri, DTDPRUri, DTPntRequest, DTTSInfoRequest
+from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSUri, \
+    DTDPUri, DTDPRUri, DTTSInfoRequest
+
+
+@ki_object("dt-ts-info")
+class DTTSInfo(BindingsBase):
+    command_uri: URIRef
+    ts_uri: URIRef
+    time_create: Literal
+    ts_interval_uri: URIRef
+    ts_date_from: Literal
+    sequence: OptionalLiteral = None
+    ts_date_to: Literal
+    # range section
+
+    power_range: Optional[URIRef] = rdf_nil
+    power_range_max: Optional[URIRef] = rdf_nil
+    max_value: OptionalLiteral = rdf_nil
+    power_range_min: Optional[URIRef] = rdf_nil
+    min_value: OptionalLiteral = rdf_nil
+
+    # range
+
+    def __init__(self, **kwargs):
+        super().__init__(bindings=kwargs)
+
+    @property
+    def update_rate_min(self) -> int:
+        return int(parse_duration(self.update_rate, as_timedelta_if_possible=True).total_seconds() / 60)
+
+    @property
+    def create_ts(self):
+        return time_utils.xsd_to_ts(self.time_create)
+
+    @property
+    def from_ts(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_date_from)
+
+    @property
+    def to_ts(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_date_to)
+
+    @property
+    def interval_ts(self) -> int:
+        return self.to_ts - self.from_ts
+
+    @property
+    def isp_len(self) -> int:
+        ms_diff = self.to_ts - self.from_ts
+        min_diff = ms_diff / 60000
+        return math.ceil(min_diff / self.update_rate_min)
+
+    def get_sequence(self) -> str:
+        return self.convert_value(self.sequence)
+
+    def get_power_limit(self) -> Tuple[float, float]:
+        min_value = self.convert_value(self.min_value, float)
+        max_value = self.convert_value(self.max_value, float)
+        return min_value, max_value
+
+
+# @ki_object("forecast-test")
+# class DTPntTest(BindingsBase):
+#     ts_uri: URIRef
+#     dp: URIRef
+
+@ki_object("dt-ts")
+class DTPnt(BindingsBase):
+    ts_uri: URIRef
+    dp: URIRef
+    ts: Literal
+    dpr: URIRef
+    value: Optional[Literal]
+
+    def __init__(self, **kwargs):
+        super().__init__(bindings=kwargs)
+
+    @property
+    def ts_ms(self) -> int:
+        return time_utils.xsd_to_ts(self.ts)
+
+    def get_value(self) -> Optional[float]:
+        return self.convert_value(self.value, float)
+
+
+@ki_object("dt-ts", allow_partial=True)
+class DTPntRequest(BindingsBase):
+    ts_uri: URIRef
+
+    # def __init__(self, **kwargs):
+    #     super().__init__(bindings=kwargs)
+
+    def get_ts_uri(self) -> 'DTTSUri':
+        return DTTSUri.parse(uri=self.ts_uri)
+
 
 dt_ki = KIHolder()
 _market_uri: URIRef = None
@@ -51,6 +147,7 @@ def _post_ts_info(market_uri: URIRef, ts_uri: DTTSUri) -> List[DTTSInfo]:
     ts_interval_uri = URIRef(ts_uri.uri + "/interval")
     dt_info = DTTSInfo(command_uri=_init_command_uri(market_uri=str(market_uri)),
                        ts_uri=ts_uri.uri_ref,
+                       update_rate=Literal(duration_isoformat(timedelta(minutes=15))),
                        time_create=Literal(time_utils.xsd_from_ts(time_utils.current_timestamp())),
                        ts_interval_uri=ts_interval_uri,
                        ts_date_from=Literal(time_utils.xsd_from_ts(ts_start)),
@@ -74,6 +171,7 @@ def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     ts_interval_uri = URIRef(current_forecast_uri.uri + "/interval")
     ds_info = DTTSInfo(command_uri=_init_command_uri(market_uri=str(_market_uri)),
                        ts_uri=current_forecast_uri.uri_ref,
+                       update_rate=Literal(duration_isoformat(timedelta(minutes=15))),
                        time_create=Literal(time_utils.xsd_from_ts(time_utils.current_timestamp())),
                        ts_interval_uri=ts_interval_uri,
                        ts_date_from=Literal(time_utils.xsd_from_ts(ts_start)),
@@ -89,7 +187,7 @@ def _generate_sample_ts(ts_uri: DTTSUri, size=96) -> List[DTPnt]:
     cur_ts = ts_uri.ts_start
     isp = 0
     res = []
-    while cur_ts <= ts_uri.ts_end and isp < (size):
+    while cur_ts <= ts_uri.ts_end and isp < size:
         isp += 1
         pnt = DTPnt(ts_uri=ts_uri.uri_ref,
                     dp=DTDPUri(prefix=dt_ki.get_kb_id(), **ts_uri.__dict__, isp=isp).uri_ref,
@@ -104,6 +202,7 @@ def _generate_sample_ts(ts_uri: DTTSUri, size=96) -> List[DTPnt]:
 @dt_ki.post("dt-ts")
 def _post_ts(ts_uri: DTTSUri) -> List[DTPnt]:
     # ts_interval_uri = URIRef(ts_uri.uri + "/interval")
+    print("_post_ts:dt-ts")
     sample_ts = _generate_sample_ts(ts_uri=ts_uri, size=96)
 
     return sample_ts
@@ -111,7 +210,7 @@ def _post_ts(ts_uri: DTTSUri) -> List[DTPnt]:
 
 @dt_ki.answer("dt-ts")
 def on_dt_ts_request(ki_id, bindings: List[DTPntRequest]) -> List[DTPnt]:
-    print("on-ts")
+    print("on_dt_ts_request:dt-ts")
     if len(bindings) > 0:
         ts_uri = DTTSUri.parse(uri=bindings[0].ts_uri, prefix=dt_ki.get_kb_id())
         sample_ts = _generate_sample_ts(ts_uri=ts_uri)

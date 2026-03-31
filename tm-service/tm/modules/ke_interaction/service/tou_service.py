@@ -1,15 +1,15 @@
 import logging
 from typing import List
 
-from effi_onto_tools.db import TimeSpan
 from isodate import parse_duration
 from ke_client import is_nil
 from rdflib.util import from_n3
 
-from tm.models.market_offer import EnergyMarketOffer, RangeInfo
+from tm.models.market_offer import RangeInfo, EnergyMarketOffer
 from tm.modules.ke_interaction import KIVars
 
 from tm.modules.ke_interaction.interactions.tou_model import *
+from tm.utils import TimeSpan
 
 
 # def get_all_tou(binding_query: List[TOUPriceInfoSimpleQuery]) -> List[TOUPriceInfoSimpleResponse]:
@@ -34,8 +34,11 @@ def get_range_tou(binding_query: List[TOUPriceInfoQuery], kb_id: str) -> List[TO
         # time_span_ms =  from_n3(KIVars.DAY_DURATION)
         time_span_ms = int(parse_duration(q.tou_period, as_timedelta_if_possible=True).total_seconds() * 1000)
         if is_nil(q.power_range):
-            # TODO: check if range exist
-            range_id = dao_manager.offer_dao.get_range(None, None).range_id
+            p_range = dao_manager.offer_dao.get_range(None, None)
+            if p_range is None:
+                range_id = dao_manager.offer_dao.add_range(RangeInfo(min_value=None, max_value=None)).range_id
+            else:
+                range_id = p_range.range_id
             tou_uriref = TOUSplitURI(prefix=kb_id, range_id=range_id, period_minutes=time_span_ms / 60000,
                                      ts=ts_from).uri_ref
             return [TOUPriceInfo(**{**q.input_bindings, **{"tou_uri": tou_uriref}})]

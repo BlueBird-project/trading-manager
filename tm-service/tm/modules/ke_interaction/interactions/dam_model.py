@@ -1,7 +1,6 @@
 import math
 from typing import Optional, Union
 
-from effi_onto_tools.db import TimeSpan
 from isodate import parse_duration
 from ke_client import BindingsBase
 from ke_client import ki_object, is_nil, ki_split_uri, SplitURIBase, OptionalLiteral, rdf_nil
@@ -9,6 +8,8 @@ from ke_client.utils import time_utils
 from ke_client.utils.enum_utils import BaseEnum, EnumItem
 from pydantic import BaseModel, ConfigDict
 from rdflib import URIRef, Literal
+
+from tm.utils import TimeSpan
 
 # DAM_market_type: Literal = Literal("ubmarket:DayAheadMarket")
 UBEFLEX_MARKET_BASE = "https://ubeflex.bluebird.eu/market/"
@@ -133,18 +134,19 @@ class MarketOfferInfoBindings(BindingsBase):
     #     return int(day_duration / isp_unit) + 1
 
 
-@ki_object("market-offer-info-filtered")
-class MarketOfferInfoFilteredBindings(MarketOfferInfoBindings):
-    ts_interval_uri: URIRef
-    ts_date_from: Literal
-    ts_date_to: Literal
-
-
 @ki_object("market-offer-info", allow_partial=True)
 class MarketOfferInfoRequest(BindingsBase):
     market_uri: URIRef
     # market_type: Optional[URIRef]
     # sequence: Optional[Literal]
+
+
+# todo duplicate obj
+@ki_object("market-offer-info-filtered")
+class MarketOfferInfoFilteredBindings(MarketOfferInfoBindings):
+    ts_interval_uri: URIRef
+    ts_date_from: Literal
+    ts_date_to: Literal
 
 
 @ki_object("market-offer-info-filtered", allow_partial=True)

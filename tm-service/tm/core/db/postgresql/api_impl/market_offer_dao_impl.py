@@ -1,27 +1,27 @@
 from typing import List, Optional, Dict, Any
 
-from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
 from tm.core.db.api.market_offer_dao import MarketOfferAPI
-from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOffer
+from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
+from tm.utils import TimeSpan
 
 
 class MarketOfferQueries:
     # TODO add override option for market offer , real offer > forecast offer
     LIST_OFFER_INFO = """SELECT "offer_id","market_id", "ts", "date_str",
-     "offer_uri","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
+     "offer_uri","range_id","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
       FROM "${table_prefix}offer_details" 
        WHERE  ("ts" BETWEEN :ts_from and :ts_to) and COALESCE("isp_unit"=:isp_unit,TRUE  )
        AND COALESCE(market_id = :market_id,TRUE)
         """
     SELECT_MARKET_OFFER_INFO_BY_URI = """SELECT "offer_id","market_id", "ts", "date_str",
-     "offer_uri","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
+     "offer_uri","range_id","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
       FROM "${table_prefix}offer_details"  WHERE offer_uri = :offer_uri   """
 
     INSERT_MARKET_OFFER_DETAILS = """  INSERT INTO "${table_prefix}offer_details" 
-    ("market_id", "ts", "date_str", "offer_uri","sequence", "isp_unit", "isp_len", "update_ts", "ext")
-    VALUES (:market_id, :ts, :date_str, :offer_uri,:sequence, :isp_unit, :isp_len,
+    ("market_id", "ts", "date_str", "offer_uri","range_id","sequence", "isp_unit", "isp_len", "update_ts", "ext")
+    VALUES (:market_id, :ts, :date_str, :offer_uri,:range_id,:sequence, :isp_unit, :isp_len,
      extract(epoch from now()) * 1000, NULL)   """
     # TODO: on conflixt
     # ON CONFLICT ("market_uri" ) DO UPDATE
@@ -38,19 +38,19 @@ class MarketOfferQueries:
     WHERE ( (:max_value is NULL) or  ( "min_value" is NULL or "min_value" < :max_value) )
      AND  ( (:min_value is NULL) or ( "max_value" is NULL or "max_value" > :min_value) )  """
 
-    GET_MARKET_OFFER_BY_OFFER_ID = """SELECT "offer_id", "isp_start", "range_id", "cost_mwh", "ts", "isp_len"
+    GET_MARKET_OFFER_BY_OFFER_ID = """SELECT "offer_id", "isp_start",    "cost_mwh", "ts", "isp_len"
       FROM "${table_prefix}market_offer"  WHERE offer_id = :offer_id
        """
-    LIST_MARKET_OFFER = """SELECT offer."offer_id", offer."isp_start", offer."range_id", 
-      offer."cost_mwh", offer."ts", offer."isp_len"
+    LIST_MARKET_OFFER = """SELECT offer."offer_id", offer."isp_start", 
+      offer."cost_mwh", offer."ts", offer."isp_len", offer_info.range_id
       FROM "${table_prefix}market_offer" offer  
       JOIN "${table_prefix}offer_details"  offer_info  on offer.offer_id = offer_info.offer_id 
       WHERE offer_info.market_id =:market_id AND
            (offer."ts" BETWEEN :ts_from and :ts_to) and COALESCE(offer_info."isp_unit"=:isp_unit,TRUE )  """
 
     INSERT_MARKET_OFFER = """ INSERT INTO "${table_prefix}market_offer" 
-        ("offer_id", "isp_start", "range_id", "cost_mwh", "ts", "isp_len")
-        VALUES (:offer_id, :isp_start, :range_id, :cost_mwh, :ts, :isp_len)   """
+        ("offer_id", "isp_start",  "cost_mwh", "ts", "isp_len")
+        VALUES (:offer_id, :isp_start,  :cost_mwh, :ts, :isp_len)   """
 
     DELETE_MARKET_OFFER = """ DELETE FROM "${table_prefix}market_offer"  WHERE offer_id=:offer_id  """
 
@@ -103,7 +103,7 @@ class MarketOfferAPIImpl(MarketOfferAPI):
             range_info = conn.select(q=self.queries.SELECT_RANGE, args=args, obj_type=RangeInfo)
             return range_info
 
-    def add_offer(self, market_offer_items: List[EnergyMarketOffer]) -> List[Dict]:
+    def add_offer(self, market_offer_items: List[EnergyMarketOfferDAO]) -> List[Dict]:
         with ConnectionWrapper() as conn:
             inserted = conn.insert_batch(q=self.queries.INSERT_MARKET_OFFER,
                                          arg_list=[vars(mo) for mo in market_offer_items],
@@ -127,8 +127,8 @@ class MarketOfferAPIImpl(MarketOfferAPI):
 
             return offers
 
-    def get_market_offer(self, offer_id: int) -> List[EnergyMarketOffer]:
+    def get_market_offer(self, offer_id: int) -> List[EnergyMarketOfferDAO]:
         with ConnectionWrapper() as conn:
             args = {"offer_id": offer_id}
-            offer = conn.select(q=self.queries.GET_MARKET_OFFER_BY_OFFER_ID, args=args, obj_type=EnergyMarketOffer)
+            offer = conn.select(q=self.queries.GET_MARKET_OFFER_BY_OFFER_ID, args=args, obj_type=EnergyMarketOfferDAO)
             return offer

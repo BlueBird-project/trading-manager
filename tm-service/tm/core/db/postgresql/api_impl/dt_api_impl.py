@@ -10,15 +10,15 @@ from tm.models.digital_twin import DigitalTwinDAO
 # class JobDAO
 
 class DTAPIQueries(QueryObject):
-    __PROJECTION__ = """ "dt_id", "market_id" ,"dt_uri" ,"job_id" ,"update_ts" ,"ext" """
+    __PROJECTION__ = """ "dt_id" ,  "dt_uri" ,"job_id" ,  "update_ts" ,"ext" """
     __TABLE_NAME__ = "dt_info"
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" """
     GET_BY_URI = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE 
-    dt_uri = :dt_uri and (( market_id is NULL and :market_id is NULL) or market_id=:market_id )"""
+    dt_uri = :dt_uri  """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
-     ( "dt_uri","market_id","job_id","ext" ,"update_ts"  )
-     VALUES (:dt_uri, :market_id,:job_id, :ext,extract(epoch from now()) * 1000) """
+     ( "dt_uri",  "job_id", "ext" ,"update_ts"  )
+     VALUES (:dt_uri,  :job_id,   :ext,extract(epoch from now()) * 1000) """
 
 
 class DTAPIImpl(DTAPI):
@@ -41,7 +41,7 @@ class DTAPIImpl(DTAPI):
         with ConnectionWrapper() as conn:
             return conn.select(q=self.queries.LIST, args={}, obj_type=DigitalTwinDAO)
 
-    def get(self, dt_uri: str, market_id: Optional[int]) -> Optional[DigitalTwinDAO]:
+    def get(self, dt_uri: str) -> Optional[DigitalTwinDAO]:
         with ConnectionWrapper() as conn:
-            return conn.get(q=self.queries.GET_BY_URI, args={"market_id": market_id, "dt_uri": dt_uri},
+            return conn.get(q=self.queries.GET_BY_URI, args={"dt_uri": dt_uri},
                             obj_type=DigitalTwinDAO)

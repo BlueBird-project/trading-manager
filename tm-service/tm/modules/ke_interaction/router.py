@@ -2,6 +2,8 @@ from typing import List, Optional, Dict, Any
 
 from fastapi import APIRouter
 from ke_client.utils import time_utils
+from rdflib import URIRef
+
 from tm.utils import TimeSpan
 
 ki_router = APIRouter(prefix="", tags=["KI"])
@@ -41,8 +43,10 @@ async def scan_forecast() -> Dict[str, Any]:
     ts_info = request_dt_ts_info(req=[])
     res["ts_info"] = ts_info
     for uri in ts_info:
-        ts = request_dt_data_by_id(ts_uri_ref=uri.ts_uri)
-        res[uri.ts_uri] = [pnt.n3() for pnt in ts]
+        ts = request_dt_data_by_id(ts_uri_ref=URIRef(uri.forecast_uri))
+        # ask_test(ts_uri_ref=URIRef( uri.forecast_uri))
+        res[uri.forecast_uri] = [ts[uri.forecast_uri]]
+        # res[uri.ts_uri] = [ts[uri.ts_uri]]
 
     return res
 

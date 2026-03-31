@@ -1,0 +1,10 @@
+drop table ${table_prefix}app_config;
+drop table  ${table_prefix}market_offer_forecast;
+drop table  ${table_prefix}forecast_details;
+drop table  ${table_prefix}market_offer;
+drop table  ${table_prefix}offer_details;
+drop table  ${table_prefix}consumption_range;
+drop table  ${table_prefix}dt_info;
+drop table  ${table_prefix}forecast_model;
+drop table  ${table_prefix}market_details;
+drop table  ${table_prefix}service_jobs ;

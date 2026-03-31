@@ -28,11 +28,11 @@ def ke_state() -> bool:
 def check_scheduler(report: Dict) -> Dict:
     from tm.core import app_settings
     report["bg_scheduler_available"] = app_settings.use_scheduler
-    if app_settings.use_ke_api:
-        from tm.core.task_manager import service_job_scheduler
+    if app_settings.use_scheduler:
+        from tm.core import task_manager
         from apscheduler.schedulers.base import STATE_RUNNING
-        report["bg_scheduler_state"] = service_job_scheduler.state == STATE_RUNNING
-        report["bg_scheduler_state_value"] = service_job_scheduler.state
+        report["bg_scheduler_state"] = task_manager.service_job_scheduler.state == STATE_RUNNING
+        report["bg_scheduler_state_value"] = task_manager.service_job_scheduler.state
     return report
 
 

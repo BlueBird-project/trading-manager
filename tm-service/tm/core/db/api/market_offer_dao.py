@@ -3,7 +3,7 @@ from typing import List, Optional, Dict
 
 from effi_onto_tools.db.dao import DAO
 
-from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOffer
+from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
 from tm.utils import TimeSpan
 
 
@@ -16,8 +16,8 @@ class MarketOfferAPI(DAO):
         pass
 
     @abstractmethod
-    def list_offer_info(self, ts: TimeSpan, market_id: Optional[int] = None, isp_unit: Optional[int] = None) -> List[
-        EnergyMarketOfferInfo]:
+    def list_offer_info(self, ts: TimeSpan, market_id: Optional[int] = None, isp_unit: Optional[int] = None) \
+            -> List[EnergyMarketOfferInfo]:
         pass
 
     @abstractmethod
@@ -37,7 +37,7 @@ class MarketOfferAPI(DAO):
         pass
 
     @abstractmethod
-    def add_offer(self, market_offer_items: List[EnergyMarketOffer]) -> List[Dict]:
+    def add_offer(self, market_offer_items: List[EnergyMarketOfferDAO]) -> List[Dict]:
         pass
 
     @abstractmethod
@@ -51,5 +51,5 @@ class MarketOfferAPI(DAO):
         pass
 
     @abstractmethod
-    def get_market_offer(self, offer_id: int) -> List[EnergyMarketOffer]:
+    def get_market_offer(self, offer_id: int) -> List[EnergyMarketOfferDAO]:
         pass

@@ -2,7 +2,6 @@
 # from datetime import tzinfo, timezone
 # from typing import List, Union, Optional, Dict, Any, Tuple
 #
-# from effi_onto_tools.db import TimeSpan
 # from effi_onto_tools.db.dao import DAO
 #
 #

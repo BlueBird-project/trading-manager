@@ -39,8 +39,8 @@ class TOUPriceInfoQuery(BindingsBase):
         super().__init__(bindings=kwargs)
 
     def get_power_limit(self) -> Tuple[float, float]:
-        min_value = float(self.min_value) if self.min_value is not None else None
-        max_value = float(self.max_value) if self.max_value is not None else None
+        min_value =self.convert_value(self.min_value, float)
+        max_value =self.convert_value(self.max_value, float)
         return min_value, max_value
 
 
@@ -59,8 +59,8 @@ class TOUPriceInfo(BindingsBase):
         super().__init__(bindings=kwargs)
 
     def get_power_limit(self) -> Tuple[float, float]:
-        min_value = float(self.min_value) if self.min_value is not None else None
-        max_value = float(self.max_value) if self.max_value is not None else None
+        min_value =self.convert_value(self.min_value, float)
+        max_value =self.convert_value(self.max_value, float)
         return min_value, max_value
 
 

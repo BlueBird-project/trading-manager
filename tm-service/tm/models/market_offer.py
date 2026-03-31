@@ -25,6 +25,7 @@ class EnergyMarketOfferDAO(BaseModel):
     ts: int
     isp_len: int = 1
 
+
 class EnergyMarketOffer(BaseModel):
     offer_id: int
     isp_start: int

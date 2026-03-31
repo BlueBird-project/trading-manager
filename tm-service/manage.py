@@ -47,32 +47,6 @@ if __name__ == "__main__":
 
         task_manager.setup_scheduler()
 
-    # # todo add to the job scheduler
-    # sleep(5)
-    # markets = get_all_markets(True)
-    #
-    # from tm.modules.ke_interaction.interactions.dam_interactions import get_current_market_offer_info, \
-    #     get_market_offer
-    # offer_infos = get_current_market_offer_info()
-    # get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
-    #
-    # print(markets)
-    # offer_infos = get_current_market_offer_info()
-    # offer_dict = get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
-    # for uri,offer in offer_dict.items():
-    #     print(f"{uri}:{len(offer)}")
-    # cur_ts = time_utils.current_timestamp()
-    # while True:
-    #     print("ticktick1")
-    #     # ts_info = request_ts_info(ts=TimeSpan(ts_from=cur_ts, ts_to=cur_ts + 3600 * 1000 * 24))
-    #     print("ticktick")
-    #     sleep(50)
-    # markets=get_all_markets()
-    # print("#########################")
-    # print("markets:")
-    # print("#########################")
-    # print(markets)
-    # print("#########################")
     if app_settings.use_rest_api:
         import uvicorn
         from tm.modules.tm_api.router import router as tm_router

@@ -63,9 +63,6 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
     for ob in offer_bindings:
         grouped_bindings[str(ob.offer_uri)].append(ob)
 
-    unlimited_range = dao_manager.offer_dao.get_range(None, None)
-    # range_id = unlimited_range.range_id
-
     for offer_uri, market_offer in grouped_bindings.items():
         offer_info = dao_manager.offer_dao.get_offer_info(offer_uri=offer_uri)
         if offer_info is None:

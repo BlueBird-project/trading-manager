@@ -53,13 +53,4 @@ knowledge_engine:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
         - ' ?dp s4ener:belongsToForecast ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
         - '   s4ener:hasEffectivePeriod ?duration ; saref:hasForecastResult ?dpr .'
-        - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
-#    forecast-test:
-#      name: "forecast-test"
-#      description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."
-#      prefixes:
-#        xsd: "http://www.w3.org/2001/XMLSchema#"
-#        saref: "https://saref.etsi.org/core/"
-#      pattern:
-#        - ' ?ts_uri rdf:type ubmarket:Forecast .'
-#        - ' ?dp s4ener:belongsToForecast ?ts_uri .'
+        - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn "EURPerMegawattHour" .'

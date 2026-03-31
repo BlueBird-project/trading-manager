@@ -16,8 +16,8 @@ class MarketOfferAPI(DAO):
         pass
 
     @abstractmethod
-    def list_offer_info(self, ts: TimeSpan, market_id: Optional[int] = None, isp_unit: Optional[int] = None) -> List[
-        EnergyMarketOfferInfo]:
+    def list_offer_info(self, ts: TimeSpan, market_id: Optional[int] = None, isp_unit: Optional[int] = None) \
+            -> List[EnergyMarketOfferInfo]:
         pass
 
     @abstractmethod

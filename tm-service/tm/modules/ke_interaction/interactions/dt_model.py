@@ -72,16 +72,15 @@ class DTTSInfo(BindingsBase):
     @property
     def isp_len(self) -> int:
         ms_diff = self.to_ts - self.from_ts
-        min_diff = ms_diff / (60000) / self.update_rate_min
-        print(f"TODO: remove , isp_len {ms_diff}")
-        return self.to_ts - self.from_ts
+        min_diff = ms_diff / 60000
+        return math.ceil(min_diff / self.update_rate_min)
 
     def get_sequence(self) -> str:
         return self.convert_value(self.sequence)
 
     def get_power_limit(self) -> Tuple[float, float]:
-        min_value =self.convert_value(self.min_value, float)
-        max_value =self.convert_value(self.max_value, float)
+        min_value = self.convert_value(self.min_value, float)
+        max_value = self.convert_value(self.max_value, float)
         return min_value, max_value
 
 

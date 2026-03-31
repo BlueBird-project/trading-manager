@@ -1,7 +1,6 @@
 import logging
 from typing import List, Optional
 
-from effi_onto_tools.db import TimeSpan
 from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIAskResponse
 from rdflib import URIRef, Literal
@@ -10,6 +9,7 @@ from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBinding
     MarketOfferBindings, EnergyMarketRequest, \
     MarketOfferRequest, MarketOfferInfoFilteredRequest, MarketOfferInfoFilteredBindings
 from tm.modules.ke_interaction.service import dam_service
+from tm.utils import TimeSpan
 
 ki = KIHolder()
 
@@ -28,6 +28,7 @@ def _get_all_markets():
         knowledge_bases=[])
 
 
+# noinspection PyUnusedLocal
 @ki.answer("market")
 def on_market_request(ki_id: str, bindings: List[EnergyMarketRequest]):
     if len(bindings) > 0:
@@ -35,6 +36,7 @@ def on_market_request(ki_id: str, bindings: List[EnergyMarketRequest]):
     return dam_service.list_markets(market_query=None)
 
 
+# noinspection PyUnusedLocal
 @ki.react("market")
 def on_market_information(ki_id: str, bindings: List[EnergyMarketBindings]):
     from tm.core import app_settings
@@ -56,6 +58,7 @@ def get_all_markets(reset_markets: bool = False) -> List[EnergyMarketBindings]:
 # endregion
 
 # region offer details (timeseries metadata)
+# noinspection PyUnusedLocal
 @ki.react("market-offer-info")
 def on_market_offer_info(ki_id: str, bindings: List[MarketOfferInfoBindings]):
     dam_service.save_offer_info(offer_bindings=bindings)
@@ -97,6 +100,7 @@ def _get_market_offer(offer_uris: List[URIRef]) -> List[MarketOfferRequest]:
     return [MarketOfferRequest(offer_uri=offer_uri) for offer_uri in offer_uris]
 
 
+# noinspection PyUnusedLocal
 @ki.react("market-offer")
 def on_market_offer(ki_id, bindings: List[MarketOfferBindings]):
     dam_service.save_offer(offer_bindings=bindings, clear=True)

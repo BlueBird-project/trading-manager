@@ -27,7 +27,7 @@ knowledge_engine:
         - ' ?tou_uri s4ener:producedBy <http://tm.bluebird.com>  .'
         - ' ?dp s4ener:belongsToTimeSeries ?tou_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
         - '     s4ener:hasEffectivePeriod ${ISP_UNIT}; saref:hasResult ?dpr.'
-        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "EURPerMegawattHour" .'
     tou-price-info:
       name: "tou-price-info"
       description: "TOU metadata - find TOU timeseries (tou_uri). Used in ANSWER,ASK  . "

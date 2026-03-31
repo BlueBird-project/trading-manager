@@ -119,7 +119,6 @@ if __name__ == "__main__" and app_settings:
         print("END")
         import sys
 
-        os._exit(1)
         # sys.exit()
     except Exception as ex:
         print("Some issue occurred: ")

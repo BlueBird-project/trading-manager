@@ -1,5 +1,3 @@
-
-
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.schedulers.base import BaseScheduler
 from pytz import utc
@@ -25,6 +23,7 @@ def init(bg=True):
         service_job_scheduler = BlockingScheduler(executors=executors, job_defaults=job_defaults, timezone=utc)
     return service_job_scheduler
 
+
 def setup_scheduler():
     from tm.core import app_settings
     global service_job_scheduler
@@ -32,10 +31,10 @@ def setup_scheduler():
     logging.info("INIT task scheduler")
 
     if app_settings.use_rest_api:
-        service_job_scheduler=init(bg=True)
+        service_job_scheduler = init(bg=True)
     else:
         print("Start sync scheduler")
-        service_job_scheduler=init(bg=False)
+        service_job_scheduler = init(bg=False)
 
     from tm.modules.ke_interaction import scheduled_jobs as ke_jobs
 

@@ -1,4 +1,5 @@
 import hashlib
+import math
 import random
 from datetime import timedelta
 from typing import List, Optional, Tuple
@@ -9,7 +10,7 @@ from ke_client import KIHolder, BindingsBase, OptionalLiteral, ki_object, rdf_ni
 from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus
 from rdflib import URIRef, Literal
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSUri, \
-    DTDPUri, DTDPRUri,  DTTSInfoRequest
+    DTDPUri, DTDPRUri, DTTSInfoRequest
 
 
 @ki_object("dt-ts-info")
@@ -57,17 +58,18 @@ class DTTSInfo(BindingsBase):
     @property
     def isp_len(self) -> int:
         ms_diff = self.to_ts - self.from_ts
-        min_diff = ms_diff / (60000) / self.update_rate_min
-        print(f"TODO: remove , isp_len {ms_diff}")
-        return self.to_ts - self.from_ts
+        min_diff = ms_diff / 60000
+        return math.ceil(min_diff / self.update_rate_min)
 
     def get_sequence(self) -> str:
         return self.convert_value(self.sequence)
 
     def get_power_limit(self) -> Tuple[float, float]:
-        min_value =self.convert_value(self.min_value, float)
-        max_value =self.convert_value(self.max_value, float)
+        min_value = self.convert_value(self.min_value, float)
+        max_value = self.convert_value(self.max_value, float)
         return min_value, max_value
+
+
 # @ki_object("forecast-test")
 # class DTPntTest(BindingsBase):
 #     ts_uri: URIRef
@@ -185,7 +187,7 @@ def _generate_sample_ts(ts_uri: DTTSUri, size=96) -> List[DTPnt]:
     cur_ts = ts_uri.ts_start
     isp = 0
     res = []
-    while cur_ts <= ts_uri.ts_end and isp < (size):
+    while cur_ts <= ts_uri.ts_end and isp < size:
         isp += 1
         pnt = DTPnt(ts_uri=ts_uri.uri_ref,
                     dp=DTDPUri(prefix=dt_ki.get_kb_id(), **ts_uri.__dict__, isp=isp).uri_ref,

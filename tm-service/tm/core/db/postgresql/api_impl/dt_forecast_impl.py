@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import List, Optional, Dict
 
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
@@ -11,8 +10,6 @@ from tm.utils import TimeSpan
 
 
 class DTForecastInfoQueries(QueryObject):
-    # __PROJECTION__ = """ "forecast_id", "forecast_uri" ,"range_id" ,"job_id","sequence" ,"offer_id" ,"model_id" ,"ts" ,
-    # "isp_len"  ,"isp_unit"  ,"update_ts" """
     __TABLE_NAME__ = "forecast_details"
 
     __PROJECTION__ = """ ${table_alias}."forecast_id", ${table_alias}."job_id",  ${table_alias}."forecast_uri" ,
@@ -110,12 +107,11 @@ class DTForecastAPImpl(DTForecastAPI):
         with ConnectionWrapper() as conn:
             return conn.select(q=self.q_dt_offer.LIST, args={"forecast_ids": forecast_ids}, obj_type=DTForecastOfferDAO)
 
-
     def save_offer(self, forecast_offers: List[DTForecastOfferDAO]) -> List[Dict]:
         with ConnectionWrapper() as conn:
             inserted = conn.insert_batch(q=self.q_dt_offer.INSERT_FORECAST_OFFER,
                                          arg_list=[vars(fo) for fo in forecast_offers],
-                                         return_id_col=["forecast_id","isp_start", "cost_mwh", "isp_len"],
+                                         return_id_col=["forecast_id", "isp_start", "cost_mwh", "isp_len"],
                                          fail_safe=False)
 
             return [{k: v for k, v in zip(["forecast_id", "isp_start", "cost_mwh", "isp_len"], r)} for r in inserted]

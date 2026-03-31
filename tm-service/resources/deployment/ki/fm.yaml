@@ -44,7 +44,7 @@ knowledge_engine:
         - '     s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "Megawatt" .'
         - ' ?cost_dp   saref:hasResult ?cost_dpr .'
-        - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "PLN" .'
+        - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "EUR" .'
     fm-ts-evaluate:
       name: "fm-ts-evaluate"
       description: "Evaluate power demand"
@@ -58,5 +58,5 @@ knowledge_engine:
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "Megawatt" .'
       result_pattern:
         - ' ?dp   saref:hasResult ?cost_dpr .'
-        - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "PLN" .'
+        - ' ?cost_dpr saref:hasValue ?cost ; saref:isMeasuredIn "EUR" .'
 

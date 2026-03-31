@@ -3,7 +3,7 @@
 # ./resources/.env
 # ./resources/env/.env.fm
 ################################################
-from rdflib import URIRef
+from typing import Optional
 
 import tm
 import logging
@@ -44,8 +44,8 @@ if __name__ == "__main__" and app_settings:
     success = False
     #####################################
     # Set market
-    ##################################33
-    market: EnergyMarketBindings = None
+    #####################################
+    market: Optional[EnergyMarketBindings] = None
 
     while not success:
         try:
@@ -54,9 +54,12 @@ if __name__ == "__main__" and app_settings:
             print(f"tick: {client.state()}")
             # set market which will be forecasted
             markets = get_markets()
-            market = markets[0]
-            set_market_uri(market_uri=market.market_uri)
-            success = True
+            if len(markets) < 1:
+                print("Error: no markets")
+            else:
+                market = markets[0]
+                set_market_uri(market_uri=market.market_uri)
+                success = True
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

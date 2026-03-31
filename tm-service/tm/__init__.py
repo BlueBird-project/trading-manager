@@ -43,7 +43,7 @@ class DemoArgs(BaseModel):
 
 def get_demo_args() -> Tuple[AppArgs, DemoArgs]:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config-path', help='YAML config path', default='/config/config.yaml')
+    parser.add_argument('-c', '--config-path', help='YAML config path', default='/config/app_config.yaml')
     parser.add_argument('--env', help='env path', default='/env/.env.tm.demo')
     parser.add_argument('--country', help='country', default='POLAND')
     parser.add_argument('--type', help='market type', default='INTRADAY')

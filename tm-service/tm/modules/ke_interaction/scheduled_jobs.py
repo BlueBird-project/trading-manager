@@ -4,9 +4,10 @@ from datetime import datetime, timedelta
 from time import sleep
 
 from apscheduler.schedulers.base import BaseScheduler
-from effi_onto_tools.db import TimeSpan
 from ke_client.utils import time_utils
 from rdflib import URIRef
+
+from tm.utils import TimeSpan
 
 _BASE_TIME_OFFSET_ = 60
 

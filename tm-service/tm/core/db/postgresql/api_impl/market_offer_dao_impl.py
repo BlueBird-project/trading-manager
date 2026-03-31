@@ -1,10 +1,10 @@
 from typing import List, Optional, Dict, Any
 
-from effi_onto_tools.db import TimeSpan
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
 from tm.core.db.api.market_offer_dao import MarketOfferAPI
 from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
+from tm.utils import TimeSpan
 
 
 class MarketOfferQueries:

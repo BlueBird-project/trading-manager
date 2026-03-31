@@ -11,6 +11,7 @@ ki = KIHolder()
 
 
 # region digital twin service details
+# noinspection PyUnusedLocal
 @ki.react("dt-info")
 def on_dt_info(ki_id, bindings: List[DigitalTwinInfo]):
     print("on dt-info")
@@ -30,6 +31,7 @@ def _request_dt_ts_info(req: List[DTTSInfoRequest]):
     return req
 
 
+# noinspection PyUnusedLocal
 @ki.react("dt-ts-info")
 def on_dt_ts_info(ki_id, bindings: List[DTTSInfo]):
     print("on new digital twin timeseries info")

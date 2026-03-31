@@ -41,7 +41,7 @@ class DTAPIImpl(DTAPI):
         with ConnectionWrapper() as conn:
             return conn.select(q=self.queries.LIST, args={}, obj_type=DigitalTwinDAO)
 
-    def get(self, dt_uri: str ) -> Optional[DigitalTwinDAO]:
+    def get(self, dt_uri: str) -> Optional[DigitalTwinDAO]:
         with ConnectionWrapper() as conn:
-            return conn.get(q=self.queries.GET_BY_URI, args={  "dt_uri": dt_uri},
+            return conn.get(q=self.queries.GET_BY_URI, args={"dt_uri": dt_uri},
                             obj_type=DigitalTwinDAO)

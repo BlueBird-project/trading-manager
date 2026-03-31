@@ -1,10 +1,10 @@
 from typing import List, Optional
 
-from effi_onto_tools.db import TimeSpan
 from fastapi import APIRouter
 
 from tm.models.market import EnergyMarket
 from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
+from tm.utils import TimeSpan
 
 router = APIRouter(prefix="")
 

@@ -1,0 +1,39 @@
+services:
+  postgres:
+    extends:
+      file: base.yaml
+      service: postgres
+    volumes:
+      - '${SERVICE_BASE_PATH}/srv/bluebird_tm/postgres-data:/var/lib/postgresql/data'
+    ports:
+      - '${DB_PORT}:5432'
+  tge-postgres:
+    extends:
+      file: base.yml
+      service: postgres
+    volumes:
+      - '${SERVICE_BASE_PATH}/srv/bluebird_tge/postgres-data:/var/lib/postgresql/data'
+    ports:
+      - '${DB_PORT}:5432'
+  db-adminer:
+    profiles: [dev, debug ]
+    container_name: tm-db-adminer
+    image: adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - '${TM_DB_ADMINER_PORT}:8080'
+  tge-adminer:
+    profiles: [dev, debug ]
+    container_name: tm-db-adminer
+    image: adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - '${TM_DB_ADMINER_PORT}:8080'
+#    networks:
+#      - gnet
+#    environment:
+#      DOCKER_DEFAULT_PLATFORM: linux/amd64

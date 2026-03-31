@@ -22,7 +22,7 @@ Service on start loads prices for the last 5 days for the configured markets
 
 #### Configuration
 
-Sample TM configuration with subscribed markets can be found here: [config](./docker/trading-manager/config.yaml)
+Sample TM configuration with subscribed country markets can be found [here (configuration used in compose.yaml)](./docker/trading-manager/app_config.yaml)  and  [here](./docker/trading-manager/config.yaml)
 
 ### PGAdmin (DB viewer)
 

@@ -1,0 +1,26 @@
+service:
+  port: 8081
+  host: "0.0.0.0"
+  root_path: ""
+  name: "local-service"
+app:
+  logging_conf_path: "./resources/logging.ini"
+  country_list:
+    - "Poland"
+    - "Spain"
+    - "Germany"
+    - "Belgium"
+    - "Austria"
+db:
+  db_log_query: false
+  db_log_error_query: true
+  db_max_rows: 65000
+  db_init: true
+ke:
+  allow_partial_ki: true
+  ki_config_path: ./resources/deployment/ke_config.yaml
+  ki_vars:
+    DAY_DURATION: '"PT1440M"^^xsd:duration'
+    ISP_UNIT: '"PT15M"^^xsd:duration'
+    CURRENCY_UNIT: "EUR"
+    ENERGY_COST_UNIT: "EURPerMegawattHour"

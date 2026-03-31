@@ -17,7 +17,7 @@ services:
       - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
     restart: on-failure:5
     volumes:
-      - ./docker/trading-manager/config.yaml:/config/config.yaml
+      - ./docker/trading-manager/app_config.yaml:/config/app_config.yaml
     networks:
       - tm-net
 
@@ -83,6 +83,17 @@ services:
     image: ghcr.io/tno/knowledge-engine/smart-connector:1.4.0
     environment:
       KE_RUNTIME_PORT: 8280
+      KE_KB_WAIT_TIMEOUT: 15
+      KE_HTTP_TIMEOUT: 10
+      # documentation about these configuration property can be found in the SmartConnectorConfig class
+#      ke.runtime.port = 8081
+#      ke.runtime.exposed.url = http://${ke.runtime.hostname}:${ke.runtime.port}
+#      ke.kb.wait.timeout = 10
+#      ke.http.timeout = 5
+#      kd.url = http://localhost:8080
+#      sc.validate.outgoing.bindings.wrt.incoming.bindings = true
+#      ke.runtime.hostname = localhost
+#      ke.reasoner.level = 2
     ports:
       - 8280:8280
     networks:

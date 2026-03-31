@@ -1,6 +1,6 @@
 include:
   - "compose.yaml"
-  - "sample.yaml"
+  - "sample_compose.yaml"
 services:
   tge-service:
     image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:latest"

@@ -1,0 +1,22 @@
+include:
+  - "compose.yaml"
+  - "sample_compose.yaml"
+services:
+  tge-service:
+    image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:latest"
+    #    image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:${TGE_TAG}"
+    ports:
+      - "11002:8080"
+    depends_on:
+      - tm-db
+      - tm-ke-service
+    restart: on-failure:5
+    env_file:
+      - path: ".env"
+        required: true # default
+      - path: "./env/.env.tge"
+        required: true # default
+    environment:
+      - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
+    networks:
+      - tm-net

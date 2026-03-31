@@ -9,6 +9,7 @@ class EnergyMarketOfferInfo(BaseModel):
     ts: int
     date_str: str
     offer_uri: Optional[str]
+    range_id: int
     sequence: Optional[str]
     isp_unit: int
     isp_len: int
@@ -17,11 +18,19 @@ class EnergyMarketOfferInfo(BaseModel):
 
 
 # TODO: add offer range to graphs and ontology
+class EnergyMarketOfferDAO(BaseModel):
+    offer_id: int
+    isp_start: int
+    cost_mwh: Optional[float]
+    ts: int
+    isp_len: int = 1
+
+
 class EnergyMarketOffer(BaseModel):
     offer_id: int
     isp_start: int
-    range_id: int
     cost_mwh: Optional[float]
+    range_id: int
     ts: int
     isp_len: int = 1
 

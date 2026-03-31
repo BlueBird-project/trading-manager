@@ -15,5 +15,5 @@ class DTAPI:
         pass
 
     @abstractmethod
-    def get(self, dt_uri: str, market_id: Optional[int]) -> Optional[DigitalTwinDAO]:
+    def get(self, dt_uri: str) -> Optional[DigitalTwinDAO]:
         pass

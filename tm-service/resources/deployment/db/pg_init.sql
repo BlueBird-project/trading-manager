@@ -7,15 +7,18 @@
  CREATE TABLE "public"."${table_prefix}service_jobs" (
      "job_id" bigint DEFAULT nextval('${table_prefix}service_jobs_job_id_seq') NOT NULL,
      "command_uri" character varying(250) NOT NULL,
+      "market_id" bigint,
      "job_name" character varying(50) NOT NULL,
      "job_description" character varying(50),
      "update_ts" bigint NOT NULL,
      "ext" character varying(10000),
      CONSTRAINT "${table_prefix}service_jobs_key" PRIMARY KEY ("job_id")
  )
+
  WITH (oids = false);
 
- CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (command_uri);
+ CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri_market_id ON public.${table_prefix}service_jobs USING btree (command_uri,market_id);
+ CREATE UNIQUE INDEX ${table_prefix}service_jobs_command_uri ON public.${table_prefix}service_jobs USING btree (market_id);
 
 
 DROP TABLE IF EXISTS "${table_prefix}dt_info";
@@ -26,14 +29,13 @@ CREATE TABLE "public"."${table_prefix}dt_info" (
     "dt_id" bigint DEFAULT nextval('${table_prefix}dt_info_id_seq') NOT NULL,
     "dt_uri" character varying(250) NOT NULL,
     "job_id" bigint,
-    "market_id" bigint,
     "update_ts" bigint NOT NULL,
     "ext" character varying(10000),
     CONSTRAINT "${table_prefix}dt_info_key" PRIMARY KEY ("dt_id")
 )
 WITH (oids = false);
 
-CREATE UNIQUE INDEX ${table_prefix}dt_info_dt_uri ON public.${table_prefix}dt_info USING btree (dt_uri,market_id);
+CREATE UNIQUE INDEX ${table_prefix}dt_info_dt_uri ON public.${table_prefix}dt_info USING btree (dt_uri);
 
 
 
@@ -58,17 +60,23 @@ CREATE SEQUENCE ${table_prefix}forecast_details_forecast_id_seq INCREMENT 1 MINV
 
 CREATE TABLE "public"."${table_prefix}forecast_details" (
     "forecast_id" bigint DEFAULT nextval('${table_prefix}forecast_details_forecast_id_seq') NOT NULL,
-    "offer_id" bigint NOT NULL,
-    "model_id" bigint NOT NULL,
+    "job_id" bigint NOT NULL  ,
+    "forecast_uri" character varying(250),
+    "range_id" integer NOT NULL,
+    "sequence" character varying(10),
+    "offer_id" bigint  ,
+    "model_id" bigint   ,
     "ts" bigint NOT NULL,
     "isp_len" integer DEFAULT '1' NOT NULL,
     "isp_unit" integer NOT NULL,
     "update_ts" bigint NOT NULL,
     CONSTRAINT "${table_prefix}forecast_details_forecast_id" PRIMARY KEY ("forecast_id")
 )
+
 WITH (oids = false);
 
-CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,offer_id);
+CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_offer_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,offer_id);
+CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_range_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,range_id);
 
 CREATE INDEX ${table_prefix}forecast_details_model_id ON public.${table_prefix}forecast_details USING btree (model_id);
 CREATE INDEX ${table_prefix}forecast_details_offer_id ON public.${table_prefix}forecast_details USING btree (offer_id);
@@ -80,8 +88,6 @@ CREATE SEQUENCE ${table_prefix}forecast_model_model_id_seq INCREMENT 1 MINVALUE 
 
 CREATE TABLE "public"."${table_prefix}forecast_model" (
     "model_id" integer DEFAULT nextval('${table_prefix}forecast_model_model_id_seq') NOT NULL,
-    "market_id" bigint NOT NULL,
-    "job_id" bigint NOT NULL,
     "model_uri" character varying(300),
     "model_name" character varying(30),
     "model_description" character varying(1000),
@@ -123,11 +129,10 @@ DROP TABLE IF EXISTS "${table_prefix}market_offer";
 CREATE TABLE "public"."${table_prefix}market_offer" (
     "offer_id" bigint NOT NULL,
     "isp_start" integer NOT NULL,
-    "range_id" integer NOT NULL,
     "cost_mwh" double precision,
     "ts" bigint NOT NULL,
     "isp_len" integer NOT NULL,
-    CONSTRAINT "${table_prefix}market_offer_market_id_offer_id_isp_start_range_id" PRIMARY KEY (  "offer_id", "isp_start", "range_id")
+    CONSTRAINT "${table_prefix}market_offer_market_id_offer_id_isp_start" PRIMARY KEY (  "offer_id", "isp_start" )
 )
 WITH (oids = false);
 
@@ -137,13 +142,11 @@ CREATE INDEX ${table_prefix}market_offer_offer_id ON public.${table_prefix}marke
 DROP TABLE IF EXISTS "${table_prefix}market_offer_forecast";
 CREATE TABLE "public"."${table_prefix}market_offer_forecast" (
     "forecast_id" bigint NOT NULL,
-    "model_id" bigint NOT NULL,
     "isp_start" integer NOT NULL,
-    "range_id" integer NOT NULL,
     "cost_mwh" double precision,
     "ts" bigint NOT NULL,
     "isp_len" integer NOT NULL,
-    CONSTRAINT "${table_prefix}market_offer_forecast_market_id_forecast_id_isp_start_rang" PRIMARY KEY (  "forecast_id", "isp_start", "range_id")
+    CONSTRAINT "${table_prefix}market_offer_forecast_market_id_forecast_id_isp_start" PRIMARY KEY (  "forecast_id", "isp_start" )
 )
 WITH (oids = false);
 
@@ -157,6 +160,7 @@ CREATE TABLE "public"."${table_prefix}offer_details" (
     "offer_id" bigint DEFAULT nextval('${table_prefix}offer_details_offer_id_seq') NOT NULL,
     "market_id" bigint NOT NULL,
     "ts" bigint NOT NULL,
+    "range_id" integer NOT NULL,
 	"date_str"  character varying(10) NOT NULL,
     "offer_uri" character varying(250),
     "sequence" character varying(10),
@@ -168,27 +172,26 @@ CREATE TABLE "public"."${table_prefix}offer_details" (
 )
 WITH (oids = false);
 
-CREATE UNIQUE INDEX ${table_prefix}offer_details_market_id_ts ON public.${table_prefix}offer_details USING btree (market_id,sequence, ts);
+CREATE UNIQUE INDEX ${table_prefix}offer_details_market_id_ts_range_id ON public.${table_prefix}offer_details USING btree (market_id,sequence, ts,range_id);
 CREATE UNIQUE INDEX ${table_prefix}offer_details_offer_uri ON public.${table_prefix}offer_details USING btree (offer_uri);
 
 
 
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_model_id_fkey" FOREIGN KEY (model_id) REFERENCES ${table_prefix}forecast_model(model_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_job_id_fkey"  FOREIGN KEY ("job_id") REFERENCES "${table_prefix}service_jobs" ("job_id") ON DELETE RESTRICT ON UPDATE CASCADE NOT DEFERRABLE;
 
 
 ALTER TABLE ONLY "public"."${table_prefix}market_offer" ADD CONSTRAINT "${table_prefix}market_offer_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."${table_prefix}market_offer" ADD CONSTRAINT "${table_prefix}market_offer_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."${table_prefix}market_offer_forecast" ADD CONSTRAINT "${table_prefix}market_offer_forecast_forecast_id_fkey" FOREIGN KEY (forecast_id) REFERENCES ${table_prefix}forecast_details(forecast_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
-ALTER TABLE ONLY "public"."${table_prefix}market_offer_forecast" ADD CONSTRAINT "${table_prefix}market_offer_forecast_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE SET NULL ON DELETE SET NULL NOT DEFERRABLE;
 
 ALTER TABLE ONLY "public"."${table_prefix}offer_details" ADD CONSTRAINT "${table_prefix}offer_details_market_id_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}offer_details" ADD CONSTRAINT "${table_prefix}offer_details_range_id_fkey" FOREIGN KEY (range_id) REFERENCES ${table_prefix}consumption_range(range_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 
 INSERT INTO   "public"."${table_prefix}consumption_range" ("min_value" , "max_value"  ) VALUES (NULL,NULL);
 
-
-
-ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_market_details_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
+ALTER TABLE ONLY "public"."${table_prefix}service_jobs" ADD CONSTRAINT "${table_prefix}job_market_details_fkey" FOREIGN KEY (market_id) REFERENCES ${table_prefix}market_details(market_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}dt_info" ADD CONSTRAINT "${table_prefix}dt_info_service_jobs_fkey" FOREIGN KEY (job_id) REFERENCES ${table_prefix}service_jobs(job_id) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE;
 -- 2025-11-28 12:49:20 UTC

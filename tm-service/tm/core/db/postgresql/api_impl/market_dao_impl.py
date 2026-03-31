@@ -7,7 +7,6 @@ from tm.models.market import EnergyMarket, LastOfferTS
 
 
 class MarketQueries:
-    # TODO: list columns instead of *
     LIST_MARKET = """SELECT "market_id","market_uri", "market_name", "market_type", 
     "market_description", "market_location", "isp_unit", "isp_len","subscribe", "update_ts", "ext"
     FROM "${table_prefix}market_details"    """

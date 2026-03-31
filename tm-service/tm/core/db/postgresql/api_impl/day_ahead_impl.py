@@ -1,7 +1,6 @@
 # from datetime import tzinfo, timezone
 # from typing import List, Union, Optional, Dict, Any, Tuple
 #
-# from effi_onto_tools.db import TimeSpan
 # from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 # from ke_client.utils import time_utils
 #

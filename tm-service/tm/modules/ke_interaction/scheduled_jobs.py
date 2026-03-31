@@ -4,8 +4,10 @@ from datetime import datetime, timedelta
 from time import sleep
 
 from apscheduler.schedulers.base import BaseScheduler
-from effi_onto_tools.db import TimeSpan
 from ke_client.utils import time_utils
+from rdflib import URIRef
+
+from tm.utils import TimeSpan
 
 _BASE_TIME_OFFSET_ = 60
 
@@ -28,9 +30,9 @@ def _dt_jobs(scheduler: BaseScheduler):
         logging.info("Scan for Forecast")
         # todo: set 'req' argument
         ts_info = request_dt_ts_info(req=[])
-        logging.info(f"Scanned dts: {",".join([ts.ts_uri for ts in ts_info])}")
+        logging.info(f"Scanned dts: {",".join([ts.forecast_uri for ts in ts_info])}")
         for uri in ts_info:
-            ts = request_dt_data_by_id(ts_uri_ref=uri.ts_uri)
+            ts = request_dt_data_by_id(ts_uri_ref=URIRef(uri.forecast_uri))
             logging.info(f"received timeseries , length: {len(ts)}")
             #         TODO store timeseries
             print(ts)

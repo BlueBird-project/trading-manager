@@ -22,7 +22,6 @@ def _set_ke_client(ke_ki_client: KEClient, bg_mode=False):
             try:
                 ke_ki_client.register()
                 timeout_attempt = 0
-                # TODO: register should return TRUE on success
                 while not is_registered:
                     time.sleep(1)
                     is_registered = ke_ki_client.is_registered
@@ -68,7 +67,6 @@ def set_bg_ke_client(interaction_list: List[KIHolder]):
         ki_client.include(ki_holder=ki)
     ki_client = _set_ke_client(ki_client, bg_mode=True)
     while not ki_client.is_registered:
-        # TODO: stop service id can't register
         logging.info(f"KE client is not registered, wait for all KI to be registered.")
         time.sleep(3)
     time.sleep(1)

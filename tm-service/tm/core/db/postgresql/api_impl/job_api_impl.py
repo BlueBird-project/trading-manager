@@ -10,15 +10,17 @@ from tm.models.job_dao import JobDAO
 # class JobDAO
 
 class JobAPIQueries(QueryObject):
-    __PROJECTION__ = """ "job_id", "command_uri" ,"job_name" ,"job_description" ,"update_ts" ,"ext" """
+    __PROJECTION__ = """ "job_id", "market_id", "command_uri" ,"job_name" ,"job_description" ,"update_ts" ,"ext" """
     __TABLE_NAME__ = "service_jobs"
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" """
     SELECT_BY_COMMAND = """SELECT ${projection}  FROM "${table_prefix}${table_name}"
      WHERE command_uri = :command_uri """
+    SELECT_BY_MARKET = """SELECT ${projection}  FROM "${table_prefix}${table_name}"
+     WHERE market_id = :market_id """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
-     ( "command_uri","job_name","job_description","ext" ,"update_ts"  )
-     VALUES (:command_uri, :job_name,:job_description, :ext,extract(epoch from now()) * 1000) """
+     ( "command_uri", "market_id","job_name","job_description","ext" ,"update_ts"  )
+     VALUES (:command_uri, :market_id, :job_name,:job_description, :ext,extract(epoch from now()) * 1000) """
 
 
 class JobAPIImpl(JobAPI):
@@ -44,3 +46,7 @@ class JobAPIImpl(JobAPI):
     def get(self, command_uri: str) -> Optional[JobDAO]:
         with ConnectionWrapper() as conn:
             return conn.get(q=self.queries.SELECT_BY_COMMAND, args={"command_uri": command_uri}, obj_type=JobDAO)
+
+    def get_by_market(self, market_id: int) -> Optional[JobDAO]:
+        with ConnectionWrapper() as conn:
+            return conn.get(q=self.queries.SELECT_BY_MARKET, args={"market_id": market_id}, obj_type=JobDAO)

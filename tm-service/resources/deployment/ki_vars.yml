@@ -1,3 +1,5 @@
 ki_vars:
   DAY_DURATION: "PT1440M"^^xsd:duration
   ISP_UNIT: "PT15M"^^xsd:duration
+  CURRENCY_UNIT: "EUR"
+  ENERGY_COST_UNIT: "EURPerMegawattHour"

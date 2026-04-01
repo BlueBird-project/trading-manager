@@ -13,8 +13,8 @@ knowledge_engine:
         - ' ?dt_uri rdf:type saref:Service ; saref:represents ?command_uri .'
         - ' ?command_uri  rdf:type saref:CommandOfInterest; saref:observes ?market_uri .'
         - ' ?command_uri  rdf:type ubmarket:MarketType .'
-#      result_pattern:
-#        - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
+    #      result_pattern:
+    #        - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
     dt-ts-info:
       name: "dt-ts-info"
       description: "DT's timeseries's metadata, model's , model's parameters, error rates. Used in ANSWER,ASK,POST,REACT."
@@ -39,8 +39,20 @@ knowledge_engine:
         - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
         - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
         - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
-#      result_pattern:
-#        - ' ?command_uri  saref:hasOutput ?ts_uri .'
+    #      result_pattern:
+    #        - ' ?command_uri  saref:hasOutput ?ts_uri .'
+    dt-offer-relation:
+      name: "dt-offer-relation"
+      description: "DT's timeseries's metadata, model's , model's parameters, error rates. Used in ANSWER,ASK,POST,REACT."
+      prefixes:
+        dcterms: "http://purl.org/dc/terms/"
+      pattern:
+        - ' ?forecast_uri rdf:type ubmarket:Forecast .'
+        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries . '
+        - ' ?forecast_uri dcterms:relation ?offer_uri . '
+
+    #      result_pattern:
+    #        - ' ?command_uri  saref:hasOutput ?ts_uri .'
     dt-ts:
       name: "dt-ts"
       description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."

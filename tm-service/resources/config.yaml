@@ -15,7 +15,6 @@ app:
     - "Belgium"
 #    - "Austria"
 #db does not require env prefix
-#TODO: make db as prefix -> db_host = "DB_" + "HOST"
 db:
   db_host: "postgres"
   db_user: "postgres"

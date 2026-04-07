@@ -22,7 +22,7 @@ def init_client() -> KEClient:
     from tm.modules.ke_interaction.interactions.dam_interactions import ki
     from tm.modules.ke_interaction.interactions.dt_interactions import ki as dt_ki
     from tm.modules.ke_interaction.interactions.fm_interactions import ki as fm_ki
-    from tm.modules.ke_interaction.interactions.tou_interactions import ki as tou_ki
+    from tm.modules.ke_interaction.interactions.tou_interactions import tou_ki as tou_ki
 
     client: KEClient = KEClient.build(logger=logging.getLogger())
     client.include(ki_holder=ki)

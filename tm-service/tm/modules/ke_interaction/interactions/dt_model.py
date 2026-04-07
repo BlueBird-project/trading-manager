@@ -16,6 +16,11 @@ class DigitalTwinInfo(BindingsBase):
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)
 
+@ki_object("dt-offer-relation")
+class ForecastOfferRelation(BindingsBase):
+    forecast_uri: URIRef
+    offer_uri: URIRef
+
 
 # @ki_object("dt-info", result=True)
 # class DigitalTwinInfoACK(BindingsBase):

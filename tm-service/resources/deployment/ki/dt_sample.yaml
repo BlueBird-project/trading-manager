@@ -4,7 +4,7 @@ knowledge_engine:
   kb_description: 'DT service'
   prefixes:
     kb: "${KB_ID}/"
-    ubmarket: "https://ubeflex.bluebird.eu/market/"
+    ubmarket: "https://ubflex.bluebird.eu/market/"
     rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     rdfs: "<http://www.w3.org/2000/01/rdf-schema#>"
     s4ener: "https://saref.etsi.org/saref4ener/"
@@ -16,7 +16,7 @@ knowledge_engine:
       name: "dt-info"
       description: "Digital Twin info. Used in ANSWER,ASK,POST,REACT."
       prefixes:
-        s4city: "https://saref.etsi.org/s4city/"
+        s4city: "https://saref.etsi.org/saref4city/"
         foaf: "http://xmlns.com/foaf/0.1/"
         saref: "https://saref.etsi.org/core/"
       pattern:
@@ -62,9 +62,9 @@ knowledge_engine:
         - "ts_uri"
       pattern:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
-        - ' ?dp s4ener:belongsToForecast ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasForecastResult ?dpr.'
-        - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn "EURPerMegawattHour" .'
+        - ' ?dp s4ener:belongsTo ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+        - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn  ubmarket:EURPerMegawattHour .'
 
 
 

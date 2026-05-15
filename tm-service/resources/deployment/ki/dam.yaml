@@ -33,14 +33,14 @@ knowledge_engine:
       name: "market"
       description: "Basic information about the market. Used in ANSWER,ASK,POST,REACT. "
       prefixes:
-        s4city: "https://saref.etsi.org/s4city/"
+        s4city: "https://saref.etsi.org/saref4city/"
         foaf: "http://xmlns.com/foaf/0.1/"
         rdfs: "http://www.w3.org/2000/01/rdf-schema#"
       pattern:
         - ' ?market_uri rdf:type ?market_type ; rdfs:subClassOf foaf:Agent ;'
-        - '      s4city:hasAdministrativeArea ?country_uri .'
+        - '      ubmarket:hasAdministrativeArea ?country_uri .'
         - ' ?country_uri rdf:type s4city:Country ; ubmarket:hasISO3166Name ?country_name .'
-        - ' ?market_type rdf:type ubmarket:MarketType .'
+        - ' ?market_type rdf:type ubmarket:MarketType  .'
     market-offer-info-filtered:
       name: "market-offer-info-filtered"
       description: "Information about new offer with time filter. Used in ANSWER,ASK ."
@@ -51,7 +51,7 @@ knowledge_engine:
         time: "http://www.w3.org/2006/time#"
       pattern:
         - ' ?market_uri rdf:type ?market_type .'
-        - ' ?market_type rdf:type ubmarket:MarketType .'
+        - ' ?market_type rdfs:subClassOf ubmarket:MarketType . '
         - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
         - ' ?offer_uri s4ener:producedBy ?market_uri .'
         - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
@@ -59,6 +59,27 @@ knowledge_engine:
         - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
         - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
         - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+#    market-offer-info-filtered-test:
+#      name: "market-offer-info-filtered-test"
+#      description: "Information about new offer with time filter. Used in ANSWER,ASK ."
+#      required_bindings:
+#        - "market_urii"
+#      prefixes:
+#        xsd: "http://www.w3.org/2001/XMLSchema#"
+#        time: "http://www.w3.org/2006/time#"
+#      pattern:
+#        - ' ?market_urii rdf:type ?market_type .'
+##        - ' ?market_type rdfs:subClassOf ubmarket:MarketType . '
+##        - ' ?market_type rdf:type ubmarket:DayAheadMarket .'
+#        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+#        - ' ?offer_uri s4ener:producedBy ?market_uri .'
+#        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
+#        - ' ?offer_uri ubmarket:hasTestFeature ?market_uri .'
+##        - ' ?market_uri2 ubmarket:hasTestFeature2 ?sequence_test .'
+#        - ' ?offer_uri s4ener:hasUpdateRate ?update_rate .'
+#        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+#        - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
+#        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
     market-offer-info:
       name: "market-offer-info"
       description: "Information about new offer. Used in ANSWER,ASK,POST,REACT."
@@ -68,7 +89,7 @@ knowledge_engine:
         xsd: "http://www.w3.org/2001/XMLSchema#"
       pattern:
         - ' ?market_uri rdf:type ?market_type .'
-        - ' ?market_type rdf:type ubmarket:MarketType .'
+        - ' ?market_type rdfs:subClassOf ubmarket:MarketType .'
         - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
         - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
         - ' ?offer_uri s4ener:producedBy ?market_uri .'

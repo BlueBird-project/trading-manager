@@ -6,12 +6,12 @@ knowledge_engine:
       name: "market"
       description: "Basic information about the market. Used in ANSWER,ASK,POST,REACT. "
       prefixes:
-        s4city: "https://saref.etsi.org/s4city/"
+        s4city: "https://saref.etsi.org/saref4city/"
         foaf: "http://xmlns.com/foaf/0.1/"
         rdfs: "http://www.w3.org/2000/01/rdf-schema#"
       pattern:
         - ' ?market_uri rdf:type ?market_type ; rdfs:subClassOf foaf:Agent ;'
-        - '      s4city:hasAdministrativeArea ?country_uri .'
+        - '      ubmarket:hasAdministrativeArea ?country_uri .'
         - ' ?country_uri rdf:type s4city:Country ; ubmarket:hasISO3166Name ?country_name .'
         - ' ?market_type rdf:type ubmarket:MarketType .'
     market-offer-info-filtered:

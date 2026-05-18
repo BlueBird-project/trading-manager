@@ -8,6 +8,7 @@ knowledge_engine:
     rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     rdfs: "<http://www.w3.org/2000/01/rdf-schema#>"
     s4ener: "https://saref.etsi.org/saref4ener/"
+    time: "http://www.w3.org/2006/time#"
   include:
     - "./resources/deployment/ki/dam.yaml"
 
@@ -63,7 +64,8 @@ knowledge_engine:
       pattern:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
         - ' ?dp s4ener:belongsTo ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-        - '   s4ener:hasEffectivePeriod ${ISP_UNIT} ; saref:hasResult ?dpr.'
+        - '   s4ener:hasEffectivePeriod ubmarket:period_15m ; saref:hasResult ?dpr.'
+        - ' ubmarket:period_15m time:hasXSDDuration ${ISP_UNIT} .'
         - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn  ubmarket:EURPerMegawattHour .'
 
 

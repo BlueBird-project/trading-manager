@@ -24,3 +24,11 @@ ke:
     ISP_UNIT: '"PT15M"^^xsd:duration'
     CURRENCY_UNIT: "EUR"
     ENERGY_COST_UNIT: "EURPerMegawattHour"
+#  ontology_prefixes:
+#    saref: "https://saref.etsi.org/core/"
+#    s4city: "https://saref.etsi.org/saref4city/"
+#    s4ener: "https://saref.etsi.org/saref4ener/"
+#    foaf: "http://xmlns.com/foaf/0.1/"
+#    ubmarket: "https://ubflex.bluebird.eu/market/"
+  extension_ontology_files:
+    - "./resources/deployment/ki/bluebird.ttl"

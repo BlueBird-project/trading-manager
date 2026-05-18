@@ -1,0 +1,20 @@
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix saref:    <https://saref.etsi.org/core/> .
+@prefix time:     <http://www.w3.org/2006/time#/>.
+@prefix ubmarket: <https://ubflex.bluebird.eu/market/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+<http://fm.bluebird.com/>
+    rdf:type saref:Service .
+
+<http://tm.bluebird.com/>
+    rdf:type saref:Service .
+
+
+ubmarket:period_15m
+    rdf:type            time:Interval ;
+    time:hasXSDDuration "PT15M"^^xsd:duration .
+
+ubmarket:period_60m
+    rdf:type            time:Interval ;
+    time:hasXSDDuration "PT60M"^^xsd:duration .

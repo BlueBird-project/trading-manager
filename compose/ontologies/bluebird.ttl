@@ -222,3 +222,9 @@ ubmarket:EURPerMegawattHour
     rdfs:subClassOf saref:UnitOfMeasure ;
     rdfs:comment    "EURPerMegawattHour"@en ;
     rdfs:label      "EURPerMegawattHour" .
+
+ubmarket:PLNPerMegawattHour
+    a               rdfs:Class ;
+    rdfs:subClassOf saref:UnitOfMeasure ;
+    rdfs:comment    "EURPerMegawattHour"@en ;
+    rdfs:label      "EURPerMegawattHour" .

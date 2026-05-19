@@ -16,6 +16,7 @@ class DigitalTwinInfo(BindingsBase):
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)
 
+
 @ki_object("dt-offer-relation")
 class ForecastOfferRelation(BindingsBase):
     forecast_uri: URIRef
@@ -134,6 +135,7 @@ class DTPnt(BindingsBase):
     ts: Literal
     dpr: URIRef
     duration: Literal
+    duration_uri: URIRef
     value: Optional[Literal]
 
     def __init__(self, **kwargs):
@@ -149,29 +151,6 @@ class DTPnt(BindingsBase):
     def isp_len(self, isp_unit: int):
         period_minutes = int(parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() / 60)
         return math.ceil(period_minutes / isp_unit)
-
-
-# @ki_object("dt-ts2")
-# class DTPnt2(BindingsBase):
-#     ts_uri: URIRef
-#     dp: URIRef
-#     ts: Literal
-#     dpr: URIRef
-#     value: Optional[Literal]
-#
-#     def __init__(self, **kwargs):
-#         super().__init__(bindings=kwargs)
-#
-#     @property
-#     def ts_ms(self) -> int:
-#         return time_utils.xsd_to_ts(self.ts)
-#
-#     def get_value(self) -> Optional[float]:
-#         return self.convert_value(self.value, float)
-#
-#     def isp_len(self, isp_unit: int):
-#         period_minutes = int(parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() / 60)
-#         return math.ceil(period_minutes / isp_unit)
 
 
 @ki_object("dt-ts", allow_partial=True)

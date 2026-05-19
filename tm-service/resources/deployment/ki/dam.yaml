@@ -57,29 +57,30 @@ knowledge_engine:
         - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
         - ' ?offer_uri s4ener:hasUpdateRate ?update_rate .'
         - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
-        - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
+        - ' ?offer_uri s4ener:hasEffectivePeriod  ?duration_uri.'
+        - ' ?duration_uri  rdf:type  time:Interval; time:hasXSDDuration ?duration .'
         - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
-#    market-offer-info-filtered-test:
-#      name: "market-offer-info-filtered-test"
-#      description: "Information about new offer with time filter. Used in ANSWER,ASK ."
-#      required_bindings:
-#        - "market_urii"
-#      prefixes:
-#        xsd: "http://www.w3.org/2001/XMLSchema#"
-#        time: "http://www.w3.org/2006/time#"
-#      pattern:
-#        - ' ?market_urii rdf:type ?market_type .'
-##        - ' ?market_type rdfs:subClassOf ubmarket:MarketType . '
-##        - ' ?market_type rdf:type ubmarket:DayAheadMarket .'
-#        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
-#        - ' ?offer_uri s4ener:producedBy ?market_uri .'
-#        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
-#        - ' ?offer_uri ubmarket:hasTestFeature ?market_uri .'
-##        - ' ?market_uri2 ubmarket:hasTestFeature2 ?sequence_test .'
-#        - ' ?offer_uri s4ener:hasUpdateRate ?update_rate .'
-#        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
-#        - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
-#        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+    #    market-offer-info-filtered-test:
+    #      name: "market-offer-info-filtered-test"
+    #      description: "Information about new offer with time filter. Used in ANSWER,ASK ."
+    #      required_bindings:
+    #        - "market_urii"
+    #      prefixes:
+    #        xsd: "http://www.w3.org/2001/XMLSchema#"
+    #        time: "http://www.w3.org/2006/time#"
+    #      pattern:
+    #        - ' ?market_urii rdf:type ?market_type .'
+    ##        - ' ?market_type rdfs:subClassOf ubmarket:MarketType . '
+    ##        - ' ?market_type rdf:type ubmarket:DayAheadMarket .'
+    #        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+    #        - ' ?offer_uri s4ener:producedBy ?market_uri .'
+    #        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
+    #        - ' ?offer_uri ubmarket:hasTestFeature ?market_uri .'
+    ##        - ' ?market_uri2 ubmarket:hasTestFeature2 ?sequence_test .'
+    #        - ' ?offer_uri s4ener:hasUpdateRate ?update_rate .'
+    #        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+    #        - ' ?offer_uri s4ener:hasEffectivePeriod ?duration  .'
+    #        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
     market-offer-info:
       name: "market-offer-info"
       description: "Information about new offer. Used in ANSWER,ASK,POST,REACT."
@@ -95,7 +96,8 @@ knowledge_engine:
         - ' ?offer_uri s4ener:producedBy ?market_uri .'
         - ' ?offer_uri s4ener:hasUpdateRate  ?update_rate.'
         - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
-        - ' ?offer_uri s4ener:hasEffectivePeriod  ?duration .'
+        - ' ?offer_uri s4ener:hasEffectivePeriod  ?duration_uri.'
+        - ' ?duration_uri  rdf:type  time:Interval; time:hasXSDDuration ?duration .'
     market-offer:
       name: "market-offer"
       description: "Daily offer of the market. Used in ANSWER,ASK,POST,REACT."
@@ -107,7 +109,8 @@ knowledge_engine:
       pattern:
         - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
         - ' ?dp s4ener:belongsToTimeSeries ?offer_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-        - '   s4ener:hasEffectivePeriod ?duration ; saref:hasResult ?dpr.'
+        - '   s4ener:hasEffectivePeriod ?duration_uri ; saref:hasResult ?dpr.'
+        - ' ?duration_uri  rdf:type  time:Interval; time:hasXSDDuration ?duration .'
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn ?is_measured_in.'
 
 

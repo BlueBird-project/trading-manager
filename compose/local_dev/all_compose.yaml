@@ -3,8 +3,8 @@ include:
   - "sample_compose.yaml"
 services:
   tge-service:
-    image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:latest"
-    #    image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:${TGE_TAG}"
+    #image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:latest"
+    image: "registry.paas.psnc.pl/bluebird/tge-dayahead-service:${TGE_TAG}"
     ports:
       - "11002:8080"
     depends_on:

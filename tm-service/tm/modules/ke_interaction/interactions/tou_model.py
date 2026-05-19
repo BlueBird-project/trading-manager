@@ -29,6 +29,7 @@ class TOUPriceInfoSimpleResponse(BindingsBase):
 class TOUPriceInfoQuery(BindingsBase):
     time_create: Literal
     tou_period: Literal
+    tou_period_uri: URIRef
     max_value: OptionalLiteral = None
     min_value: OptionalLiteral = None
     power_range: Optional[URIRef] = None
@@ -49,6 +50,7 @@ class TOUPriceInfo(BindingsBase):
     tou_uri: URIRef
     time_create: Literal
     tou_period: Literal
+    tou_period_uri: URIRef
     power_range: Optional[URIRef]=rdf_nil
     power_range_max: Optional[URIRef] = rdf_nil
     max_value: OptionalLiteral = rdf_nil
@@ -132,5 +134,6 @@ class TOURangeMaxURI(SplitURIBase):
 @ki_split_uri(uri_template=f"tou_range_min" + "/${range_id}")
 class TOURangeMinURI(SplitURIBase):
     range_id: int
+
 
 # endregion

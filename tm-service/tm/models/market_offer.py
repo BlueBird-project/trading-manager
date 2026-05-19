@@ -30,6 +30,7 @@ class EnergyMarketOffer(BaseModel):
     offer_id: int
     isp_start: int
     cost_mwh: Optional[float]
+    sequence: Optional[str] = None
     range_id: int
     ts: int
     isp_len: int = 1

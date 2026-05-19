@@ -12,9 +12,9 @@ from rdflib import URIRef, Literal
 from tm.utils import TimeSpan
 
 # DAM_market_type: Literal = Literal("ubmarket:DayAheadMarket")
-UBEFLEX_MARKET_BASE = "https://ubeflex.bluebird.eu/market/"
-DAYAHEAD_MARKET_TYPE = URIRef(value="DayAheadMarket", base=UBEFLEX_MARKET_BASE)
-INTRADAY_MARKET_TYPE = URIRef(value="IntradayMarket", base=UBEFLEX_MARKET_BASE)
+UBFLEX_MARKET_BASE = "https://ubflex.bluebird.eu/market/"
+DAYAHEAD_MARKET_TYPE = URIRef(value="DayAheadMarket", base=UBFLEX_MARKET_BASE)
+INTRADAY_MARKET_TYPE = URIRef(value="IntradayMarket", base=UBFLEX_MARKET_BASE)
 
 
 class MarketTypeValue(BaseModel):
@@ -91,6 +91,7 @@ class MarketOfferInfoBindings(BindingsBase):
     sequence: OptionalLiteral = None
     update_rate: Literal
     duration: Literal
+    duration_uri: URIRef
 
     def __init__(self, skip_nil=True, **kwargs):
         super().__init__(bindings=kwargs)
@@ -171,8 +172,9 @@ class MarketOfferBindings(BindingsBase):
     dp: URIRef
     ts: Literal
     dpr: URIRef
-    is_measured_in: Literal
+    is_measured_in: URIRef
     duration: Literal
+    duration_uri: URIRef
     value: Union[URIRef, Literal, None]
 
     def __init__(self, **kwargs):
@@ -201,6 +203,8 @@ class TimeIntervalUri(SplitURIBase):
     ts_to: int
 
 
-@ki_split_uri(uri_template="https://ubeflex.bluebird.eu/country/${country}")
+@ki_split_uri(uri_template="https://ubflex.bluebird.eu/country/${country}")
 class CountryUri(SplitURIBase):
     country: str
+
+

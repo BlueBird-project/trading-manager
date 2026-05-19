@@ -64,5 +64,6 @@ knowledge_engine:
       pattern:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
         - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-        - '   s4ener:hasEffectivePeriod ?duration ; saref:hasResult ?dpr .'
+        - '   s4ener:hasEffectivePeriod ?duration_uri ; saref:hasResult ?dpr .'
+        - ' ?duration_uri  rdf:type  time:Interval; time:hasXSDDuration ?duration .'
         - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn ubmarket:EURPerMegawattHour .'

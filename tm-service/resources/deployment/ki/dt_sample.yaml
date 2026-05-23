@@ -11,21 +11,22 @@ knowledge_engine:
     time: "http://www.w3.org/2006/time#"
   include:
     - "./resources/deployment/ki/dam.yaml"
+    - "./resources/deployment/ki/dt.yaml"
 
   graph_patterns:
-    dt-info:
-      name: "dt-info"
-      description: "Digital Twin info. Used in ANSWER,ASK,POST,REACT."
-      prefixes:
-        s4city: "https://saref.etsi.org/saref4city/"
-        foaf: "http://xmlns.com/foaf/0.1/"
-        saref: "https://saref.etsi.org/core/"
-      pattern:
-        - ' ?dt_uri rdf:type saref:Service ; saref:represents ?command_uri .'
-        - ' ?command_uri  rdf:type saref:CommandOfInterest; saref:observes ?market_uri .'
-        - ' ?command_uri  rdf:type ubmarket:MarketType .'
-#      result_pattern:
-#        - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
+#    dt-info:
+#      name: "dt-info"
+#      description: "Digital Twin info. Used in ANSWER,ASK,POST,REACT."
+#      prefixes:
+#        s4city: "https://saref.etsi.org/saref4city/"
+#        foaf: "http://xmlns.com/foaf/0.1/"
+#        saref: "https://saref.etsi.org/core/"
+#      pattern:
+#        - ' ?dt_uri rdf:type saref:Service ; saref:represents ?command_uri .'
+#        - ' ?command_uri  rdf:type saref:CommandOfInterest; saref:observes ?market_uri .'
+#        - ' ?command_uri  rdf:type ubmarket:MarketType .'
+##      result_pattern:
+##        - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
     dt-ts-info:
       name: "dt-ts-info"
       description: "DT's timeseries's metadata, model's , model's parameters, error rates. Used in ANSWER,ASK,POST,REACT."
@@ -50,9 +51,6 @@ knowledge_engine:
         - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
         - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
         - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
-#      result_pattern:
-#        - ' ?command_uri  saref:hasOutput ?ts_uri .'
-#    dt-ts-sample:
     dt-ts:
       name: "dt-ts"
       description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."
@@ -69,36 +67,3 @@ knowledge_engine:
         - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn  ubmarket:EURPerMegawattHour .'
 
 
-
-
-#      pattern:
-#        - ' ?ts_uri rdf:type ubmarket:Forecast .'
-#        - ' ?dp s4ener:belongsToForecast ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-#        - '    saref:hasForecastResult ?dpr.'
-#        - ' ?dpr    saref:hasValue ?value   .'
-#    dt-ts:
-#      name: "dt-ts"
-#      description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."
-#      prefixes:
-#        xsd: "http://www.w3.org/2001/XMLSchema#"
-#        saref: "https://saref.etsi.org/core/"
-#      required_bindings:
-#        - "ts_uri"
-#      pattern:
-#        - ' ?ts_uri rdf:type ubmarket:Forecast .'
-#        - ' ?dp s4ener:belongsToForecast ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-#        - '   s4ener:hasEffectivePeriod ?duration ; saref:hasForecastResult ?dpr.'
-#        - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn "PLNPerMegawattHour" .'
-#    dt-ts2:
-#      name: "dt-ts2"
-#      description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."
-#      prefixes:
-#        xsd: "http://www.w3.org/2001/XMLSchema#"
-#        saref: "https://saref.etsi.org/core/"
-#      required_bindings:
-#        - "ts_uri"
-#      pattern:
-#        - ' ?ts_uri rdf:type ubmarket:Forecast .'
-#        - ' ?dp s4ener:belongsToForecast ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-#        - '     saref:hasForecastResult ?dpr.'
-#        - ' ?dpr    saref:hasValue ?value   .'

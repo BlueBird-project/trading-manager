@@ -82,7 +82,7 @@ def _dam_jobs(scheduler: BaseScheduler):
     @scheduler.scheduled_job(trigger='cron', id="offer_scan", day_of_week='*', hour='8,19',
                              minute='25',
                              month='*', year='*', day='*', max_instances=1, coalesce=True)
-    def scan_market():
+    def scan_offer():
         logging.info("Scan for dam offer")
         # todo: set 'req' argument
         from tm.modules.ke_interaction.interactions.dam_interactions import get_current_market_offer_info, \
@@ -99,11 +99,18 @@ def _dam_jobs(scheduler: BaseScheduler):
 
     def _get_markets():
         from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
-        # TODO: improve market management
-        sleep(20)
-        # wait for client to register
-        get_all_markets(True)
-        scan_market()
+        from tm.modules.ke_interaction.interactions.client import ki_client
+        i = 0
+        while i < 10 and (not ki_client.state()):
+            # wait for client to register
+            sleep(20)
+            i += 1
+        if not ki_client.state():
+            logging.warning("Ki client hasn't  started on timee, dam offers are not scanned on start")
+        else:
+            logging.info(f"KI state: {ki_client.state()}")
+            get_all_markets(True)
+            scan_offer()
 
     t = threading.Thread(target=_get_markets)
     t.start()

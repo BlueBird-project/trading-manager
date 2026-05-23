@@ -16,8 +16,16 @@ class DTForecastAPI:
         pass
 
     @abstractmethod
-    def find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int]) \
-            -> List[DTForecastInfoDAO]:
+    def find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int],
+                       sequence: Optional[int], range_id: Optional[int]) -> List[DTForecastInfoDAO]:
+        pass
+
+    @abstractmethod
+    def get_offer_forecasts(self, offer_id: Optional[int], model_id: Optional[int], ) -> List[DTForecastInfoDAO]:
+        pass
+
+    @abstractmethod
+    def set_forecast_offer(self, forecast_uri: str, offer_id: Optional[int]) -> bool:
         pass
 
     @abstractmethod
@@ -42,4 +50,12 @@ class DTForecastAPI:
 
     @abstractmethod
     def clear_forecast_offer(self, forecast_id) -> int:
+        pass
+
+    @abstractmethod
+    def delete_forecast(self, forecast_id: int) -> int:
+        pass
+
+    @abstractmethod
+    def delete_forecast_uri(self, forecast_uri: str) -> int:
         pass

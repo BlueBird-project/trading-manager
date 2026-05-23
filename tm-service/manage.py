@@ -69,4 +69,5 @@ if __name__ == "__main__":
         #                     openapi_url="/openapi.json", redoc_url="/redoc")
         # admin_app.include_router(router=admin_router, prefix="")
         # app.mount("/admin", admin_app)
-        uvicorn.run(app, port=service_settings.port, host=service_settings.host, root_path=service_settings.root_path)
+        uvicorn.run(app, port=service_settings.port, host=service_settings.host, root_path=service_settings.root_path,
+                    log_config=None)

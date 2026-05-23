@@ -1,6 +1,8 @@
 import logging
+from datetime import timedelta
 from typing import List, Optional
 
+from isodate import duration_isoformat
 from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIAskResponse
 from rdflib import URIRef, Literal
@@ -66,30 +68,32 @@ def on_market_offer_info(ki_id: str, bindings: List[MarketOfferInfoBindings]):
 
 
 @ki.ask("market-offer-info-filtered")
-def _get_market_offer_info_filtered(market_uri: URIRef, ti: Optional[TimeSpan]):
-    return [MarketOfferInfoFilteredRequest(ti=ti, market_uri=market_uri)]
+def _get_market_offer_info_filtered(market_uri: URIRef, ti: Optional[TimeSpan], isp_unit: int = 15):
+    return [MarketOfferInfoFilteredRequest(ti=ti, market_uri=market_uri,
+                                           update_rate=Literal(duration_isoformat(timedelta(minutes=isp_unit))))]
 
 
-def get_market_offer_info_filtered(market_uri: str, ti: Optional[TimeSpan]) -> List[MarketOfferInfoBindings]:
-    bindings: KIAskResponse = _get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=ti)
+def get_market_offer_info_filtered(market_uri: str, ti: Optional[TimeSpan], isp_unit) -> List[MarketOfferInfoBindings]:
+    bindings: KIAskResponse = _get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=ti, isp_unit=isp_unit)
     if ti is not None:
         market_offer_bindings = [MarketOfferInfoFilteredBindings(**b) for b in bindings.binding_set]
     else:
         market_offer_bindings = [MarketOfferInfoBindings(**b) for b in bindings.binding_set]
-    logging.info(f"Received {len(market_offer_bindings)} offers.")
+    logging.info(f"Received {len(market_offer_bindings)} offers for: {market_uri}.")
     dam_service.save_offer_info(offer_bindings=market_offer_bindings)
     return market_offer_bindings
 
 
-def get_current_market_offer_info(market_uri: Optional[str] = None) -> List[MarketOfferInfoBindings]:
+def get_current_market_offer_info(market_uri: Optional[str] = None, isp_unit: int = 15) -> \
+        List[MarketOfferInfoBindings]:
     if market_uri is None:
         markets = dam_service.get_all_markets()
         accu = []
         for market in markets:
-            accu += get_market_offer_info_filtered(market_uri=URIRef(market.market_uri), ti=None)
+            accu += get_market_offer_info_filtered(market_uri=URIRef(market.market_uri), ti=None, isp_unit=isp_unit)
         return accu
     else:
-        return get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=None)
+        return get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=None, isp_unit=isp_unit)
 
 
 # endregion

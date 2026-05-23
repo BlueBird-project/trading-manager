@@ -22,16 +22,25 @@ class DTForecastInfoQueries(QueryObject):
     #   AND   ("ts" BETWEEN :ts_from and :ts_to)  """
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}"  as ${table_alias}
         JOIN  "${table_prefix}""" + DTAPIQueries.__TABLE_NAME__ + """" as dt_info 
-      WHERE COALESCE( dt_info.job_id = :job_id , TRUE ) AND
-        COALESCE( model_id = :model_id , TRUE )  AND   ("ts" BETWEEN :ts_from and :ts_to)  """
+      WHERE COALESCE( dt_info.job_id = :job_id , TRUE ) 
+       AND ( :offer_id is NULL or COALESCE( offer_id = :offer_id , FALSE ) )
+           AND ( (:sequence is NULL and sequence is NULL) OR COALESCE( sequence = :sequence , TRUE ) )
+           AND COALESCE( range_id = :range_id , TRUE ) 
+       AND COALESCE( model_id = :model_id , TRUE )  AND   ("ts" BETWEEN :ts_from and :ts_to)  """
 
     GET_BY_URI = """SELECT ${projection} FROM "${table_prefix}${table_name}" as ${table_alias} 
+     WHERE   forecast_uri = :forecast_uri """
+    SET_OFFER = """UPDATE "${table_prefix}${table_name}" SET offer_id = :offer_id  
      WHERE   forecast_uri = :forecast_uri """
     # GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}"
     #     WHERE COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
     GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" 
         JOIN  "${table_prefix}""" + DTAPIQueries.__TABLE_NAME__ + """" as dt_info 
-        WHERE  COALESCE( dt_info.job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
+        WHERE  COALESCE( dt_info.job_id = :job_id , TRUE ) 
+           AND COALESCE( model_id = :model_id , TRUE ) 
+           AND ( (:sequence is NULL and sequence is NULL) OR COALESCE( sequence = :sequence , TRUE ) )
+           AND COALESCE( range_id = :range_id , TRUE ) 
+           AND ( :offer_id is NULL or COALESCE( offer_id = :offer_id , FALSE ) ) """
     GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" as ${table_alias}
      WHERE  forecast_id = :forecast_id """
 
@@ -39,7 +48,10 @@ class DTForecastInfoQueries(QueryObject):
      ( "job_id", "forecast_uri","range_id"  ,"sequence" ,"offer_id" ,"model_id" ,"ts" , 
     "isp_len"  ,"isp_unit"  ,"update_ts"  )
      VALUES (:job_id, :forecast_uri, :range_id, :sequence, :offer_id, :model_id, :ts ,
-      :isp_len , :isp_unit , extract(epoch from now()) * 1000) """
+      :isp_len , :isp_unit , extract(epoch from now()) * 1000)
+       """
+    DELETE_URI = """DELETE FROM "${table_prefix}${table_name}" where forecast_uri = :forecast_uri       """
+    DELETE = """DELETE FROM "${table_prefix}${table_name}" where forecast_id = :forecast_id       """
 
 
 class DTForecastQueries(QueryObject):
@@ -78,17 +90,38 @@ class DTForecastAPImpl(DTForecastAPI):
     def list_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int]) -> List[DTForecastInfoDAO]:
         return self.find_forecasts(ts=ts, job_id=job_id, model_id=None)
 
-    def find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int], ) \
-            -> List[DTForecastInfoDAO]:
+    def _find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int],
+                        sequence: Optional[int], range_id: Optional[int], offer_id: Optional[int]) -> List[
+        DTForecastInfoDAO]:
         with ConnectionWrapper() as conn:
             if ts is None:
-                t = conn.get(q=self.q_dt_info.GET_MAX_TS, args={"job_id": job_id, "model_id": model_id}, raw=True)
+                t = conn.get(q=self.q_dt_info.GET_MAX_TS,
+                             args={"job_id": job_id, "offer_id": offer_id, "model_id": model_id, "sequence": sequence,
+                                   "range_id": range_id}, raw=True)
                 if t is None:
                     return []
-                args = {"ts_from": t[0], "ts_to": t[0], "job_id": job_id, "model_id": model_id}
+                args = {"ts_from": t[0], "ts_to": t[0], "job_id": job_id, "offer_id": offer_id, "model_id": model_id,
+                        "sequence": sequence, "range_id": range_id}
             else:
-                args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "job_id": job_id, "model_id": model_id}
+                args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "job_id": job_id, "offer_id": offer_id,
+                        "model_id": model_id, "sequence": sequence, "range_id": range_id}
             return conn.select(q=self.q_dt_info.LIST, args=args, obj_type=DTForecastInfoDAO)
+
+    def find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int],
+                       sequence: Optional[int], range_id: Optional[int]) -> List[DTForecastInfoDAO]:
+        return self._find_forecasts(ts=ts, job_id=job_id, model_id=model_id, sequence=sequence, range_id=range_id,
+                                    offer_id=None)
+
+    def get_offer_forecasts(self, offer_id: Optional[int], model_id: Optional[int], ) -> List[DTForecastInfoDAO]:
+        return self._find_forecasts(ts=None, job_id=None, model_id=None, sequence=None, range_id=None,
+                                    offer_id=offer_id)
+
+    def set_forecast_offer(self, forecast_uri: str, offer_id: Optional[int]) -> bool:
+        with ConnectionWrapper() as conn:
+            t = conn.update(q=self.q_dt_info.SET_OFFER, args={"forecast_uri": forecast_uri, "offer_id": offer_id})
+            if t > 1:
+                raise Exception("Invalid number of updated rows, table might be missing unique constraint")
+            return t == 1
 
     def get(self, forecast_id: int) -> Optional[DTForecastInfoDAO]:
         with ConnectionWrapper() as conn:
@@ -120,5 +153,22 @@ class DTForecastAPImpl(DTForecastAPI):
         with ConnectionWrapper() as conn:
             deleted = conn.update(q=self.q_dt_offer.DELETE_FORECAST_OFFER,
                                   args={"forecast_id": forecast_id})
+
+            return deleted
+
+    def delete_forecast(self, forecast_id: int, clear_offer: bool = False) -> int:
+        if clear_offer:
+            self.clear_forecast_offer(forecast_id=forecast_id)
+        with ConnectionWrapper() as conn:
+            deleted = conn.update(q=self.q_dt_info.DELETE, args={"forecast_id": forecast_id})
+
+            return deleted
+
+    def delete_forecast_uri(self, forecast_uri: str, clear_offer: bool = False) -> int:
+        if clear_offer:
+            forecast_id = self.get_by_uri(forecast_uri=forecast_uri).forecast_id
+            self.clear_forecast_offer(forecast_id=forecast_id)
+        with ConnectionWrapper() as conn:
+            deleted = conn.update(q=self.q_dt_info.DELETE_URI, args={"forecast_uri": forecast_uri})
 
             return deleted

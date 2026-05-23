@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-
 from tm.models.market import EnergyMarket
 from tm.models.market_offer import EnergyMarketOfferInfo, RangeInfo, EnergyMarketOfferDAO, EnergyMarketOffer
 from tm.utils import TimeSpan
@@ -11,9 +10,10 @@ def list_markets() -> List[EnergyMarket]:
     return dao_manager.market_api.list_market()
 
 
-def list_offer_info(market_id, ts: TimeSpan, granularity: Optional[int] = None) -> List[EnergyMarketOfferInfo]:
+def list_offer_info(market_id, ts: Optional[TimeSpan], granularity: Optional[int] = None, sequence: Optional[str] = None) \
+        -> List[EnergyMarketOfferInfo]:
     from tm.core.db.postgresql import dao_manager
-    return dao_manager.offer_dao.list_offer_info(market_id=market_id, ts=ts, isp_unit=granularity)
+    return dao_manager.offer_dao.list_offer_info(market_id=market_id, ts=ts, isp_unit=granularity, sequence=sequence)
 
 
 def list_offer(market_id: int, ts: TimeSpan, granularity: Optional[int] = None) -> List[EnergyMarketOffer]:

@@ -8,7 +8,7 @@ from tm.models.market import EnergyMarket
 from tm.models.market_offer import EnergyMarketOfferInfo, EnergyMarketOfferDAO
 
 from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings, MarketOfferInfoBindings, \
-    MarketOfferBindings, UBEFLEX_MARKET_BASE, CountryUri, MarketType, EnergyMarketRequest
+    MarketOfferBindings, UBFLEX_MARKET_BASE, CountryUri, MarketType, EnergyMarketRequest
 from tm.utils import isp_unit_to_ms
 
 
@@ -19,7 +19,7 @@ def save_markets(market_bindings: List[EnergyMarketBindings], subscribe: bool = 
 
         db_market = dao_manager.market_api.get_market(binding.market_uri)
         if db_market is None:
-            market.market_type = market.market_type.replace(UBEFLEX_MARKET_BASE, "")
+            market.market_type = market.market_type.replace(UBFLEX_MARKET_BASE, "")
             market.market_name = market.market_type + ":" + market.market_location
             market.subscribe = subscribe
             dao_manager.market_api.save_market(market)

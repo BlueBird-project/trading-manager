@@ -72,9 +72,16 @@ def set_logging():
     global app_args
     from io import StringIO
     import logging.config
+    from logging.handlers import RotatingFileHandler
     from tm.core import app_settings
 
     with open(app_settings.logging_conf_path) as f:
         ini_text = os.path.expandvars(f.read())
         config_fp = StringIO(ini_text)
         logging.config.fileConfig(config_fp)
+
+    root_logger = logging.getLogger()
+
+    for handler in root_logger.handlers:
+        if isinstance(handler, RotatingFileHandler):
+            handler.doRollover()

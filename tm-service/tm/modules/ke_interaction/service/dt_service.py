@@ -7,7 +7,7 @@ from ke_client.utils import to_json
 from tm.models.digital_twin import DigitalTwinDAO, DTForecastInfoDAO, DTForecastOfferDAO
 from tm.models.job_dao import JobDAO
 from tm.models.market_offer import RangeInfo
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt
+from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt, ForecastOfferRelation
 
 from tm.utils import isp_unit_to_ms
 
@@ -113,3 +113,21 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
     # cost_mwh: Optional[float]
     # ts: int
     # isp_len: int = 1
+
+
+def join_forecast_offer(relations: List[ForecastOfferRelation]):
+    from tm.core.db.postgresql import dao_manager
+    d = {}
+    for r in relations:
+        offer_info = dao_manager.offer_dao.get_offer_info(offer_uri=r.offer_uri)
+        if offer_info is None:
+            logging.error(f"offer: {r.offer_uri} does not exist")
+            raise Exception(f"offer: {r.offer_uri} does not exist")
+        forecast_info = dao_manager.forecast_api.get_by_uri(forecast_uri=r.forecast_uri)
+        if forecast_info is None:
+            logging.error(f"offer: {r.forecast_info} does not exist")
+            raise Exception(f"offer: {r.forecast_info} does not exist")
+        d[r.forecast_uri] = offer_info.offer_id
+    for f_uri, offer_id in d.items():
+        assert dao_manager.forecast_api.set_forecast_offer(forecast_uri=f_uri, offer_id=offer_id)
+

@@ -12,13 +12,13 @@ ki_router = APIRouter(prefix="", tags=["KI"])
 @ki_router.post("/dam/scan", description="Scan for available markets in the network,"
                                          " current offers metadata and current offers time series")
 # @ki_router.get("/dam/scan")
-async def dam_scan() -> Dict[str, Any]:
+async def dam_scan(isp_unit: int = 15) -> Dict[str, Any]:
     res = {}
     from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
     from tm.modules.ke_interaction.interactions.dam_interactions import get_current_market_offer_info
     from tm.modules.ke_interaction.interactions.dam_interactions import get_market_offer
     res["markets"] = [m.n3() for m in get_all_markets(False)]
-    offer_infos = get_current_market_offer_info()
+    offer_infos = get_current_market_offer_info(isp_unit=isp_unit)
     res["info_uris"] = [o.n3() for o in offer_infos]
     offer = get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
     res["market_offer"] = offer
@@ -69,3 +69,23 @@ async def flex_ts(ts_uri: str) -> List[Dict[str, Any]]:
     # async def flex_ts(ts_uri: str) -> List[FMPnt]:
     from tm.modules.ke_interaction.interactions.fm_interactions import request_data
     return [r.n3() for r in request_data(ts_uris=[ts_uri])]
+
+
+@ki_router.get("/tou", response_description="returns List[FMPnt]",
+               description="tou test")
+async def flex_ts() -> List[Dict[str, Any]]:
+    # sprawdzic
+    from tm.modules.ke_interaction.interactions.tou_model import TOUSplitURI, TOUPriceQuery
+    from tm.modules.ke_interaction.interactions.tou_interactions import tou_ki
+    from tm.core.db.postgresql import dao_manager
+    from tm.modules.ke_interaction.service.tou_service import get_price
+    range_id = dao_manager.offer_dao.get_range().range_id
+    time_span_ms = 3600 * 6 * 1000
+    ts_from = time_utils.current_timestamp() - time_span_ms / 2
+    # todo: check this property kb_id =tou_ki.kb_id
+    uri = TOUSplitURI(prefix=tou_ki.get_kb_id(), range_id=range_id, period_minutes=time_span_ms / 60000,
+                      ts=ts_from).uri_ref
+    # async def flex_ts(ts_uri: str) -> List[FMPnt]:
+    q = TOUPriceQuery(tou_uri=uri)
+    prices = get_price(binding_query=[q], kb_id=tou_ki.get_kb_id())
+    return [p.__dict__ for p in prices]

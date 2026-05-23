@@ -138,11 +138,11 @@ class MarketOfferInfoBindings(BindingsBase):
 @ki_object("market-offer-info", allow_partial=True)
 class MarketOfferInfoRequest(BindingsBase):
     market_uri: URIRef
+    update_rate: OptionalLiteral = None
     # market_type: Optional[URIRef]
     # sequence: Optional[Literal]
 
 
-# todo duplicate obj
 @ki_object("market-offer-info-filtered")
 class MarketOfferInfoFilteredBindings(MarketOfferInfoBindings):
     ts_interval_uri: URIRef
@@ -206,5 +206,3 @@ class TimeIntervalUri(SplitURIBase):
 @ki_split_uri(uri_template="https://ubflex.bluebird.eu/country/${country}")
 class CountryUri(SplitURIBase):
     country: str
-
-

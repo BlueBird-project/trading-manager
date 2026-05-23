@@ -13,7 +13,7 @@ class MarketOfferQueries:
      "offer_uri","range_id","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
       FROM "${table_prefix}offer_details" 
        WHERE  ("ts" BETWEEN :ts_from and :ts_to) and COALESCE("isp_unit"=:isp_unit,TRUE  )
-       AND COALESCE(market_id = :market_id,TRUE)    AND COALESCE(offer_details = :offer_details,TRUE)
+       AND COALESCE(market_id = :market_id,TRUE)    AND COALESCE(sequence = :sequence,TRUE)
         """
     GET_MAX_TS = """SELECT max("ts") as ts FROM "${table_prefix}offer_details"  
       WHERE COALESCE("isp_unit"=:isp_unit,TRUE  ) AND COALESCE(market_id = :market_id,TRUE) 
@@ -72,7 +72,6 @@ class MarketOfferAPIImpl(MarketOfferAPI):
                 raise ValueError(f"Market offer not saved: {market_offer.__dict__}")
             market_offer.offer_id = inserted_id
             return market_offer
-
 
     def list_offer_info(self, ts: Optional[TimeSpan], market_id: Optional[int] = None,
                         isp_unit: Optional[int] = None, sequence: Optional[str] = None) -> List[EnergyMarketOfferInfo]:
@@ -137,7 +136,7 @@ class MarketOfferAPIImpl(MarketOfferAPI):
     def list_market_offer(self, ts: TimeSpan, market_id: Optional[int] = None,
                           isp_unit: Optional[int] = None) -> List[EnergyMarketOffer]:
         with ConnectionWrapper() as conn:
-            args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "isp_unit": isp_unit, "market_id": market_id }
+            args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "isp_unit": isp_unit, "market_id": market_id}
             offers = conn.select(q=self.queries.LIST_MARKET_OFFER, args=args, obj_type=EnergyMarketOffer)
 
             return offers

@@ -75,15 +75,19 @@ def get_price(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
         split_uri = TOUSplitURI.parse(uri=q.tou_uri, prefix=kb_id)
         ts = TimeSpan(ts_from=split_uri.ts, ts_to=split_uri.ts + isp_unit_to_ms(isp_unit=split_uri.period_minutes))
         # time_span_ms =  from_n3(KIVars.DAY_DURATION)
-        # TODO  use all suybscribed markets
+        # TODO  use all subscribed markets
         if len(dao_manager.market_api.list_subscribed_market()) == 0:
             # TODO: check this on start service
             logging.warning("No subscribed markets")
             return []
+        # todo check how are interpreted sequences
+        # powyzej
         market_id = dao_manager.market_api.list_subscribed_market()[0].market_id
+        # todo: list recent offers  popatrz entsoe -service
         isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)
         offers = dao_manager.offer_dao.list_market_offer(ts=ts, market_id=market_id, isp_unit=isp_unit)
 
+        # TODO: interpolate prices when ISP unit is different then isp unit stored in the db
         def converter(o: EnergyMarketOffer):
             tou_uri = q.tou_uri
             # tou_uri_parser.n3(TOUSplitURI(range_id=o.range_id, period_minutes=o.isp_len, ts=o.ts))

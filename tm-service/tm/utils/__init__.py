@@ -36,6 +36,13 @@ class TimeSpan(BaseModel):
         ts_from = ts_to - DAY_MS
         return TimeSpan(ts_from=ts_from, ts_to=ts_to)
 
+    @staticmethod
+    def next_day():
+        from ke_client.utils import time_utils
+        ts_from = time_utils.current_timestamp()
+        ts_to = ts_from + DAY_MS
+        return TimeSpan(ts_from=ts_from, ts_to=ts_to)
+
 
 def ms_to_isp_unit(ms: int) -> int:
     """

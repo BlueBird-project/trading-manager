@@ -19,7 +19,11 @@ async def list_markets() -> List[EnergyMarket]:
 async def get_market_offer_info(market_id: int, ts_from: Optional[int] = None, ts_to: Optional[int] = None,
                                 granularity: Optional[int] = None) -> List[EnergyMarketOfferInfo]:
     from tm.modules.tm_api import service
-    ts = TimeSpan(ts_from=ts_from, ts_to=ts_to)
+    # TODO: test
+    if ts_from is None and ts_to is None:
+        ts = None
+    else:
+        ts = TimeSpan(ts_from=ts_from, ts_to=ts_to)
     return service.list_offer_info(market_id=market_id, ts=ts, granularity=granularity)
 
 
@@ -30,13 +34,16 @@ async def get_market_offer(market_id: int, ts_from: Optional[int] = None, ts_to:
     ts = TimeSpan(ts_from=ts_from, ts_to=ts_to)
     return service.list_offer(market_id=market_id, ts=ts, granularity=granularity)
 
-
-@router.get("/offer/", deprecated=True)
-async def list_offer(ts_from: Optional[int] = None, ts_to: Optional[int] = None,
-                     granularity: Optional[int] = None) -> List[EnergyMarketOfferInfo]:
-    from tm.modules.tm_api import service
-    ts = TimeSpan(ts_from=ts_from, ts_to=ts_to)
-    return service.list_offer_info(market_id=None, ts=ts, granularity=granularity)
+#
+# @router.get("/offer/", deprecated=True)
+# async def list_offer(ts_from: Optional[int] = None, ts_to: Optional[int] = None,
+#                      granularity: Optional[int] = None) -> List[EnergyMarketOfferInfo]:
+#     from tm.modules.tm_api import service
+#     if ts_from is None and ts_to is None:
+#         ts = None
+#     else:
+#         ts = TimeSpan(ts_from=ts_from, ts_to=ts_to)
+#     return service.list_offer_info(market_id=None, ts=ts, granularity=granularity)
 
 
 @router.get("/offer/{offer_id}")

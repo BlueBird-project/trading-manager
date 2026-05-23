@@ -3,7 +3,6 @@
 # ./resources/.env
 # ./resources/env/.env.fm
 ################################################
-from effi_onto_tools.utils import time_utils
 from effi_onto_tools.utils.time_utils import tick, tock
 
 import tm
@@ -52,16 +51,17 @@ if __name__ == "__main__" and app_settings:
             # get prices
             ################################################
             # timeseries metadata
-            res = get_tou_info(ts=TimeSpan.last_day())
-            print(res)
+            # res = get_tou_info(ts=TimeSpan.last_day())
+            res = get_tou_info(ts=TimeSpan.next_day())
+            print(f"get_tou_info: {res}")
             for ts_info in res:
                 ################################################
                 # get timeseries data points for each uri
                 ################################################
-                print("get prices for: " + ts_info.tou_uri)
+                print("get prices for: " + str(ts_info.tou_uri))
                 prices = get_tou_price(tou_uris=[ts_info.tou_uri])
                 if len(prices) > 0:
-                    print(f"{len(prices)}: {prices[0]}")
+                    print(f"price response = {len(prices)}: {prices[0]}")
                 else:
                     print(f"empty price response")
             sleep(15)

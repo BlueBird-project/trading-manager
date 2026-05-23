@@ -21,7 +21,7 @@ def _get_tou_price(tou_uris: List[URIRef]):
 
 @tou_ki.ask("tou-price-info")
 def _get_price_info(query: Union[TOUPriceInfoQuery]):
-    print("query: ")
+    print("tou-price-info: query: ")
     print(query)
     return [query]
 

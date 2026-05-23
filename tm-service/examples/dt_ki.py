@@ -5,9 +5,12 @@
 ################################################
 from typing import Optional
 
+from effi_onto_tools.utils.time_utils import tick, tock
+
 import tm
 import logging
 from time import sleep
+from tm.utils import TimeSpan
 
 ################################################
 # setup configurations

@@ -3,11 +3,14 @@
 # ./resources/.env
 # ./resources/env/.env.fm
 ################################################
-from rdflib import URIRef
+from typing import Optional
+
+from effi_onto_tools.utils.time_utils import tick, tock
 
 import tm
 import logging
 from time import sleep
+from tm.utils import TimeSpan
 
 ################################################
 # setup configurations
@@ -44,8 +47,8 @@ if __name__ == "__main__" and app_settings:
     success = False
     #####################################
     # Set market
-    ##################################33
-    market: EnergyMarketBindings = None
+    #####################################
+    market: Optional[EnergyMarketBindings] = None
 
     while not success:
         try:
@@ -54,9 +57,12 @@ if __name__ == "__main__" and app_settings:
             print(f"tick: {client.state()}")
             # set market which will be forecasted
             markets = get_markets()
-            market = markets[0]
-            set_market_uri(market_uri=market.market_uri)
-            success = True
+            if len(markets) < 1:
+                print("Error: no markets")
+            else:
+                market = markets[0]
+                set_market_uri(market_uri=market.market_uri)
+                success = True
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)
@@ -81,7 +87,7 @@ if __name__ == "__main__" and app_settings:
             if len(dt_info_ack) > 0:
                 success = True
             else:
-                sleep(10)
+                sleep(30)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)
@@ -102,7 +108,7 @@ if __name__ == "__main__" and app_settings:
                 print("ack: " + str(len(ts_ack)))
 
             print(f"tock")
-            sleep(30)
+            sleep(60)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

@@ -5,6 +5,7 @@ from ke_client.ki_model import KIAskResponse
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
+from tm.modules.ke_interaction.interactions.ki_models import DurationURI
 from tm.utils import TimeSpan
 
 tou_ki = KIHolder()
@@ -20,7 +21,7 @@ def _get_tou_price(tou_uris: List[URIRef]):
 
 @tou_ki.ask("tou-price-info")
 def _get_price_info(query: Union[TOUPriceInfoQuery]):
-    print("query: ")
+    print("tou-price-info: query: ")
     print(query)
     return [query]
 
@@ -31,9 +32,11 @@ def get_tou_info(ts: TimeSpan) -> list[TOUPriceInfo]:
     :param ts:
     :return:
     """
-    iso_duration = f"PT{int((ts.ts_to - ts.ts_from) / 60000)}M"
+    minutes = int((ts.ts_to - ts.ts_from) / 60000)
+    iso_duration = f"PT{minutes}M"
     q = TOUPriceInfoQuery(time_create=Literal(time_utils.xsd_from_ts(ts.ts_from)),
-                          tou_period=Literal(lexical_or_value=iso_duration, datatype="xsd:duration"))
+                          tou_period=Literal(lexical_or_value=iso_duration, datatype="xsd:duration"),
+                          tou_period_uri=DurationURI(minutes=minutes).uri_ref)
     price_info_bindings: KIAskResponse = _get_price_info(query=q)
     return [TOUPriceInfo(**b) for b in price_info_bindings.binding_set]
 

@@ -36,3 +36,6 @@ ke:
   ki_vars:
     DAY_DURATION: '"PT1440M"^^xsd:duration'
     ISP_UNIT: '"PT15M"^^xsd:duration'
+  extension_ontology_files:
+    - "/app/resources/ontologies/bluebird.ttl"
+    - "/app/resources/ontologies/resources.ttl"

@@ -24,3 +24,6 @@ ke:
     ISP_UNIT: '"PT15M"^^xsd:duration'
     CURRENCY_UNIT: "EUR"
     ENERGY_COST_UNIT: "EURPerMegawattHour"
+  extension_ontology_files:
+    - "/app/resources/ontologies/bluebird.ttl"
+    - "/app/resources/ontologies/resources.ttl"

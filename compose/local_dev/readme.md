@@ -75,8 +75,8 @@ docker-compose -p local -f sample_compose.yaml --env-file .env create
 docker-compose -p local -f sample_compose.yaml --env-file .env start
 
 
-docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  create
-docker-compose -p local -f all.yaml --env-file .env --env-file ./env/.env.secrets  start 
+docker-compose -p local -f all_compose.yaml --env-file .env --env-file ./env/.env.secrets  create
+docker-compose -p local -f all_compose.yaml --env-file .env --env-file ./env/.env.secrets  start 
 ```
 
 check consumed resources:
@@ -97,9 +97,9 @@ https://box.pionier.net.pl/d/2782022c45ce4360a8c5/
 ### import image
 
 ```shell
-docker load -i .\images\bluebird.tge-dayahead-service_0.5.8.tar
-docker load -i .\images\bluebird.tm-entsoe-service_0.5.7.tar
-docker load -i .\images\bluebird.trading-manager_0.5.3.tar 
+docker load -i .\images\bluebird.tge-dayahead-service_0.6.1.tar
+docker load -i .\images\bluebird.tm-entsoe-service_0.6.0.tar
+docker load -i .\images\bluebird.trading-manager_0.6.0.tar 
 ```
 
 ### export image

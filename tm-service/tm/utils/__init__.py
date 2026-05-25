@@ -43,6 +43,15 @@ class TimeSpan(BaseModel):
         ts_to = ts_from + DAY_MS
         return TimeSpan(ts_from=ts_from, ts_to=ts_to)
 
+    def __len__(self):
+        try:
+            span = self.ts_to - self.ts_from
+            if span < 0:
+                raise ValueError("Negative time interval")
+            return span
+        except AttributeError | TypeError:
+            return None
+
 
 def ms_to_isp_unit(ms: int) -> int:
     """

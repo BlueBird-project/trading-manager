@@ -22,3 +22,4 @@ class LastOfferTS(BaseModel):
     market_uri: str
     subscribe: Optional[int]
     ts: Optional[int]
+

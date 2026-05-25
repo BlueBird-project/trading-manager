@@ -57,9 +57,10 @@ async def scan_forecast() -> Dict[str, Any]:
 async def flex_info(ts: Optional[TimeSpan] = None) -> List[Dict[str, Any]]:
     # async def flex_info(ts: Optional[TimeSpan] = None) -> List[FMTSResponse]:
     from tm.modules.ke_interaction.interactions.fm_interactions import request_ts_info
-    if ts is None:
+    if ts is None or len(ts) == 0:
         cur_ts = time_utils.current_timestamp()
         ts = TimeSpan(ts_from=cur_ts, ts_to=cur_ts + 3600 * 1000 * 24)
+
     return [t.n3() for t in request_ts_info(ts=ts)]
 
 

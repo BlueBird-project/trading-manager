@@ -61,9 +61,9 @@ knowledge_engine:
         - "ts_uri"
       pattern:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
-        - ' ?dp s4ener:belongsTo ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
         - '   s4ener:hasEffectivePeriod ubmarket:period_15m ; saref:hasResult ?dpr.'
-        - ' ubmarket:period_15m time:hasXSDDuration ${ISP_UNIT} .'
+        - ' ubmarket:period_15m rdf:type  time:Interval; time:hasXSDDuration ${ISP_UNIT} .'
         - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn  ubmarket:EURPerMegawattHour .'
 
 

@@ -32,3 +32,4 @@ ke:
 #    ubmarket: "https://ubflex.bluebird.eu/market/"
   extension_ontology_files:
     - "./resources/deployment/ki/bluebird.ttl"
+    - "./resources/deployment/ki/resources.ttl"

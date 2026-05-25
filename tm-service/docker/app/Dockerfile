@@ -33,6 +33,8 @@ COPY /demo_ki.py /app/demo_ki.py
 COPY /resources/deployment /app/resources/deployment
 COPY /docker/app/config.yaml /config/config.yaml
 COPY /resources/env/.env.tm.demo /env/.env.tm.demo
+COPY --from=ontologies_dir . /app/resources/deployment/ontologies
+
 ENV KE_KI_CONFIG_PATH="/app/resources/deployment/ke_config.yaml"
 ENV DB_INIT_SCRIPT_LOCATION="/app/resources/deployment/db/pg_init.sql"
 ENV APP_LOGGING_CONF_PATH="/app/resources/deployment/logging.ini"

@@ -7,6 +7,8 @@ services:
       tags:
         - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/${REGISTRY_APPLICATION}:latest"
         - "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/${REGISTRY_APPLICATION}:${IMAGE_TAG}"
+      additional_contexts:
+        ontologies_dir: ..\..\compose\ontologies
     ports:
       - "9090:8080"
     depends_on:

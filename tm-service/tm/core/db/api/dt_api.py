@@ -5,7 +5,7 @@ from tm.models.digital_twin import DigitalTwinDAO
 
 
 class DTAPI:
-
+    # TODO currently DT can have only one command/job
     @abstractmethod
     def save(self, job: DigitalTwinDAO) -> DigitalTwinDAO:
         pass

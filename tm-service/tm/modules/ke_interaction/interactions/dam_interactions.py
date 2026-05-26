@@ -84,16 +84,16 @@ def get_market_offer_info_filtered(market_uri: str, ti: Optional[TimeSpan], isp_
     return market_offer_bindings
 
 
-def get_current_market_offer_info(market_uri: Optional[str] = None, isp_unit: int = 15) -> \
-        List[MarketOfferInfoBindings]:
+def get_current_market_offer_info(market_uri: Optional[str] = None, isp_unit: int = 15,
+                                  ti: Optional[TimeSpan] = None) -> List[MarketOfferInfoBindings]:
     if market_uri is None:
         markets = dam_service.get_all_markets()
         accu = []
         for market in markets:
-            accu += get_market_offer_info_filtered(market_uri=URIRef(market.market_uri), ti=None, isp_unit=isp_unit)
+            accu += get_market_offer_info_filtered(market_uri=URIRef(market.market_uri), ti=ti, isp_unit=isp_unit)
         return accu
     else:
-        return get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=None, isp_unit=isp_unit)
+        return get_market_offer_info_filtered(market_uri=URIRef(market_uri), ti=ti, isp_unit=isp_unit)
 
 
 # endregion

@@ -48,9 +48,9 @@ if __name__ == "__main__" and app_settings:
 
             print(f"tick: {client.state()}")
             ################################################
-            # get prices
+            # get prices (currently TM returns first market offer on the list  )
             ################################################
-            # timeseries metadata
+            # timeseries details/metadata
             # res = get_tou_info(ts=TimeSpan.last_day())
             res = get_tou_info(ts=TimeSpan.next_day())
             print(f"get_tou_info: {res}")

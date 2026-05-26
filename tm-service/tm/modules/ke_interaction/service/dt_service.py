@@ -23,6 +23,8 @@ def process(dt_info_list: List[DigitalTwinInfo]):
         else:
             db_job = dao_manager.job_api.get(command_uri=dt_info.command_uri)
             if db_job is None:
+                db_job = dao_manager.job_api.get_by_market(market_id=market.market_id)
+            if db_job is None:
                 job = dao_manager.job_api.save(JobDAO(command_uri=dt_info.command_uri, market_id=market.market_id,
                                                       job_name=dt_info.dt_uri,
                                                       ext=to_json({"market_uri": dt_info.market_uri})))
@@ -130,4 +132,3 @@ def join_forecast_offer(relations: List[ForecastOfferRelation]):
         d[r.forecast_uri] = offer_info.offer_id
     for f_uri, offer_id in d.items():
         assert dao_manager.forecast_api.set_forecast_offer(forecast_uri=f_uri, offer_id=offer_id)
-

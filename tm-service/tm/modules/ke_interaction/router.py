@@ -12,13 +12,14 @@ ki_router = APIRouter(prefix="", tags=["KI"])
 @ki_router.post("/dam/scan", description="Scan for available markets in the network,"
                                          " current offers metadata and current offers time series")
 # @ki_router.get("/dam/scan")
-async def dam_scan(isp_unit: int = 15) -> Dict[str, Any]:
+async def dam_scan(isp_unit: int = 15, ts_from: Optional[int] = None, ts_to: Optional[int] = None) -> Dict[str, Any]:
     res = {}
     from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
     from tm.modules.ke_interaction.interactions.dam_interactions import get_current_market_offer_info
     from tm.modules.ke_interaction.interactions.dam_interactions import get_market_offer
     res["markets"] = [m.n3() for m in get_all_markets(False)]
-    offer_infos = get_current_market_offer_info(isp_unit=isp_unit)
+    # TODO: iterate overdays when ti is very long
+    offer_infos = get_current_market_offer_info(isp_unit=isp_unit, ti=TimeSpan(ts_from=ts_from, ts_to=ts_to))
     res["info_uris"] = [o.n3() for o in offer_infos]
     offer = get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
     res["market_offer"] = offer

@@ -113,7 +113,7 @@ class OfferDPSplitURI(SplitURIBase):
 #     period_minutes: int
 #     isp_start: int
 
-
+# TODO: shall we add market id and let FM to choose offer ? should offer be chosen by TM or FM?
 @ki_split_uri(uri_template="tou/${range_id}/${period_minutes}/${ts}")
 class TOUSplitURI(SplitURIBase):
     range_id: int

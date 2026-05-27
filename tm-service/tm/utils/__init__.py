@@ -52,6 +52,14 @@ class TimeSpan(BaseModel):
         except AttributeError | TypeError:
             return None
 
+    @staticmethod
+    def non_empty(ts: Optional['TimeSpan'] = None) -> 'TimeSpan':
+        if ts is None or len(ts) == 0:
+            from ke_client.utils import time_utils
+            cur_ts = time_utils.current_timestamp()
+            return TimeSpan(ts_from=cur_ts - DAY_MS, ts_to=cur_ts + DAY_MS)
+        return ts
+
 
 def ms_to_isp_unit(ms: int) -> int:
     """

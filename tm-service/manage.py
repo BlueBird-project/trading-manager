@@ -52,6 +52,8 @@ if __name__ == "__main__":
         from tm.modules.tm_api.router import router as tm_router
         from tm.core.healthcheck.router import router as healthcheck_router
         from tm.modules.ke_interaction.router import ki_router
+        from tm.modules.tm_api.dt_router import dt_router
+
         # from main.modules.tge_api.admin_router import router as admin_router
         from fastapi import FastAPI
 
@@ -59,6 +61,7 @@ if __name__ == "__main__":
                       openapi_url="/openapi.json", redoc_url="/redoc")
         app.include_router(router=tm_router, prefix="/api")
         app.include_router(router=ki_router, prefix="/ki")
+        app.include_router(router=dt_router, prefix="/dt")
 
         healthcheck_app = FastAPI(docs_url="/docs",
                                   openapi_url="/openapi.json", redoc_url="/redoc")

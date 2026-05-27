@@ -41,7 +41,7 @@ class DTForecastAPI:
         pass
 
     @abstractmethod
-    def get_offers(self, forecast_id: List[int]) -> List[DTForecastOfferDAO]:
+    def get_offers(self, forecast_ids: List[int]) -> List[DTForecastOfferDAO]:
         pass
 
     @abstractmethod

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -47,3 +47,18 @@ class DTForecastOfferDAO:
     cost_mwh: Optional[float]
     ts: int
     isp_len: int = 1
+
+
+@dataclass
+class DTForecastOfferDTO:
+    offers: List[DTForecastOfferDAO]
+    forecast_id: Optional[int]
+    forecast_uri: Optional[str]
+
+    def __init__(self, offers: List[DTForecastOfferDAO], forecast_id: Optional[int], forecast_uri: Optional[str]):
+        if forecast_id is None and forecast_uri is None:
+            raise ValueError("forecast_id and forecast_uri are None")
+        self.offers = offers
+        self.forecast_id = forecast_id
+        self.forecast_uri = forecast_uri
+        self.id = forecast_uri if forecast_uri is not None else str(forecast_id)

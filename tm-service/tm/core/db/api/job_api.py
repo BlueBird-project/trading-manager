@@ -5,9 +5,13 @@ from tm.models.job_dao import JobDAO
 
 
 class JobAPI:
-
+    # command/job is connected with market
     @abstractmethod
     def save(self, job: JobDAO) -> JobDAO:
+        pass
+
+    @abstractmethod
+    def update(self, job: JobDAO) -> JobDAO:
         pass
 
     @abstractmethod
@@ -15,7 +19,11 @@ class JobAPI:
         pass
 
     @abstractmethod
-    def get(self, command_uri: str) -> Optional[JobDAO]:
+    def get(self, job_id: int) -> Optional[JobDAO]:
+        pass
+
+    @abstractmethod
+    def get_by_command(self, command_uri: str) -> Optional[JobDAO]:
         pass
 
     @abstractmethod

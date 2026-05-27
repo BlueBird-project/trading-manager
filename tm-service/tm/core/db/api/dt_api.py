@@ -11,9 +11,17 @@ class DTAPI:
         pass
 
     @abstractmethod
+    def update(self, job: DigitalTwinDAO) -> DigitalTwinDAO:
+        pass
+
+    @abstractmethod
     def list(self, ) -> List[DigitalTwinDAO]:
         pass
 
     @abstractmethod
-    def get(self, dt_uri: str) -> Optional[DigitalTwinDAO]:
+    def get(self, dt_id: int) -> Optional[DigitalTwinDAO]:
+        pass
+
+    @abstractmethod
+    def get_by_uri(self, dt_uri: str) -> Optional[DigitalTwinDAO]:
         pass

@@ -22,6 +22,7 @@ class DTForecastInfoQueries(QueryObject):
     #   AND   ("ts" BETWEEN :ts_from and :ts_to)  """
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}"  as ${table_alias}
         JOIN  "${table_prefix}""" + DTAPIQueries.__TABLE_NAME__ + """" as dt_info 
+         ON dtf_info."job_id" = dt_info."job_id" 
       WHERE COALESCE( dt_info.job_id = :job_id , TRUE ) 
        AND ( :offer_id is NULL or COALESCE( offer_id = :offer_id , FALSE ) )
            AND ( (:sequence is NULL and sequence is NULL) OR COALESCE( sequence = :sequence , TRUE ) )
@@ -36,6 +37,7 @@ class DTForecastInfoQueries(QueryObject):
     #     WHERE COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
     GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" 
         JOIN  "${table_prefix}""" + DTAPIQueries.__TABLE_NAME__ + """" as dt_info 
+         ON dtf_info."job_id" = dt_info."job_id" 
         WHERE  COALESCE( dt_info.job_id = :job_id , TRUE ) 
            AND COALESCE( model_id = :model_id , TRUE ) 
            AND ( (:sequence is NULL and sequence is NULL) OR COALESCE( sequence = :sequence , TRUE ) )
@@ -88,7 +90,7 @@ class DTForecastAPImpl(DTForecastAPI):
             return forecast_info
 
     def list_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int]) -> List[DTForecastInfoDAO]:
-        return self.find_forecasts(ts=ts, job_id=job_id, model_id=None)
+        return self.find_forecasts(ts=ts, job_id=job_id, model_id=None,sequence=None,range_id=None)
 
     def _find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int],
                         sequence: Optional[int], range_id: Optional[int], offer_id: Optional[int]) -> List[

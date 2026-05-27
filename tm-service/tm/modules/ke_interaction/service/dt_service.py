@@ -13,15 +13,13 @@ from tm.utils import isp_unit_to_ms
 
 
 def process(dt_info_list: List[DigitalTwinInfo]):
-    # response: List[] = []
-    # TODO: update all dt metadata ?
     for dt_info in dt_info_list:
         from tm.core.db.postgresql import dao_manager
         market = dao_manager.market_api.get_market(market_uri=dt_info.market_uri)
         if market is None:
             logging.error(f"Unknown market: {dt_info.market_uri}")
         else:
-            db_job = dao_manager.job_api.get(command_uri=dt_info.command_uri)
+            db_job = dao_manager.job_api.get_by_command(command_uri=dt_info.command_uri)
             if db_job is None:
                 db_job = dao_manager.job_api.get_by_market(market_id=market.market_id)
             if db_job is None:
@@ -29,15 +27,22 @@ def process(dt_info_list: List[DigitalTwinInfo]):
                                                       job_name=dt_info.dt_uri,
                                                       ext=to_json({"market_uri": dt_info.market_uri})))
             else:
+                db_job.ext=to_json({"market_uri": dt_info.market_uri})
+                db_job.job_name=dt_info.dt_uri
+                db_job.market_id=market.market_id
+                db_job.command_uri=dt_info.command_uri
+                dao_manager.job_api.update(job=db_job )
                 job = db_job
-            db_dt = dao_manager.dt_api.get(dt_uri=dt_info.dt_uri)
+            db_dt = dao_manager.dt_api.get_by_uri(dt_uri=dt_info.dt_uri)
             if db_dt is None:
                 dt = dao_manager.dt_api.save(
                     DigitalTwinDAO(dt_uri=dt_info.dt_uri, job_id=job.job_id))
+                logging.info(f"Registered new dt: {dt.dt_uri}:{dt.job_id}")
             else:
-                # TODO: dt_api.update(....)
-                dt = db_dt
-            # response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
+                db_dt.job_id = job.job_id
+                dt = dao_manager.dt_api.update(db_dt)
+                logging.info(f"Updated dt: {dt.dt_uri}:{dt.job_id}")
+                # response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
     # return response
 
 
@@ -55,7 +60,7 @@ def process_forecast_info(bindings: List[DTTSInfo]) -> List[DTForecastInfoDAO]:
             range_id = dao_manager.offer_dao.add_range(RangeInfo(min_value=min_power, max_value=max_power)).range_id
         else:
             range_id = power_range.range_id
-        job = dao_manager.job_api.get(command_uri=b.command_uri)
+        job = dao_manager.job_api.get_by_command(command_uri=b.command_uri)
         if job is None:
             logging.error(f"Job(Command) not found: {b.command_uri}")
         else:

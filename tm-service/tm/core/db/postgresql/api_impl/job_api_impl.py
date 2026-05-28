@@ -22,7 +22,7 @@ class JobAPIQueries(QueryObject):
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
      ( "command_uri", "market_id","job_name","job_description","ext" ,"update_ts"  )
-     VALUES (:command_uri,, :job_name,:job_description, :ext,extract(epoch from now()) * 1000) """
+     VALUES (:command_uri, :market_id, :job_name, :job_description, :ext,extract(epoch from now()) * 1000) """
 
     UPDATE = """UPDATE  "${table_prefix}${table_name}" SET 
      "command_uri"=:command_uri, "market_id"= :market_id,"job_name"=:job_name,

@@ -94,7 +94,7 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
             #     TODO:
             # raise Exception(f"Init offer info {offer_uri}")
             # TODO: add bg task to ask KE for offer details
-            logging.error(f"Offer not registered {forecast_info}")
+            logging.error(f"Forecast Offer not registered {forecast_info}")
             # del grouped_bindings[offer_uri]
         else:
             if clear:

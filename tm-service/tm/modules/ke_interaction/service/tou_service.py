@@ -82,6 +82,7 @@ def get_price(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
             return []
         # todo check how are interpreted sequences
         # powyzej
+        # TODO: return all time series prizes for all markets (TO FM )!!!!!!!!!!!!!
         market_id = dao_manager.market_api.list_subscribed_market()[0].market_id
         # todo: list recent offers  popatrz entsoe -service
         isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)

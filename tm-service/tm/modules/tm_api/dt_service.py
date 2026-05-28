@@ -16,6 +16,11 @@ def list_jobs() -> List[JobDAO]:
     return dao_manager.job_api.list()
 
 
+def get_job(job_id: int) -> Optional[JobDAO]:
+    from tm.core.db.postgresql import dao_manager
+    return dao_manager.job_api.get(job_id=job_id)
+
+
 def get_market_job(market_id: int) -> Optional[JobDAO]:
     from tm.core.db.postgresql import dao_manager
     return dao_manager.job_api.get_by_market(market_id=market_id)

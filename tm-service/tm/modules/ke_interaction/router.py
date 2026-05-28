@@ -77,12 +77,10 @@ async def flex_ts() -> List[Dict[str, Any]]:
     from tm.modules.ke_interaction.interactions.tou_interactions import tou_ki
     from tm.core.db.postgresql import dao_manager
     from tm.modules.ke_interaction.service.tou_service import get_price
+    ts=TimeSpan()
     range_id = dao_manager.offer_dao.get_range().range_id
-    time_span_ms = 3600 * 6 * 1000
-    ts_from = time_utils.current_timestamp() - time_span_ms / 2
-    # todo: check this property kb_id =tou_ki.kb_id
-    uri = TOUSplitURI(prefix=tou_ki.get_kb_id(), range_id=range_id, period_minutes=time_span_ms / 60000,
-                      ts=ts_from).uri_ref
+    uri = TOUSplitURI(prefix=tou_ki.get_kb_id(), range_id=range_id, period_minutes=ts.time_span_min ,
+                      ts=ts.ts_from).uri_ref
     # async def flex_ts(ts_uri: str) -> List[FMPnt]:
     q = TOUPriceQuery(tou_uri=uri)
     prices = get_price(binding_query=[q], kb_id=tou_ki.get_kb_id())

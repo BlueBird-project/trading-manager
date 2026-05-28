@@ -15,7 +15,8 @@ class TimeSpan(BaseModel):
     def __init__(self, ts_from: Optional[int] = None, ts_to: Optional[int] = None):
         if ts_from is None and ts_to is None:
             from ke_client.utils import time_utils
-            ts_to = time_utils.current_timestamp()
+            ts_to = time_utils.current_timestamp() + DAY_MS
+            ts_from = ts_to - 2 * DAY_MS
         ts_from = ts_from if ts_from is not None else ts_to - DAY_MS
         ts_to = ts_to if ts_to is not None else ts_from + DAY_MS
         if ts_to < ts_from:
@@ -59,6 +60,14 @@ class TimeSpan(BaseModel):
             cur_ts = time_utils.current_timestamp()
             return TimeSpan(ts_from=cur_ts - DAY_MS, ts_to=cur_ts + DAY_MS)
         return ts
+
+    @property
+    def time_span_ms(self):
+        return self.ts_to - self.ts_from
+
+    @property
+    def time_span_min(self):
+        return self.time_span_ms / 60000
 
 
 def ms_to_isp_unit(ms: int) -> int:

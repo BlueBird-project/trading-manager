@@ -97,9 +97,9 @@ https://box.pionier.net.pl/d/2782022c45ce4360a8c5/
 ### import image
 
 ```shell
-docker load -i .\images\bluebird.tge-dayahead-service_0.6.1.tar
-docker load -i .\images\bluebird.tm-entsoe-service_0.6.2.tar
-docker load -i .\images\bluebird.trading-manager_0.6.1.tar 
+docker load -i .\images\bluebird.tge-dayahead-service_0.6.5.tar
+docker load -i .\images\bluebird.tm-entsoe-service_0.6.3.tar
+docker load -i .\images\bluebird.trading-manager_0.6.6.tar 
 ```
 
 ### export image

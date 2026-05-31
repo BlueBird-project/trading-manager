@@ -20,8 +20,8 @@ class DTTSInfo(BindingsBase):
     time_create: Literal
     ts_interval_uri: URIRef
     ts_date_from: Literal
-    sequence: OptionalLiteral = None
     ts_date_to: Literal
+    sequence: OptionalLiteral = None
     # range section
 
     power_range: Optional[URIRef] = rdf_nil

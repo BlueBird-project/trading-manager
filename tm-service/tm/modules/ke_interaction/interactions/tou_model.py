@@ -1,9 +1,12 @@
 from typing import Optional, Tuple
 
-from ke_client import BindingsBase, rdf_nil, OptionalLiteral
+from ke_client import BindingsBase, rdf_nil, OptionalLiteral, is_nil
 from ke_client import ki_object, SplitURIBase, ki_split_uri
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
+
+from tm.modules.ke_interaction.interactions.dam_model import TimeIntervalUri
+from tm.utils import TimeSpan
 
 
 # region exchange binding objects
@@ -17,19 +20,19 @@ from rdflib import URIRef, Literal
 #         super().__init__(bindings=kwargs)
 
 
-@ki_object("tou-price-info", allow_partial=True)
-class TOUPriceInfoSimpleResponse(BindingsBase):
-    tou_uri: URIRef
+# @ki_object("tou-price-info", allow_partial=True)
+# class TOUPriceInfoSimpleResponse(BindingsBase):
+#     tou_uri: URIRef
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
 
-    def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
 
-
-@ki_object("tou-price-info", allow_partial=True)
+# @ki_object("tou-price-info", allow_partial=True)
 class TOUPriceInfoQuery(BindingsBase):
-    time_create: Literal
-    tou_period: Literal
-    tou_period_uri: URIRef
+    # time_create: Literal
+    # tou_period: Literal
+    # tou_period_uri: URIRef
     max_value: OptionalLiteral = None
     min_value: OptionalLiteral = None
     power_range: Optional[URIRef] = None
@@ -40,18 +43,50 @@ class TOUPriceInfoQuery(BindingsBase):
         super().__init__(bindings=kwargs)
 
     def get_power_limit(self) -> Tuple[float, float]:
-        min_value =self.convert_value(self.min_value, float)
-        max_value =self.convert_value(self.max_value, float)
+        min_value = self.convert_value(self.min_value, float)
+        max_value = self.convert_value(self.max_value, float)
         return min_value, max_value
 
 
-@ki_object("tou-price-info")
+@ki_object("tou-price-info-filtered", allow_partial=True)
+class TOUPriceInfoQueryFiltered(TOUPriceInfoQuery):
+    ts_interval_uri: Optional[URIRef]
+    ts_date_from: OptionalLiteral
+    ts_date_to: OptionalLiteral
+
+    def __init__(self, ti: Optional[TimeSpan] = None, **kwargs):
+        if ti is None:
+            super().__init__(ts_interval_uri=rdf_nil, ts_date_from=rdf_nil, ts_date_to=rdf_nil, **kwargs)
+        else:
+            ts_interval_uri_ref = TimeIntervalUri(ts_from=ti.ts_from, ts_to=ti.ts_to).uri_ref
+            super().__init__(ts_interval_uri=ts_interval_uri_ref,
+                             ts_date_from=Literal(time_utils.xsd_from_ts(ti.ts_from)),
+                             ts_date_to=Literal(time_utils.xsd_from_ts(ti.ts_to)), **kwargs)
+
+    @property
+    def ts(self) -> TimeSpan:
+        return TimeSpan(ts_from=self.ts_from, ts_to=self.ts_to)
+
+    @property
+    def ts_from(self) -> Optional[int]:
+        if self.ts_date_from is None or is_nil(self.ts_date_from):
+            return None
+        return time_utils.xsd_to_ts(self.ts_date_from)
+
+    @property
+    def ts_to(self) -> Optional[int]:
+        if self.ts_date_to is None or is_nil(self.ts_date_to):
+            return None
+        return time_utils.xsd_to_ts(self.ts_date_to)
+
+
+# @ki_object("tou-price-info")
 class TOUPriceInfo(BindingsBase):
     tou_uri: URIRef
     time_create: Literal
     tou_period: Literal
     tou_period_uri: URIRef
-    power_range: Optional[URIRef]=rdf_nil
+    power_range: Optional[URIRef] = rdf_nil
     power_range_max: Optional[URIRef] = rdf_nil
     max_value: OptionalLiteral = rdf_nil
     power_range_min: Optional[URIRef] = rdf_nil
@@ -61,9 +96,24 @@ class TOUPriceInfo(BindingsBase):
         super().__init__(bindings=kwargs)
 
     def get_power_limit(self) -> Tuple[float, float]:
-        min_value =self.convert_value(self.min_value, float)
-        max_value =self.convert_value(self.max_value, float)
+        min_value = self.convert_value(self.min_value, float)
+        max_value = self.convert_value(self.max_value, float)
         return min_value, max_value
+
+
+@ki_object("tou-price-info-filtered")
+class TOUPriceInfoFiltered(TOUPriceInfo):
+    ts_interval_uri: Optional[URIRef]
+    ts_date_from: OptionalLiteral
+    ts_date_to: OptionalLiteral
+
+    @property
+    def ts_from(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_date_from)
+
+    @property
+    def ts_to(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_date_to)
 
 
 @ki_object("tou-price")
@@ -95,6 +145,14 @@ class TOUPriceQuery(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
+# @ki_object("tou-price-filtered", allow_partial=True)
+# class TOUPriceQueryFiltered(BindingsBase):
+#     tou_uri: URIRef
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
+
+
 # endregion
 
 # region uris
@@ -107,18 +165,56 @@ class OfferDPSplitURI(SplitURIBase):
     isp_start: int
 
 
+@ki_split_uri(uri_template=f"offer" + "/${offer_id}/${range_id}/${period_minutes}/${isp_start}")
+class OfferDPSplitURIFiltered(SplitURIBase):
+    range_id: int
+    period_minutes: int
+    offer_id: int
+    isp_start: int
+
+
 # @ki_split_uri(uri_template=f"offer" + "/${range_id}/${period_minutes}/${isp_start}")
+
+
 # class TOUDPSplitURI(SplitURIBase):
 #     range_id: int
 #     period_minutes: int
 #     isp_start: int
 
-# TODO: shall we add market id and let FM to choose offer ? should offer be chosen by TM or FM?
-@ki_split_uri(uri_template="tou/${range_id}/${period_minutes}/${ts}")
-class TOUSplitURI(SplitURIBase):
+# @ki_split_uri(uri_template="tou/${range_id}/${period_minutes}/${ts}")
+# class TOUSplitURI(SplitURIBase):
+#     range_id: int
+#     period_minutes: int
+#     ts: int
+
+
+@ki_split_uri(uri_template="tou/${market_id}/${sequence}/${range_id}/${period_minutes}/${ts}")
+class TOUSplitURIFiltered(SplitURIBase):
     range_id: int
     period_minutes: int
     ts: int
+    market_id: int
+    sequence: str
+
+    __EMPTY__ = "_"
+
+    @property
+    def time_span(self) -> TimeSpan:
+        return TimeSpan(ts_from=self.ts, ts_to=self.ts + self.period_minutes * 60000)
+
+    def __init__(self, sequence: Optional[str], **kwargs):
+        if sequence is None:
+            sequence = TOUSplitURIFiltered.__EMPTY__
+        super().__init__(sequence=sequence, **kwargs)
+
+    @property
+    def processed_sequence(self) -> Optional[str]:
+        if self.sequence == TOUSplitURIFiltered.__EMPTY__:
+            return None
+        return self.sequence
+
+    def __hash__(self):
+        return hash((self.range_id, self.period_minutes, self.ts, self.market_id, self.sequence))
 
 
 @ki_split_uri(uri_template="tou_range/${range_id}")
@@ -134,6 +230,5 @@ class TOURangeMaxURI(SplitURIBase):
 @ki_split_uri(uri_template=f"tou_range_min" + "/${range_id}")
 class TOURangeMinURI(SplitURIBase):
     range_id: int
-
 
 # endregion

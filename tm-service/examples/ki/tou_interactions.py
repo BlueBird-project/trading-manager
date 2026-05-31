@@ -9,8 +9,8 @@ from tm.modules.ke_interaction.interactions.ki_models import DurationURI
 from tm.utils import TimeSpan
 
 tou_ki = KIHolder()
-from tm.modules.ke_interaction.interactions.tou_model import TOUPrice, TOUPriceInfoQuery, \
-    TOUPriceInfo, TOUPriceQuery
+from tm.modules.ke_interaction.interactions.tou_model import TOUPrice,   TOUPriceQuery, \
+    TOUPriceInfoFiltered, TOUPriceInfoQueryFiltered
 
 
 @tou_ki.ask("tou-price")
@@ -19,14 +19,14 @@ def _get_tou_price(tou_uris: List[URIRef]):
     return ask_bindings
 
 
-@tou_ki.ask("tou-price-info")
-def _get_price_info(query: Union[TOUPriceInfoQuery]):
+@tou_ki.ask("tou-price-info-filtered")
+def _get_price_info(query: Union[TOUPriceInfoQueryFiltered]):
     print("tou-price-info: query: ")
     print(query)
     return [query]
 
 
-def get_tou_info(ts: TimeSpan) -> list[TOUPriceInfo]:
+def get_tou_info(ts: TimeSpan) -> list[TOUPriceInfoFiltered]:
     """
     get timeseries metadata
     :param ts:
@@ -34,11 +34,12 @@ def get_tou_info(ts: TimeSpan) -> list[TOUPriceInfo]:
     """
     minutes = int((ts.ts_to - ts.ts_from) / 60000)
     iso_duration = f"PT{minutes}M"
-    q = TOUPriceInfoQuery(time_create=Literal(time_utils.xsd_from_ts(ts.ts_from)),
-                          tou_period=Literal(lexical_or_value=iso_duration, datatype="xsd:duration"),
-                          tou_period_uri=DurationURI(minutes=minutes).uri_ref)
+    # q = TOUPriceInfoQueryFiltered(time_create=Literal(time_utils.xsd_from_ts(ts.ts_from)),
+    #                       tou_period=Literal(lexical_or_value=iso_duration, datatype="xsd:duration"),
+    #                       tou_period_uri=DurationURI(minutes=minutes).uri_ref)
+    q = TOUPriceInfoQueryFiltered(ti=ts)
     price_info_bindings: KIAskResponse = _get_price_info(query=q)
-    return [TOUPriceInfo(**b) for b in price_info_bindings.binding_set]
+    return [TOUPriceInfoFiltered(**b) for b in price_info_bindings.binding_set]
 
 
 def get_tou_price(tou_uris: List[str]) -> List[TOUPrice]:

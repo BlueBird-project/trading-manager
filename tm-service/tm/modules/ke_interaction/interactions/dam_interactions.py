@@ -69,6 +69,10 @@ def on_market_offer_info(ki_id: str, bindings: List[MarketOfferInfoBindings]):
 
 @ki.ask("market-offer-info-filtered")
 def _get_market_offer_info_filtered(market_uri: URIRef, ti: Optional[TimeSpan], isp_unit: int = 15):
+    mo=MarketOfferInfoFilteredRequest(ti=ti, market_uri=market_uri,
+                                      update_rate=Literal(duration_isoformat(timedelta(minutes=isp_unit))))
+    print(
+        f"market-offer-info-filtered: {market_uri}, {mo.n3()}")
     return [MarketOfferInfoFilteredRequest(ti=ti, market_uri=market_uri,
                                            update_rate=Literal(duration_isoformat(timedelta(minutes=isp_unit))))]
 

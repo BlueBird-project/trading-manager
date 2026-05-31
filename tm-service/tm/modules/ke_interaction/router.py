@@ -2,8 +2,11 @@ from typing import List, Optional, Dict, Any
 
 from fastapi import APIRouter
 from ke_client.utils import time_utils
-from rdflib import URIRef
+from rdflib import URIRef, Literal
 
+from tm.modules.ke_interaction.interactions.ki_models import DurationURI
+from tm.modules.ke_interaction.interactions.tou_model import TOUPriceInfoQueryFiltered
+from tm.modules.ke_interaction.service.tou_service import get_price_filtered, get_range_tou_filtered
 from tm.utils import TimeSpan
 
 ki_router = APIRouter(prefix="", tags=["KI"])
@@ -73,15 +76,19 @@ async def flex_ts(ts_uri: str) -> List[Dict[str, Any]]:
                description="tou test")
 async def flex_ts() -> List[Dict[str, Any]]:
     # sprawdzic
-    from tm.modules.ke_interaction.interactions.tou_model import TOUSplitURI, TOUPriceQuery
+    from tm.modules.ke_interaction.interactions.tou_model import TOUPriceQuery
     from tm.modules.ke_interaction.interactions.tou_interactions import tou_ki
     from tm.core.db.postgresql import dao_manager
-    from tm.modules.ke_interaction.service.tou_service import get_price
-    ts=TimeSpan()
+    ts = TimeSpan()
+
     range_id = dao_manager.offer_dao.get_range().range_id
-    uri = TOUSplitURI(prefix=tou_ki.get_kb_id(), range_id=range_id, period_minutes=ts.time_span_min ,
-                      ts=ts.ts_from).uri_ref
+    info_q = TOUPriceInfoQueryFiltered( )
+
+    from tm.modules.ke_interaction.interactions.client import ki_client
+
+    info_resp = get_range_tou_filtered(binding_query=[info_q], kb_id=ki_client.kb_id)
+    price_q = [TOUPriceQuery(tou_uri=info.tou_uri) for info in info_resp]
     # async def flex_ts(ts_uri: str) -> List[FMPnt]:
-    q = TOUPriceQuery(tou_uri=uri)
-    prices = get_price(binding_query=[q], kb_id=tou_ki.get_kb_id())
+    # q = TOUPriceQuery(tou_uri=uri)
+    prices = get_price_filtered(binding_query=price_q, kb_id=tou_ki.get_kb_id())
     return [p.__dict__ for p in prices]

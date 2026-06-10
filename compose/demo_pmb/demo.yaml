@@ -67,7 +67,7 @@ services:
     networks:
       - tm-net
   tm-ke-service:
-    image: ghcr.io/tno/knowledge-engine/smart-connector:1.4.0
+    image: ghcr.io/tno/knowledge-engine/smart-connector:1.5.0
     environment:
       KE_RUNTIME_PORT: 8280
     ports:

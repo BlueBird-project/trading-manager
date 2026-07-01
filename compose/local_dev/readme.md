@@ -53,6 +53,11 @@ Download & import docker images [here](#download-images)
 
 ### Build
 
+Set env variables
+```shell
+./set-env.ps1
+```
+
 ```yaml
 docker-compose -p local -f compose.yaml --env-file .env build
 
@@ -98,6 +103,7 @@ https://box.pionier.net.pl/d/2782022c45ce4360a8c5/
 
 ```shell
 docker load -i .\images\bluebird.tm-entsoe-service_0.6.3.tar
+docker load -i .\images\bluebird.tm-entsoe-service_0.7.0.tar
 docker load -i .\images\bluebird.trading-manager_0.6.6.tar 
 
 #TGE service

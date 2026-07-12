@@ -38,7 +38,7 @@ def _restart_jobs(scheduler: BaseScheduler, on_start=False):
         logging.info(f"Restart KE client and job scheduler ({threading.current_thread().ident}) ")
 
         from tm.modules.ke_interaction.interactions.client import ki_client as ke_ki_client
-        ke_ki_client.reconnect(timeout_s=1)
+        ke_ki_client.reconnect(timeout_s=1, try_extend_gp=True)
         reset_scheduler()
         # next_run = datetime.now(pytz.utc) + timedelta(seconds=15)
 
@@ -58,7 +58,7 @@ def _restart_jobs(scheduler: BaseScheduler, on_start=False):
     def start_retry_job():
         logging.info(f"Restart KE client ({threading.current_thread().ident}) ")
         from tm.modules.ke_interaction.interactions.client import ki_client as ke_ki_client
-        ke_ki_client.reconnect(timeout_s=1)
+        ke_ki_client.reconnect(timeout_s=1, try_extend_gp=True)
 
 
 def setup_scheduler_jobs(scheduler: BaseScheduler, on_start: bool):

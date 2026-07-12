@@ -19,10 +19,10 @@ TM Smart Client connection graph patterns  to read/subscribe data from other cli
 
 ## TM docker management
 
-docker-compose -f .\compose\local.yml --env-file .\resources\.env build
-docker-compose -f .\compose\local.yml --env-file .\resources\.env build tm-service
+docker-compose -f .\compose\local.yaml --env-file .\resources\.env build
+docker-compose -f .\compose\local.yaml --env-file .\resources\.env build tm-service
 
-docker-compose -f .\compose\local.yml --env-file .\resources\.env build --no-cache
+docker-compose -f .\compose\local.yaml --env-file .\resources\.env build --no-cache
 
 docker save -o d:/tmp/tm-service-app_latest.tar tm-service-app:latest
 docker save -o d:/tmp/${image_name}_${image_version}.tar ${full_image_name}

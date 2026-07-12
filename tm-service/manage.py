@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if app_settings.use_scheduler:
         from tm.core import task_manager
 
-        task_manager.setup_scheduler()
+        task_manager.setup_scheduler(on_start=True)
 
     if app_settings.use_rest_api:
         import uvicorn

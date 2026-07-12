@@ -79,7 +79,7 @@ docker-compose -p local -f compose.yaml --env-file .env start
 docker-compose -p local -f sample_compose.yaml --env-file .env create
 docker-compose -p local -f sample_compose.yaml --env-file .env start
 
-
+#samples + tge service
 docker-compose -p local -f all_compose.yaml --env-file .env --env-file ./env/.env.secrets  create
 docker-compose -p local -f all_compose.yaml --env-file .env --env-file ./env/.env.secrets  start 
 ```

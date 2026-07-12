@@ -10,18 +10,18 @@ entsoe_api:
     - code: 10Y1001A1001A82H
       market_types:
         day_ahead:
-          - sequence: 1
+          - sequence: "1"
             publish: "13:00"
             offer_length: 96
             max_delay: PT2H
-          - sequence: 2
+          - sequence: "2"
             publish: "16:00"
             offer_length: 96
             max_delay: PT2H
     - code: 10YAT-APG------L
       market_types:
         day_ahead:
-          - sequence: 1
+          - sequence: "1"
             publish: "13:00"
             offer_length: 96
             max_delay: PT2H

@@ -5,6 +5,6 @@ The Trading Manager is a core component of the BlueBird project, responsible for
 energy consumption, for defined time intervals and to deliver this information in a structured form suitable for further optimization and decision-making processes.
 
 ## Repository structure
-* TM main repository - implements KE Smart Client connector and provides REST service: [tm-servie](https://github.com/BlueBird-project/trading-manager/tree/main/tm-service) 
+* TM main repository - implements KE Smart Client connector and provides REST service: [tm-service](https://github.com/BlueBird-project/trading-manager/tree/main/tm-service) 
 * Docker container configuration: [compose](https://github.com/BlueBird-project/trading-manager/tree/main/compose) 
 * [bidding-opt](https://github.com/BlueBird-project/trading-manager/tree/main/bidding-opt) - TODO:

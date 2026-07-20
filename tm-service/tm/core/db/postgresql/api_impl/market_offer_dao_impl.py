@@ -12,7 +12,9 @@ class MarketOfferQueries:
     LIST_OFFER_INFO = """SELECT "offer_id","market_id", "ts", "date_str",
      "offer_uri","range_id","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
       FROM "${table_prefix}offer_details" 
-       WHERE  ("ts" BETWEEN :ts_from and :ts_to) and COALESCE("isp_unit"=:isp_unit,TRUE  )
+       WHERE  
+         ( coalesce(:ts_from<= ("ts" + "isp_unit"::bigint * 60000 *isp_len::bigint),TRUE) and  coalesce(:ts_to>="ts",TRUE))
+        and COALESCE("isp_unit"=:isp_unit,TRUE  )
        AND COALESCE(market_id = :market_id,TRUE)    AND COALESCE(sequence = :sequence,TRUE)
         """
     GET_MAX_TS = """SELECT max("ts") as ts FROM "${table_prefix}offer_details"  
@@ -49,8 +51,10 @@ class MarketOfferQueries:
       offer."cost_mwh", offer."ts", offer."isp_len", offer_info.range_id,offer_info.sequence
       FROM "${table_prefix}market_offer" offer  
       JOIN "${table_prefix}offer_details"  offer_info  on offer.offer_id = offer_info.offer_id 
-      WHERE offer_info.market_id =:market_id AND
-           (offer."ts" BETWEEN :ts_from and :ts_to) and COALESCE(offer_info."isp_unit"=:isp_unit,TRUE )  """
+      WHERE offer_info.market_id =:market_id 
+      AND ( coalesce(:ts_from<=(offer."ts" + offer."isp_unit"::bigint * 60000 *offer.isp_len::bigint),TRUE) 
+            and  coalesce(:ts_to>=offer."ts",TRUE) )
+      and COALESCE(offer_info."isp_unit"=:isp_unit,TRUE )  """
 
     INSERT_MARKET_OFFER = """ INSERT INTO "${table_prefix}market_offer" 
         ("offer_id", "isp_start",  "cost_mwh", "ts", "isp_len")

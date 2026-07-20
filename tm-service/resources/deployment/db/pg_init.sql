@@ -76,7 +76,12 @@ CREATE TABLE "public"."${table_prefix}forecast_details" (
 WITH (oids = false);
 
 CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_offer_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,offer_id);
-CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_range_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,range_id);
+--CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_range_id ON public.${table_prefix}forecast_details USING btree (ts, model_id,range_id);
+CREATE UNIQUE INDEX ${table_prefix}forecast_details_ts_model_id_sequence_range_id
+ON public.${table_prefix}forecast_details USING btree (ts, model_id,sequence,range_id)
+NULLS NOT DISTINCT;
+
+
 CREATE UNIQUE INDEX ${table_prefix}forecast_details_forecast_uri ON public.${table_prefix}forecast_details USING btree (forecast_uri);
 
 CREATE INDEX ${table_prefix}forecast_details_model_id ON public.${table_prefix}forecast_details USING btree (model_id);
@@ -173,7 +178,9 @@ CREATE TABLE "public"."${table_prefix}offer_details" (
 )
 WITH (oids = false);
 
-CREATE UNIQUE INDEX ${table_prefix}offer_details_market_id_ts_range_id ON public.${table_prefix}offer_details USING btree (market_id,sequence, ts,range_id);
+CREATE UNIQUE INDEX ${table_prefix}offer_details_market_id_ts_range_id ON
+public.${table_prefix}offer_details USING btree (market_id,sequence, ts,range_id)
+NULLS NOT DISTINCT;
 CREATE UNIQUE INDEX ${table_prefix}offer_details_offer_uri ON public.${table_prefix}offer_details USING btree (offer_uri);
 
 

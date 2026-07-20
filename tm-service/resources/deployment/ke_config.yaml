@@ -31,29 +31,6 @@ knowledge_engine:
         - '   s4ener:hasEffectivePeriod ubmarket:period_15m ; saref:hasResult ?dpr.'
         - ' ubmarket:period_15m time:hasXSDDuration ${ISP_UNIT} .'
         - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn ubmarket:EURPerMegawattHour  .'
-#    tou-price-info:
-    #      name: "tou-price-info"
-    #      description: "TOU metadata - find TOU timeseries (tou_uri). Used in ANSWER,ASK  . "
-    #      prefixes:
-    #        xsd: "http://www.w3.org/2001/XMLSchema#"
-    #        saref: "https://saref.etsi.org/core/"
-    #        om: "http://www.ontology-of-units-of-measure.org/resource/om-2/"
-    #      required_bindings:
-    #        - "time_create"
-    #        - "tou_period"
-    #      pattern:
-    #        - ' ?tou_uri rdf:type s4ener:TimeSeries .'
-    #        - ' ?tou_uri s4ener:producedBy <http://tm.bluebird.com/>  .'
-    #        - ' ?tou_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
-    #        - ' ?tou_uri s4ener:hasCreationTime ?time_create .'
-    #        - ' ?tou_uri s4ener:hasEffectivePeriod  ?tou_period_uri .'
-    #        - ' ?tou_period_uri  rdf:type  time:Interval; time:hasXSDDuration ?tou_period .'
-    #        - ' ?tou_uri ubmarket:hasPowerRange  ?power_range .'
-    #        - ' ?power_range s4ener:endOfRange ?power_range_max ; s4ener:startOfRange ?power_range_min . '
-    #        - '	?power_range_max rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
-    #        - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
-    #        - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
-    #        - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
     tou-price-info-filtered:
       name: "tou-price-info-filtered"
       description: "TOU metadata - find TOU timeseries (tou_uri). Used in ANSWER,ASK  . "
@@ -78,3 +55,30 @@ knowledge_engine:
         - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
         - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
         - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
+    tm-info:
+      name: "tm-info"
+      description: "Information TM. Used in ANSWER,ASK,POST,REACT."
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+      pattern:
+        - ' kb:service rdf:type saref:Service . '
+        - ' kb:service saref:hasOperation ?command_uri . '
+        - ' ?command_uri  saref:observes ?market_uri . '
+    tm-market-offer-info:
+      name: "tm-market-offer-info"
+      description: "Information about new offer. Used in ANSWER,ASK,POST,REACT."
+      required_bindings:
+        - "market_uri"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+      pattern:
+        - ' ?market_uri rdf:type ?market_type .'
+        - ' ?market_type rdfs:subClassOf ubmarket:MarketType .'
+        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
+        - ' ?offer_uri s4ener:producedBy ?market_uri .'
+        - ' ?market_uri saref:isObservedBy ?command_uri .'
+        - ' ?offer_uri s4ener:hasUpdateRate  ?update_rate.'
+        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+        - ' ?offer_uri s4ener:hasEffectivePeriod  ?duration_uri.'
+        - ' ?duration_uri  rdf:type  time:Interval; time:hasXSDDuration ?duration .'

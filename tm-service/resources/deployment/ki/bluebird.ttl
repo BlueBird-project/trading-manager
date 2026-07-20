@@ -25,8 +25,10 @@ ubmarket:MarketTimeSeries
                         owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
                         owl:onDataRange xsd:string
                     ];
-    rdfs:comment    "Forecasted timeseries"@en ;
+    rdfs:comment    "Market timeseries"@en ;
     rdfs:label      "MarketTimeSeries" .
+
+
 
 ubmarket:MarketType
     a               rdfs:Class ;
@@ -69,6 +71,20 @@ ubmarket:CapacityMarket
     rdfs:subClassOf ubmarket:MarketType ;
     rdfs:comment    "CapacityMarket - market with contracted consumer's flexibility and baseline  (static-BaseLine|dynamic-DynamicBaseline) . Demands power reduction below baseline during peak hours by contracted flexibility  "@en ;
     rdfs:label      "CapacityMarket" .
+
+ubmarket:isForecastOf
+    a            owl:ObjectProperty ;
+    rdfs:domain  s4ener:TimeSeries ;
+    rdfs:comment "Connect timeseries with forecast"@en ;
+    rdfs:range   ubmarket:Forecast ;
+    rdfs:label   "isForecastOf" .
+
+ubmarket:forecasts
+    a            owl:ObjectProperty ;
+    rdfs:domain  ubmarket:Forecast ;
+    rdfs:comment "Forecast timeseries with forecasted timeseries"@en ;
+    rdfs:range   s4ener:TimeSeries ;
+    rdfs:label   "isForecastOf" .
 
 ubmarket:hasAdministrativeArea
     a            owl:ObjectProperty ;

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List
+from typing import List, Optional
 
 from effi_onto_tools.db.dao import DAO
 
@@ -23,7 +23,11 @@ class MarketAPI(DAO):
         pass
 
     @abstractmethod
-    def get_market(self, market_uri: str) -> EnergyMarket:
+    def get_market(self, market_uri: str) -> Optional[EnergyMarket]:
+        pass
+
+    @abstractmethod
+    def get_market_by_id(self, market_id: int) -> Optional[EnergyMarket]:
         pass
 
     @abstractmethod

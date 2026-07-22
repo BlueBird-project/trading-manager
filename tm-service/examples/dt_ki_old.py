@@ -10,7 +10,6 @@ from effi_onto_tools.utils.time_utils import tick, tock
 import tm
 import logging
 from time import sleep
-
 from tm.utils import TimeSpan
 
 ################################################
@@ -42,35 +41,34 @@ if __name__ == "__main__" and app_settings:
     # register knowledge interaction modules
     ################################################
     client = set_bg_ke_client([sample_ki, dt_ki])
-    from examples.ki.dt_model import TMInfo
+    from examples.ki.sample_ki import get_markets
+    from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings
 
     success = False
     #####################################
     # Set market
     #####################################
-    tm_info: Optional[TMInfo] = None
+    market: Optional[EnergyMarketBindings] = None
 
     while not success:
         try:
-            from examples.ki.dt_interactions import set_tm
-            from examples.ki.dt_interactions import find_tm
+            from examples.ki.dt_interactions import set_market_uri
 
             print(f"tick: {client.state()}")
             # set market which will be forecasted
-            tm_info_list = find_tm()
-            if len(tm_info_list) < 1:
-                print("Error: no tm")
-                sleep(10)
+            markets = get_markets()
+            if len(markets) < 1:
+                print("Error: no markets")
             else:
-                tm_info = tm_info_list[0]
-                set_tm(tm=tm_info)
+                market = markets[0]
+                set_market_uri(market_uri=market.market_uri)
                 success = True
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)
             sleep(5)
 
-    print(f"Observed tm : {tm_info}")
+    print(f"Observed market : {market}")
     ################################################
     #############################
     # #publish information about digital twin
@@ -97,26 +95,12 @@ if __name__ == "__main__" and app_settings:
 
     while True:
         try:
-
-            from examples.ki.dt_interactions import post_dt_info, post_forecast, get_offer_uri, get_offer
-
-            offer_uris = get_offer_uri()
-            if len(offer_uris) < 1:
-                print("Error: no offer")
-                continue
-            else:
-                print(f"offer info: {len(offer_uris)}")
-                success = True
-            current_offer = get_offer(offer_uris=[o.offer_uri for o in offer_uris])
-            print(current_offer)
-            print(f"len offer: {len(current_offer)}")
-            current_offer_dict = {c.offer_uri: c for c in current_offer}
+            from examples.ki.dt_interactions import post_dt_info, post_forecast
 
             print(f"tick: {client.state()}")
             print(f"Post ts")
-            for k in current_offer_dict.keys():
-                ts_ack = post_forecast(offer_uri=k, offer=[o for o in current_offer if o.offer_uri==k])
 
+            ts_ack = post_forecast(market_uri=market.market_uri)
             # ts_ack = post_forecast(market_uri=URIRef("http://market.uri.com.pl"))
             print("ack: " + str(len(ts_ack)))
             if len(ts_ack) > 0:

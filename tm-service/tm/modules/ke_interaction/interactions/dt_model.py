@@ -17,10 +17,10 @@ class DigitalTwinInfo(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
-@ki_object("dt-offer-relation")
-class ForecastOfferRelation(BindingsBase):
-    forecast_uri: URIRef
-    offer_uri: URIRef
+# @ki_object("dt-offer-relation")
+# class ForecastOfferRelation(BindingsBase):
+#     forecast_uri: URIRef
+#     offer_uri: URIRef
 
 
 # @ki_object("dt-info", result=True)
@@ -36,19 +36,20 @@ class ForecastOfferRelation(BindingsBase):
 class DTTSInfo(BindingsBase):
     command_uri: URIRef
     ts_uri: URIRef
+    forecast_of: URIRef
     time_create: Literal
     ts_interval_uri: URIRef
     ts_date_from: Literal
-    sequence: OptionalLiteral = None
+    # sequence: OptionalLiteral = None
     ts_date_to: Literal
     update_rate: Literal
     # range section
 
-    power_range: Optional[URIRef] = rdf_nil
-    power_range_max: Optional[URIRef] = rdf_nil
-    max_value: OptionalLiteral = rdf_nil
-    power_range_min: Optional[URIRef] = rdf_nil
-    min_value: OptionalLiteral = rdf_nil
+    # power_range: Optional[URIRef] = rdf_nil
+    # power_range_max: Optional[URIRef] = rdf_nil
+    # max_value: OptionalLiteral = rdf_nil
+    # power_range_min: Optional[URIRef] = rdf_nil
+    # min_value: OptionalLiteral = rdf_nil
 
     # range
 
@@ -81,13 +82,13 @@ class DTTSInfo(BindingsBase):
         min_diff = ms_diff / 60000
         return math.ceil(min_diff / self.update_rate_min)
 
-    def get_sequence(self) -> str:
-        return self.convert_value(self.sequence)
+    # def get_sequence(self) -> str:
+    #     return self.convert_value(self.sequence)
 
-    def get_power_limit(self) -> Tuple[float, float]:
-        min_value = self.convert_value(self.min_value, float)
-        max_value = self.convert_value(self.max_value, float)
-        return min_value, max_value
+    # def get_power_limit(self) -> Tuple[float, float]:
+    #     min_value = self.convert_value(self.min_value, float)
+    #     max_value = self.convert_value(self.max_value, float)
+    #     return min_value, max_value
 
 
 @ki_object("dt-ts-info", allow_partial=True)
@@ -136,7 +137,7 @@ class DTPnt(BindingsBase):
     dpr: URIRef
     duration: Literal
     duration_uri: URIRef
-    value: Optional[Literal]
+    value: OptionalLiteral
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)

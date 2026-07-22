@@ -119,7 +119,7 @@ if __name__ == "__main__" and app_settings:
                     print("ack: " + str(len(ts_ack)))
 
             print(f"tock")
-            sleep(60)
+            sleep(240)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

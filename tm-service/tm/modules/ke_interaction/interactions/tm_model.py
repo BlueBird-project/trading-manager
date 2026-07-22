@@ -88,6 +88,7 @@ class TOUPriceInfoQuery(BindingsBase):
     max_value: OptionalLiteral = None
     min_value: OptionalLiteral = None
     power_range: Optional[URIRef] = None
+    ts_type:Optional[URIRef] = None
 
     def __init__(self, **kwargs):
         if "power_range" not in kwargs:
@@ -138,6 +139,7 @@ class TOUPriceInfoQueryFiltered(TOUPriceInfoQuery):
 # @ki_object("tou-price-info")
 class TOUPriceInfo(BindingsBase):
     tou_uri: URIRef
+    ts_type:URIRef
     time_create: Literal
     tou_period: Literal
     tou_period_uri: URIRef
@@ -174,6 +176,7 @@ class TOUPriceInfoFiltered(TOUPriceInfo):
 @ki_object("tou-price")
 class TOUPrice(BindingsBase):
     tou_uri: URIRef
+    ts_type: URIRef
     dp: URIRef
     ts: Literal
     dpr: URIRef
@@ -195,6 +198,7 @@ class TOUPrice(BindingsBase):
 @ki_object("tou-price", allow_partial=True)
 class TOUPriceQuery(BindingsBase):
     tou_uri: URIRef
+    ts_type: URIRef
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)

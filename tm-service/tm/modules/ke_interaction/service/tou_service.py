@@ -7,7 +7,7 @@ from tm.models.digital_twin import DTForecastOfferDAO
 from tm.models.job_dao import JobDAO
 from tm.models.market_offer import RangeInfo, EnergyMarketOfferDAO
 from tm.modules.ke_interaction import KIVars
-from tm.modules.ke_interaction.interactions.ki_models import DurationURI
+from tm.modules.ke_interaction.interactions.ki_models import DurationURI, SAREF4ENER_TIMESERIES, UBMARKET_FORECAST
 from tm.modules.ke_interaction.interactions.tm_model import *
 from tm.modules.ke_interaction.interactions.tm_uris import *
 from tm.utils import TimeSpan
@@ -87,6 +87,7 @@ def _get_market_forecasts(kb_id: str, range_id: int, market_id: int, ts: TimeSpa
                                            ts=ts_from).uri_ref
 
     return [TOUPriceInfoFiltered(time_create=Literal(time_utils.xsd_from_ts(ts.ts_from)),
+                                 ts_type=UBMARKET_FORECAST,
                                  tou_period=Literal(lexical_or_value=f"PT{ts.time_span_min}M",
                                                     datatype="xsd:duration"),
                                  tou_period_uri=DurationURI(minutes=ts.time_span_min).uri_ref,
@@ -132,6 +133,7 @@ def get_range_tou_filtered(binding_query: List[TOUPriceInfoQueryFiltered], kb_id
                                                                       isp_unit=isp_unit)
                 all_info += [
                     TOUPriceInfoFiltered(time_create=Literal(time_utils.xsd_from_ts(ts.ts_from)),
+                                         ts_type=SAREF4ENER_TIMESERIES,
                                          tou_period=Literal(lexical_or_value=f"PT{ts.time_span_min}M",
                                                             datatype="xsd:duration"),
                                          tou_period_uri=DurationURI(minutes=ts.time_span_min).uri_ref,
@@ -198,6 +200,7 @@ def get_forecasted_prices(q: TOUPriceQuery, kb_id: str, isp_unit: int, split_uri
                                             forecast_id=o.forecast_id,
                                             isp_start=o.isp_start).uri
         return TOUPrice(tou_uri=tou_uri, dp=URIRef(dp_uri), ts=Literal(time_utils.xsd_from_ts(o.ts)),
+                        ts_type=UBMARKET_FORECAST,
                         dpr=URIRef(dp_uri + "/dpr"),
                         value=o.cost_mwh)
 
@@ -217,6 +220,7 @@ def get_prices(q: TOUPriceQuery, kb_id: str, isp_unit: int, split_uri: TOUSplitU
                                          offer_id=o.offer_id,
                                          isp_start=o.isp_start).uri
         return TOUPrice(tou_uri=tou_uri, dp=URIRef(dp_uri), ts=Literal(time_utils.xsd_from_ts(o.ts)),
+                        ts_type=SAREF4ENER_TIMESERIES,
                         dpr=URIRef(dp_uri + "/dpr"),
                         value=o.cost_mwh)
 
@@ -233,12 +237,15 @@ def get_price_filtered(binding_query: List[TOUPriceQuery], kb_id: str) -> List[T
     all_offers = []
     for q in binding_query:
         isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)
-        try:
+        if q.ts_type == SAREF4ENER_TIMESERIES:
+            split_uri = TOUSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
+            get_prices(q=q, kb_id=kb_id, isp_unit=isp_unit, split_uri=split_uri, all_offers=all_offers)
+        elif q.ts_type == UBMARKET_FORECAST:
             split_uri = TOUForecastSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
             all_offers = get_forecasted_prices(q=q, kb_id=kb_id, isp_unit=isp_unit, split_uri=split_uri,
                                                all_offers=all_offers)
-        except ValueError:
-            split_uri = TOUSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
-            get_prices(q=q, kb_id=kb_id, isp_unit=isp_unit, split_uri=split_uri, all_offers=all_offers)
+        else:
+            # todo:
+            raise Exception
 
     return all_offers

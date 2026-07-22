@@ -17,8 +17,8 @@ def _find_tm():
 
 
 @tou_ki.ask("tou-price")
-def _get_tou_price(tou_uris: List[URIRef], tm_uri: URIRef):
-    ask_bindings = [TOUPriceQuery(tou_uri=tou_uri, tm_uri=tm_uri) for tou_uri in tou_uris]
+def _get_tou_price(tou_list: List[TOUPriceInfoFiltered], tm_uri: URIRef):
+    ask_bindings = [TOUPriceQuery(tou_uri=tou.tou_uri, tm_uri=tm_uri, ts_type=tou.ts_type) for tou in tou_list]
     return ask_bindings
 
 
@@ -45,9 +45,9 @@ def get_tou_info(ts: TimeSpan, tm_uri: URIRef) -> list[TOUPriceInfoFiltered]:
     return [TOUPriceInfoFiltered(**b) for b in price_info_bindings.binding_set]
 
 
-def get_tou_price(tou_uris: List[str], tm_uri: URIRef) -> List[TOUPrice]:
-    tou_uris_refs = [URIRef(tou_uri) for tou_uri in tou_uris]
-    bindings: KIAskResponse = _get_tou_price(tou_uris=tou_uris_refs, tm_uri=tm_uri)
+def get_tou_price(tou_uris: List[TOUPriceInfoFiltered], tm_uri: URIRef) -> List[TOUPrice]:
+    # tou_uris_refs = [URIRef(tou_uri) for tou_uri in tou_uris]
+    bindings: KIAskResponse = _get_tou_price(tou_list=tou_uris, tm_uri=tm_uri)
     return [TOUPrice(**b) for b in bindings.binding_set]
 
 

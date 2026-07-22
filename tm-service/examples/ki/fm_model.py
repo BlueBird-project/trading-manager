@@ -10,6 +10,7 @@ from tm.utils import TimeSpan
 
 class TOUPriceInfoQuery(BindingsBase):
     tm_uri: URIRef
+    ts_type:  Optional[URIRef] = None
     max_value: OptionalLiteral = None
     min_value: OptionalLiteral = None
     power_range: Optional[URIRef] = None
@@ -72,6 +73,7 @@ class TOUPriceInfoQueryFiltered(TOUPriceInfoQuery):
 class TOUPriceInfo(BindingsBase):
     tou_uri: URIRef
     tm_uri: URIRef
+    ts_type:URIRef
     time_create: Literal
     tou_period: Literal
     tou_period_uri: URIRef
@@ -108,6 +110,7 @@ class TOUPriceInfoFiltered(TOUPriceInfo):
 @ki_object("tou-price")
 class TOUPrice(BindingsBase):
     tou_uri: URIRef
+    ts_type:URIRef
     tm_uri: URIRef
     dp: URIRef
     ts: Literal
@@ -130,6 +133,7 @@ class TOUPrice(BindingsBase):
 @ki_object("tou-price", allow_partial=True)
 class TOUPriceQuery(BindingsBase):
     tm_uri: URIRef
+    ts_type:URIRef
     tou_uri: URIRef
 
     def __init__(self, **kwargs):

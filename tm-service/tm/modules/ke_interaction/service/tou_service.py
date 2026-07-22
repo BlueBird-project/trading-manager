@@ -1,15 +1,16 @@
-import logging
 from typing import List
 
 from isodate import parse_duration
 from rdflib.util import from_n3
 
-from tm.models.market_offer import RangeInfo, EnergyMarketOffer, EnergyMarketOfferDAO
+from tm.models.digital_twin import DTForecastOfferDAO
+from tm.models.job_dao import JobDAO
+from tm.models.market_offer import RangeInfo, EnergyMarketOfferDAO
 from tm.modules.ke_interaction import KIVars
 from tm.modules.ke_interaction.interactions.ki_models import DurationURI
-
-from tm.modules.ke_interaction.interactions.tou_model import *
-from tm.utils import TimeSpan, isp_unit_to_ms
+from tm.modules.ke_interaction.interactions.tm_model import *
+from tm.modules.ke_interaction.interactions.tm_uris import *
+from tm.utils import TimeSpan
 
 
 # def get_all_tou(binding_query: List[TOUPriceInfoSimpleQuery]) -> List[TOUPriceInfoSimpleResponse]:
@@ -66,6 +67,33 @@ from tm.utils import TimeSpan, isp_unit_to_ms
 #
 #         return price_info
 
+def _get_market_forecasts(kb_id: str, range_id: int, market_id: int, ts: TimeSpan, q: TOUPriceInfoQueryFiltered) -> \
+        List[TOUPriceInfoFiltered]:
+    from tm.core.db.postgresql import dao_manager
+    job: JobDAO = dao_manager.job_api.get_by_market(market_id=market_id)
+    if job is None:
+        return []
+    ts = TimeSpan(ts_from=ts.ts_from,
+                  ts_to=ts.ts_to + 72 * 3600 * 1000)
+    f_info_list = dao_manager.forecast_api.list_recent_forecasts(job_id=job.job_id, ts=ts)
+
+    # offers = dao_manager.forecast_api.get_offers(forecast_ids=[f_info.forecast_id for f_info in f_info_list])
+
+    def _get_uri(forecast_id: int, ts_from: int, period_minutes: int):
+        # return TOUForecastSplitURIFiltered(prefix=kb_id, range_id=range_id,
+        #                                    period_minutes=period_minutes,
+        #                                    ts=ts_from, job_id=job.job_id, sequence=sequence).uri_ref
+        return TOUForecastSplitURIFiltered(prefix=kb_id, forecast_id=forecast_id, period_minutes=period_minutes,
+                                           ts=ts_from).uri_ref
+
+    return [TOUPriceInfoFiltered(time_create=Literal(time_utils.xsd_from_ts(ts.ts_from)),
+                                 tou_period=Literal(lexical_or_value=f"PT{ts.time_span_min}M",
+                                                    datatype="xsd:duration"),
+                                 tou_period_uri=DurationURI(minutes=ts.time_span_min).uri_ref,
+                                 tou_uri=_get_uri(forecast_id=mo.forecast_id, ts_from=mo.ts,
+                                                  period_minutes=mo.isp_len * mo.isp_unit),
+                                 **q.input_bindings) for mo in f_info_list]
+
 
 def get_range_tou_filtered(binding_query: List[TOUPriceInfoQueryFiltered], kb_id: str) -> List[TOUPriceInfoFiltered]:
     from tm.core.db.postgresql import dao_manager
@@ -91,15 +119,15 @@ def get_range_tou_filtered(binding_query: List[TOUPriceInfoQueryFiltered], kb_id
             # TODO: interpolate prices when ISP unit is different then isp unit stored in the db
             isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)
 
-            def _get_uri(market_id, sequence: Optional[str]):
+            def _get_uri(offer_id: int):
                 return TOUSplitURIFiltered(prefix=kb_id,
-                                           range_id=range_id,
+                                           offer_id=offer_id,
                                            period_minutes=ts.time_span_min,
-                                           ts=ts.ts_from,
-                                           market_id=market_id, sequence=sequence).uri_ref
+                                           ts=ts.ts_from).uri_ref
 
             for market in subscribed_markets:
                 # TODO: get offer by range_id (currently range_id is not used) !!!!
+
                 market_offers = dao_manager.offer_dao.list_offer_info(ts=ts, market_id=market.market_id,
                                                                       isp_unit=isp_unit)
                 all_info += [
@@ -107,7 +135,7 @@ def get_range_tou_filtered(binding_query: List[TOUPriceInfoQueryFiltered], kb_id
                                          tou_period=Literal(lexical_or_value=f"PT{ts.time_span_min}M",
                                                             datatype="xsd:duration"),
                                          tou_period_uri=DurationURI(minutes=ts.time_span_min).uri_ref,
-                                         tou_uri=_get_uri(market_id=mo.market_id, sequence=mo.sequence),
+                                         tou_uri=_get_uri(offer_id=mo.offer_id),
                                          # ts_interval_uri=TimeIntervalUri(ts_from=ts.ts_from, ts_to=ts.ts_to).uri_ref,
                                          # ts_date_from=Literal(time_utils.xsd_from_ts(mo.ts)),
                                          # ts_date_to=Literal(
@@ -115,71 +143,102 @@ def get_range_tou_filtered(binding_query: List[TOUPriceInfoQueryFiltered], kb_id
                                          **q.input_bindings)
                     for mo in market_offers
                 ]
+                # TODO: for each sequence,  get forecasts after maximum date
+                all_info += _get_market_forecasts(kb_id=kb_id, range_id=range_id, market_id=market.market_id, ts=ts,
+                                                  q=q)
     return all_info
 
 
-def get_price(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
+# def get_price(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
+#     from tm.core.db.postgresql import dao_manager
+#
+#     all_offers = []
+#     for q in binding_query:
+#         split_uri = TOUSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
+#         ts = TimeSpan(ts_from=split_uri.ts, ts_to=split_uri.ts + isp_unit_to_ms(isp_unit=split_uri.period_minutes))
+#         isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)
+#         # time_span_ms =  from_n3(KIVars.DAY_DURATION)
+#         subscribed_markets = dao_manager.market_api.list_subscribed_market()
+#         if len(subscribed_markets) == 0:
+#             logging.warning("No subscribed markets")
+#             return []
+#             # powyzej
+#         for market in subscribed_markets:
+#             market_offers = dao_manager.offer_dao.list_market_offer(ts=ts, market_id=market.market_id,
+#                                                                     isp_unit=isp_unit)
+#             all_offers += market_offers
+#             # todo: list recent offers  popatrz entsoe -service
+#
+#         # TODO: interpolate prices when ISP unit is different then isp unit stored in the db
+#
+#     def converter(o: EnergyMarketOffer):
+#         tou_uri = q.tou_uri
+#         # tou_uri_parser.n3(TOUSplitURI(range_id=o.range_id, period_minutes=o.isp_len, ts=o.ts))
+#         dp_uri = OfferDPSplitURI(prefix=kb_id, range_id=o.range_id, period_minutes=o.isp_len,
+#                                  offer_id=o.offer_id,
+#                                  isp_start=o.isp_start).uri
+#         return TOUPrice(tou_uri=tou_uri, dp=URIRef(dp_uri), ts=Literal(time_utils.xsd_from_ts(o.ts)),
+#                         dpr=URIRef(dp_uri + "/dpr"),
+#                         value=o.cost_mwh)
+#
+#     offer_bindings = [converter(o) for o in all_offers]
+#
+#     return offer_bindings
+
+
+def get_forecasted_prices(q: TOUPriceQuery, kb_id: str, isp_unit: int, split_uri: TOUForecastSplitURIFiltered,
+                          all_offers: List[TOUPrice]):
     from tm.core.db.postgresql import dao_manager
 
-    all_offers = []
-    for q in binding_query:
-        split_uri = TOUSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
-        ts = TimeSpan(ts_from=split_uri.ts, ts_to=split_uri.ts + isp_unit_to_ms(isp_unit=split_uri.period_minutes))
-        isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)
-        # time_span_ms =  from_n3(KIVars.DAY_DURATION)
-        subscribed_markets = dao_manager.market_api.list_subscribed_market()
-        if len(subscribed_markets) == 0:
-            logging.warning("No subscribed markets")
-            return []
-            # powyzej
-        for market in subscribed_markets:
-            market_offers = dao_manager.offer_dao.list_market_offer(ts=ts, market_id=market.market_id,
-                                                                    isp_unit=isp_unit)
-            all_offers += market_offers
-            # todo: list recent offers  popatrz entsoe -service
-
-        # TODO: interpolate prices when ISP unit is different then isp unit stored in the db
-
-    def converter(o: EnergyMarketOffer):
+    def converter(o: DTForecastOfferDAO):
         tou_uri = q.tou_uri
         # tou_uri_parser.n3(TOUSplitURI(range_id=o.range_id, period_minutes=o.isp_len, ts=o.ts))
-        dp_uri = OfferDPSplitURI(prefix=kb_id, range_id=o.range_id, period_minutes=o.isp_len,
-                                 offer_id=o.offer_id,
-                                 isp_start=o.isp_start).uri
+        # TODO: warning
+        dp_uri = ForecastDPSplitURIFiltered(prefix=kb_id, period_minutes=o.isp_len,
+                                            forecast_id=o.forecast_id,
+                                            isp_start=o.isp_start).uri
         return TOUPrice(tou_uri=tou_uri, dp=URIRef(dp_uri), ts=Literal(time_utils.xsd_from_ts(o.ts)),
                         dpr=URIRef(dp_uri + "/dpr"),
                         value=o.cost_mwh)
 
-    offer_bindings = [converter(o) for o in all_offers]
+    f_offer = dao_manager.forecast_api.get_offer(forecast_id=split_uri.forecast_id)
+    all_offers += [converter(o) for o in f_offer]
 
-    return offer_bindings
+    return all_offers
 
 
-def get_price_filtered(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
+def get_prices(q: TOUPriceQuery, kb_id: str, isp_unit: int, split_uri: TOUSplitURIFiltered, all_offers: List[TOUPrice]):
     from tm.core.db.postgresql import dao_manager
+
+    def converter(o: EnergyMarketOfferDAO):
+        tou_uri = q.tou_uri
+        # tou_uri_parser.n3(TOUSplitURI(range_id=o.range_id, period_minutes=o.isp_len, ts=o.ts))
+        dp_uri = OfferDPSplitURIFiltered(prefix=kb_id, period_minutes=o.isp_len,
+                                         offer_id=o.offer_id,
+                                         isp_start=o.isp_start).uri
+        return TOUPrice(tou_uri=tou_uri, dp=URIRef(dp_uri), ts=Literal(time_utils.xsd_from_ts(o.ts)),
+                        dpr=URIRef(dp_uri + "/dpr"),
+                        value=o.cost_mwh)
+
+    # offer_info = dao_manager.offer_dao.list_offer_info(ts=split_uri.time_span, market_id=split_uri.market_id,
+    #                                                    isp_unit=isp_unit,
+    #                                                    sequence=split_uri.sequence)
+    market_offers = dao_manager.offer_dao.get_market_offer(offer_id=split_uri.offer_id)
+    all_offers += [converter(o) for o in market_offers]
+    return all_offers
+
+
+# todo
+def get_price_filtered(binding_query: List[TOUPriceQuery], kb_id: str) -> List[TOUPrice]:
     all_offers = []
     for q in binding_query:
-        split_uri = TOUSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
-
-        def converter(o: EnergyMarketOfferDAO):
-            tou_uri = q.tou_uri
-            # tou_uri_parser.n3(TOUSplitURI(range_id=o.range_id, period_minutes=o.isp_len, ts=o.ts))
-            dp_uri = OfferDPSplitURIFiltered(prefix=kb_id, range_id=split_uri.range_id, period_minutes=o.isp_len,
-                                             offer_id=o.offer_id,
-                                             isp_start=o.isp_start).uri
-            return TOUPrice(tou_uri=tou_uri, dp=URIRef(dp_uri), ts=Literal(time_utils.xsd_from_ts(o.ts)),
-                            dpr=URIRef(dp_uri + "/dpr"),
-                            value=o.cost_mwh)
-
-        # ts = TimeSpan(ts_from=split_uri.ts, ts_to=split_uri.ts + isp_unit_to_ms(isp_unit=split_uri.period_minutes))
         isp_unit = int(parse_duration(from_n3(KIVars.ISP_UNIT), as_timedelta_if_possible=True).total_seconds() / 60)
-        # time_span_ms =  from_n3(KIVars.DAY_DURATION)
-
-        offer_info = dao_manager.offer_dao.list_offer_info(ts=split_uri.time_span, market_id=split_uri.market_id,
-                                                           isp_unit=isp_unit,
-                                                           sequence=split_uri.sequence)
-        for oi in offer_info:
-            market_offers = dao_manager.offer_dao.get_market_offer(offer_id=oi.offer_id)
-            all_offers += [converter(o) for o in market_offers]
+        try:
+            split_uri = TOUForecastSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
+            all_offers = get_forecasted_prices(q=q, kb_id=kb_id, isp_unit=isp_unit, split_uri=split_uri,
+                                               all_offers=all_offers)
+        except ValueError:
+            split_uri = TOUSplitURIFiltered.parse(uri=q.tou_uri, prefix=kb_id)
+            get_prices(q=q, kb_id=kb_id, isp_unit=isp_unit, split_uri=split_uri, all_offers=all_offers)
 
     return all_offers

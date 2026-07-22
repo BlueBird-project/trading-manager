@@ -64,7 +64,7 @@ if __name__ == "__main__" and app_settings:
                 # get timeseries data points for each uri
                 ################################################
                 print("get prices for: " + str(ts_info.tou_uri))
-                prices = get_tou_price(tou_uris=[ts_info.tou_uri], tm_uri=tm_agent.tm_uri)
+                prices = get_tou_price(tou_uris=[ts_info], tm_uri=tm_agent.tm_uri)
                 if len(prices) > 0:
                     print(f"price response = {len(prices)}: {prices[0]}")
                 else:
@@ -82,7 +82,7 @@ if __name__ == "__main__" and app_settings:
             else:
                 print(f"empty response")
             # print(response)
-            sleep(60)
+            sleep(120)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

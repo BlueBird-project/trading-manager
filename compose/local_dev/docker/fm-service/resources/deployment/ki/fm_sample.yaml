@@ -24,7 +24,7 @@ knowledge_engine:
         - "tou_uri"
         - "tm_uri"
       pattern:
-        - ' ?tou_uri rdf:type s4ener:TimeSeries .'
+        - ' ?tou_uri rdf:type ?ts_type .'
         - ' ?tou_uri s4ener:producedBy ?tm_uri  .'
         - ' ?dp s4ener:belongsToTimeSeries ?tou_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
         - '   s4ener:hasEffectivePeriod ubmarket:period_15m ; saref:hasResult ?dpr.'
@@ -40,7 +40,7 @@ knowledge_engine:
       required_bindings:
         - "tm_uri"
       pattern:
-        - ' ?tou_uri rdf:type s4ener:TimeSeries .'
+        - ' ?tou_uri rdf:type ?ts_type .'
         - ' ?tou_uri s4ener:producedBy ?tm_uri .'
         - ' ?tou_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
         - ' ?tou_uri s4ener:hasCreationTime ?time_create .'

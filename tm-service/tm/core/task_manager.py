@@ -32,8 +32,8 @@ def init(bg=True):
 
 def _restart_jobs(scheduler: BaseScheduler, on_start=False):
     import logging
-    from tm.core import app_settings
-    # hotfix for knowledge engine graph pattern inference (after service or KE server restart, inferred graph patterns are removed
+    # hotfix for knowledge engine graph pattern inference (after service or KE server restart,
+    # inferred graph patterns are removed
     def start_retry_job():
         logging.info(f"Restart KE client and job scheduler ({threading.current_thread().ident}) ")
 
@@ -88,7 +88,6 @@ def setup_scheduler(on_start=False):
 
 
 def reset_scheduler():
-    from tm.core import app_settings
     global service_job_scheduler
     import logging
     logging.info(f"Restart scheduler ({threading.current_thread().ident})")

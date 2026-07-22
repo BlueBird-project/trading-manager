@@ -2,12 +2,12 @@ import hashlib
 import math
 import random
 from datetime import timedelta
-from typing import List, Optional, Tuple, Dict
+from typing import List, Optional
 
 from isodate import duration_isoformat, parse_duration
-from ke_client.utils import time_utils
-from ke_client import KIHolder, BindingsBase, OptionalLiteral, ki_object, rdf_nil
+from ke_client import KIHolder, BindingsBase, ki_object
 from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus, KIAskResponse
+from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
 from examples.ki import dt_model

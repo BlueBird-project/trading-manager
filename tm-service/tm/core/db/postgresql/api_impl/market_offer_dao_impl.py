@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict
 
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 

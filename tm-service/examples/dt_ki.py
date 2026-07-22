@@ -3,15 +3,11 @@
 # ./resources/.env
 # ./resources/env/.env.fm
 ################################################
-from typing import Optional
-
-from effi_onto_tools.utils.time_utils import tick, tock
-
-import tm
 import logging
 from time import sleep
+from typing import Optional
 
-from tm.utils import TimeSpan
+import tm
 
 ################################################
 # setup configurations
@@ -116,13 +112,11 @@ if __name__ == "__main__" and app_settings:
             print(f"Post ts")
             for k in current_offer_dict.keys():
                 ts_ack = post_forecast(offer_uri=k, offer=[o for o in current_offer if o.offer_uri==k])
-
-            # ts_ack = post_forecast(market_uri=URIRef("http://market.uri.com.pl"))
-            print("ack: " + str(len(ts_ack)))
-            if len(ts_ack) > 0:
-                print("ack: " + str(len(ts_ack)) + " " + str(ts_ack[0]))
-            else:
                 print("ack: " + str(len(ts_ack)))
+                if len(ts_ack) > 0:
+                    print("ack: " + str(len(ts_ack)) + " " + str(ts_ack[0]))
+                else:
+                    print("ack: " + str(len(ts_ack)))
 
             print(f"tock")
             sleep(60)

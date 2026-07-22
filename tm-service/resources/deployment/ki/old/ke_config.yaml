@@ -39,9 +39,6 @@ knowledge_engine:
         xsd: "http://www.w3.org/2001/XMLSchema#"
         saref: "https://saref.etsi.org/core/"
         om: "http://www.ontology-of-units-of-measure.org/resource/om-2/"
-#      required_bindings:
-#        - "time_create"
-#        - "tou_period"
       pattern:
         - ' ?tou_uri rdf:type s4ener:TimeSeries .'
         - ' ?tou_uri s4ener:producedBy kb:service  .'
@@ -65,8 +62,6 @@ knowledge_engine:
       pattern:
         - ' kb:service rdf:type foaf:Agent . '
         - ' kb:service rdf:type ubmarket:MarketAgent. '
-#        - ' ?tm_uri rdf:type foaf:Agent . '
-#        - ' ?tm_uri rdf:type ubmarket:MarketAgent. '
     tm-info:
       name: "tm-info"
       description: "Information TM. Used in ANSWER,ASK,POST,REACT."

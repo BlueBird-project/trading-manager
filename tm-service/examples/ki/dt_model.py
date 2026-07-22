@@ -1,9 +1,6 @@
-import math
 from typing import Optional, Union
 
-from isodate import parse_duration
 from ke_client import ki_object, BindingsBase, OptionalLiteral, is_nil
-from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
 

@@ -6,9 +6,7 @@ from ke_client.utils import to_json
 
 from tm.models.digital_twin import DigitalTwinDAO, DTForecastInfoDAO, DTForecastOfferDAO
 from tm.models.job_dao import JobDAO
-from tm.models.market_offer import RangeInfo
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt
-
 from tm.utils import isp_unit_to_ms
 
 

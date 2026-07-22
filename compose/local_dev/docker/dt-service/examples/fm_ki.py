@@ -44,22 +44,27 @@ if __name__ == "__main__" and app_settings:
     while True:
         try:
             from examples.ki.fm_interactions import evaluate_flexibility_ask, evaluate_flexibility
-            from examples.ki.tou_interactions import get_tou_info, get_tou_price
+            from examples.ki.tou_interactions import get_tou_info, get_tou_price, find_tm
 
             print(f"tick: {client.state()}")
             ################################################
-            # get prices
+            # get prices (currently TM returns first market offer on the list  )
             ################################################
-            # timeseries metadata
+            # timeseries details/metadata
             # res = get_tou_info(ts=TimeSpan.last_day())
-            res = get_tou_info(ts=TimeSpan.next_day())
+            tm_agent = find_tm()
+            if tm_agent is None or len(tm_agent) == 0:
+                raise Exception("Can't find any trading manager")
+            tm_agent = tm_agent[0]
+            print(f"TM : {tm_agent}")
+            res = get_tou_info(ts=TimeSpan.next_day(), tm_uri=tm_agent.tm_uri)
             print(f"get_tou_info: {res}")
             for ts_info in res:
                 ################################################
                 # get timeseries data points for each uri
                 ################################################
                 print("get prices for: " + str(ts_info.tou_uri))
-                prices = get_tou_price(tou_uris=[ts_info.tou_uri])
+                prices = get_tou_price(tou_uris=[ts_info.tou_uri], tm_uri=tm_agent.tm_uri)
                 if len(prices) > 0:
                     print(f"price response = {len(prices)}: {prices[0]}")
                 else:
@@ -77,7 +82,7 @@ if __name__ == "__main__" and app_settings:
             else:
                 print(f"empty response")
             # print(response)
-            sleep(45)
+            sleep(60)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

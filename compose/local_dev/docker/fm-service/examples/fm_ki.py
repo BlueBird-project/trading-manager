@@ -3,7 +3,6 @@
 # ./resources/.env
 # ./resources/env/.env.fm
 ################################################
-from effi_onto_tools.utils.time_utils import tick, tock
 
 import tm
 import logging
@@ -71,11 +70,10 @@ if __name__ == "__main__" and app_settings:
                     print(f"empty price response")
             sleep(15)
             ###########################
-            tick()
+
             print(f"Evaluate power plan")
             # get prices for power demand
             response = evaluate_flexibility_ask()
-            tock()
             # print(len(response))
             if len(response) > 0:
                 print(f"{len(response)}: {response[0]}")

@@ -1,33 +1,45 @@
+
 ## Services
 
 ### ENTSO-E
 
 #### Configure
 
-This service requires API TOKEN (
-ENTSOE_TOKEN) - [acquire token](https://www.amsleser.no/blog/post/21-obtaining-api-token-from-entso-e)  
-Put token in [./env/.env.secrets](./env/.env.secrets)
-
-Market configuration is located in [./docker/entsoe-service/entsoe.yaml](./docker/entsoe-service/entsoe.yaml)
-
-Market codes to extend the service with other regions
-are [here](https://transparencyplatform.zendesk.com/hc/en-us/articles/15885757676308-Area-List-with-Energy-Identification-Code-EIC)
-
 Service documentation is [here](https://github.com/BlueBird-project/tm-market-plugins/blob/main/entso-e/README.md)
+List of market codes is [here](https://transparencyplatform.zendesk.com/hc/en-us/articles/15885757676308-Area-List-with-Energy-Identification-Code-EIC)
+
+
+Configuration:
+1. Obtain API Token (ENTSOE_TOKEN) - [acquire token](https://www.amsleser.no/blog/post/21-obtaining-api-token-from-entso-e)  
+2. Set API Token in [./env/.env.secrets](./env/.env.secrets)
+3. Configure markets [./docker/entsoe-service/entsoe.yaml](./docker/entsoe-service/entsoe.yaml)
+
 
 #### Additional information
 
-Service on start loads prices for the last 5 days for the configured markets
+ * Service on start loads prices for the last 5 days for the configured markets
 
 ### Trading Manager
 
 #### Configuration
 
-Sample TM configuration with subscribed country markets can be
-found [here (configuration used in compose.yaml)](./docker/trading-manager/app_config.yaml)
+Sample TM configuration with subscribed country markets can be found [here (configuration loaded in compose.yaml)](./docker/trading-manager/app_config.yaml)
 and  [here](./docker/trading-manager/config.yaml)
 
-### PGAdmin (DB viewer)
+### Sample FM Service
+
+This service provides sample FM Smart Client implementation with sample interactions fed with random data.
+Docker configuration is [here](./docker/fm-service/Dockerfile) and FM service sources are located[here](./docker/fm-service/examples)   
+
+
+### Sample DT service 
+
+This service provides sample DM Smart Client implementation with sample interactions fed with random data.
+Docker configuration is [here](./docker/dt-service/Dockerfile) and FM service sources are located[here](./docker/dt-service/examples)  
+
+
+
+### PGAdmin (DB web gui)
 
 By default PGAdmin is exposed to: http://localhost:9199/
 
@@ -45,7 +57,9 @@ database: postgres
 schema: public
 ```
 
-## Docker
+
+
+## Docker images
 
 Root directory: `local_dev`
 
@@ -95,6 +109,9 @@ check consumed resources:
 ```shell
 
 #download images from:
+https://box.pionier.net.pl/d/7603fc382fa74e89a490/
+
+#old link
 https://box.pionier.net.pl/d/2782022c45ce4360a8c5/
 
 ```
@@ -102,22 +119,36 @@ https://box.pionier.net.pl/d/2782022c45ce4360a8c5/
 ### import image
 
 ```shell
-docker load -i .\images\bluebird.tm-entsoe-service_0.6.3.tar
-docker load -i .\images\bluebird.tm-entsoe-service_0.7.0.tar
-docker load -i .\images\bluebird.trading-manager_0.6.6.tar 
+docker load -i .\images\trading-manager.latest.tar
+docker load -i .\images\local-entsoe-service.latest.tar
 
+#DT and FM sample dockers 
+docker load -i .\images\local-dt-service.tar
+docker load -i .\images\local-fm-service.tar
+
+# ENTSO-E build/base image
+docker load -i .\images\base-entsoe-service.latest.tar 
 #TGE service
-docker load -i .\images\bluebird.tge-dayahead-service_0.6.7.tar
+docker load -i .\images\bluebird.tge-dayahead-service_latest.ta
 ```
-
+----                 -------------         ------ ----  
+-a----        2026-07-23     15:03      668028928 local-dt-service.tar
+-a----        2026-07-23     15:03      668035584 local-fm-service.tar
+-a----        2026-07-23     15:03      667934208 trading-manager.0.7.2.tar
+-a----        2026-07-23     15:03      671878656 trading-manager.latest.tar
 ### export image
 
 ```shell
 
 docker save -o "./images/trading-manager.$Env:TM_TAG.tar" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:$Env:TM_TAG"
-docker save -o ./images/local-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-entsoe-service:latest" 
-docker save -o ./images/base-entsoe-service.latest.tar "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:latest" 
- 
+docker save -o "./images/trading-manager.latest.tar" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:$Env:TM_TAG" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/trading-manager:latest"
+
+docker save -o "./images/local-entsoe-service.latest.tar" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-entsoe-service:latest" 
+docker save -o "./images/local-dt-service.tar"  "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-dt-service:latest" 
+docker save -o "./images/local-fm-service.tar"  "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/local-fm-service:latest" 
+
+docker save -o "./images/base-entsoe-service.$Env:ENTSO_E_TAG.tar" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:$Env:ENTSO_E_TAG" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:latest" 
+docker save -o "./images/base-entsoe-service.latest.tar" "$Env:REGISTRY_DOMAIN/$Env:REGISTRY_PROJECT/tm-entsoe-service:latest" 
 
 ```
 

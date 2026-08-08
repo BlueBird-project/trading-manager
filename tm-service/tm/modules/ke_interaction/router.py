@@ -1,12 +1,8 @@
 from typing import List, Optional, Dict, Any
 
 from fastapi import APIRouter
-from ke_client.utils import time_utils
-from rdflib import URIRef, Literal
+from rdflib import URIRef
 
-from tm.modules.ke_interaction.interactions.ki_models import DurationURI
-from tm.modules.ke_interaction.interactions.tou_model import TOUPriceInfoQueryFiltered
-from tm.modules.ke_interaction.service.tou_service import get_price_filtered, get_range_tou_filtered
 from tm.utils import TimeSpan
 
 ki_router = APIRouter(prefix="", tags=["KI"])
@@ -76,13 +72,14 @@ async def flex_ts(ts_uri: str) -> List[Dict[str, Any]]:
                description="tou test")
 async def flex_ts() -> List[Dict[str, Any]]:
     # sprawdzic
-    from tm.modules.ke_interaction.interactions.tou_model import TOUPriceQuery
-    from tm.modules.ke_interaction.interactions.tou_interactions import tou_ki
+    from tm.modules.ke_interaction.interactions.tm_model import TOUPriceInfoQueryFiltered, TOUPriceQuery
+    from tm.modules.ke_interaction.service.tou_service import get_price_filtered, get_range_tou_filtered
+    from tm.modules.ke_interaction.interactions.tm_interactions import tm_ki
     from tm.core.db.postgresql import dao_manager
     ts = TimeSpan()
 
     range_id = dao_manager.offer_dao.get_range().range_id
-    info_q = TOUPriceInfoQueryFiltered( )
+    info_q = TOUPriceInfoQueryFiltered.init()
 
     from tm.modules.ke_interaction.interactions.client import ki_client
 
@@ -90,5 +87,24 @@ async def flex_ts() -> List[Dict[str, Any]]:
     price_q = [TOUPriceQuery(tou_uri=info.tou_uri) for info in info_resp]
     # async def flex_ts(ts_uri: str) -> List[FMPnt]:
     # q = TOUPriceQuery(tou_uri=uri)
-    prices = get_price_filtered(binding_query=price_q, kb_id=tou_ki.get_kb_id())
+    prices = get_price_filtered(binding_query=price_q, kb_id=tm_ki.get_kb_id())
     return [p.__dict__ for p in prices]
+
+
+@ki_router.get("/tou/offer_info", response_description="returns List[FMPnt]",
+               description="tou test")
+async def tou_offer_info() -> list[Dict]:
+    # sprawdzic
+    from tm.modules.ke_interaction.interactions.tm_model import TOUPriceInfoQueryFiltered
+    from tm.modules.ke_interaction.service.tou_service import get_range_tou_filtered
+    from tm.core.db.postgresql import dao_manager
+    ts = TimeSpan.last_day()
+
+    range_id = dao_manager.offer_dao.get_range().range_id
+    info_q = TOUPriceInfoQueryFiltered.init()
+
+    from tm.modules.ke_interaction.interactions.client import ki_client
+
+    info_resp = get_range_tou_filtered(binding_query=[info_q], kb_id=ki_client.kb_id)
+    # todo zwracac informacje o sequence
+    return [{**vars(i)} for i in info_resp]

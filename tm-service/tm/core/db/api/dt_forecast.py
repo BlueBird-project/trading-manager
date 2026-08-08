@@ -16,7 +16,17 @@ class DTForecastAPI:
         pass
 
     @abstractmethod
+    def list_recent_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int]) -> List[DTForecastInfoDAO]:
+        pass
+
+    @abstractmethod
     def find_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int],
+                       sequence: Optional[int], range_id: Optional[int]) -> List[DTForecastInfoDAO]:
+        pass
+
+
+    @abstractmethod
+    def find_recent_forecasts(self, ts: Optional[TimeSpan], job_id: Optional[int], model_id: Optional[int],
                        sequence: Optional[int], range_id: Optional[int]) -> List[DTForecastInfoDAO]:
         pass
 

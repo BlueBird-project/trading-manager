@@ -6,9 +6,7 @@ from ke_client.utils import to_json
 
 from tm.models.digital_twin import DigitalTwinDAO, DTForecastInfoDAO, DTForecastOfferDAO
 from tm.models.job_dao import JobDAO
-from tm.models.market_offer import RangeInfo
-from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt, ForecastOfferRelation
-
+from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSInfo, DTPnt
 from tm.utils import isp_unit_to_ms
 
 
@@ -27,11 +25,11 @@ def process(dt_info_list: List[DigitalTwinInfo]):
                                                       job_name=dt_info.dt_uri,
                                                       ext=to_json({"market_uri": dt_info.market_uri})))
             else:
-                db_job.ext=to_json({"market_uri": dt_info.market_uri})
-                db_job.job_name=dt_info.dt_uri
-                db_job.market_id=market.market_id
-                db_job.command_uri=dt_info.command_uri
-                dao_manager.job_api.update(job=db_job )
+                db_job.ext = to_json({"market_uri": dt_info.market_uri})
+                db_job.job_name = dt_info.dt_uri
+                db_job.market_id = market.market_id
+                db_job.command_uri = dt_info.command_uri
+                dao_manager.job_api.update(job=db_job)
                 job = db_job
             db_dt = dao_manager.dt_api.get_by_uri(dt_uri=dt_info.dt_uri)
             if db_dt is None:
@@ -52,32 +50,38 @@ def process_forecast_info(bindings: List[DTTSInfo]) -> List[DTForecastInfoDAO]:
     # unlimited_range = dao_manager.offer_dao.get_range(None, None)
     # range_id = unlimited_range.range_id
     for b in bindings:
-        min_power, max_power = b.get_power_limit()
-        power_range = dao_manager.offer_dao.get_range(min_power, max_power)
-        if power_range is None:
-            logging.warning("Adding new power range")
-            # TODO: prohibit autmatic range generation ?
-            range_id = dao_manager.offer_dao.add_range(RangeInfo(min_value=min_power, max_value=max_power)).range_id
-        else:
-            range_id = power_range.range_id
+        # min_power, max_power = b.get_power_limit()
+        # power_range = dao_manager.offer_dao.get_range(min_power, max_power)
+        # if power_range is None:
+        #     logging.warning("Adding new power range")
+        #     # should we prevent automatic range generation ?
+        #     range_id = dao_manager.offer_dao.add_range(RangeInfo(min_value=min_power, max_value=max_power)).range_id
+        # else:
+        #     range_id = power_range.range_id
         job = dao_manager.job_api.get_by_command(command_uri=b.command_uri)
         if job is None:
-            logging.error(f"Job(Command) not found: {b.command_uri}")
+            logging.error(f"Job(Command) not found: {b.command_uri} for forecast :{b.ts_uri}")
+            continue
+        offer = dao_manager.offer_dao.get_offer_info(offer_uri=b.forecast_of)
+        if offer is None:
+            logging.error(f"Offer not found: {b.forecast_of} for forecast :{b.ts_uri}")
+            continue
+
+        db_ts = dao_manager.forecast_api.get_by_uri(forecast_uri=b.ts_uri)
+        if db_ts is not None:
+            print(f"Forecast {b.ts_uri} have already been added")
+            logging.info(f"Forecast {b.ts_uri} have already been added")
+            #     TODO: update current instance in Db?
+            added_ts.append(db_ts)
         else:
-            db_ts = dao_manager.forecast_api.get_by_uri(forecast_uri=b.ts_uri)
-            if db_ts is not None:
-                print(f"Forecast {b.ts_uri} have already been added")
-                logging.info(f"Forecast {b.ts_uri} have already been added")
-                #     TODO: update current instance in Db?
-                added_ts.append(db_ts)
-            else:
-                new_ts = dao_manager.forecast_api.save(
-                    # b.n3()
-                    forecast_info=DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.create_ts,
-                                                    isp_unit=b.update_rate_min, sequence=b.get_sequence(),
-                                                    isp_len=b.isp_len, range_id=range_id))
-                logging.info(f"Forecast {b.ts_uri}:{new_ts.forecast_id} have been added")
-                added_ts.append(new_ts)
+            new_ts = dao_manager.forecast_api.save(
+                # b.n3()
+                forecast_info=DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.create_ts,
+                                                offer_id=offer.offer_id,
+                                                isp_unit=b.update_rate_min, sequence=offer.sequence,
+                                                isp_len=b.isp_len, range_id=offer.range_id))
+            logging.info(f"Forecast {b.ts_uri}:{new_ts.forecast_id} have been added")
+            added_ts.append(new_ts)
     return added_ts
 
 
@@ -122,18 +126,18 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
     # isp_len: int = 1
 
 
-def join_forecast_offer(relations: List[ForecastOfferRelation]):
-    from tm.core.db.postgresql import dao_manager
-    d = {}
-    for r in relations:
-        offer_info = dao_manager.offer_dao.get_offer_info(offer_uri=r.offer_uri)
-        if offer_info is None:
-            logging.error(f"offer: {r.offer_uri} does not exist")
-            raise Exception(f"offer: {r.offer_uri} does not exist")
-        forecast_info = dao_manager.forecast_api.get_by_uri(forecast_uri=r.forecast_uri)
-        if forecast_info is None:
-            logging.error(f"offer: {r.forecast_info} does not exist")
-            raise Exception(f"offer: {r.forecast_info} does not exist")
-        d[r.forecast_uri] = offer_info.offer_id
-    for f_uri, offer_id in d.items():
-        assert dao_manager.forecast_api.set_forecast_offer(forecast_uri=f_uri, offer_id=offer_id)
+# def join_forecast_offer(relations: List[ForecastOfferRelation]):
+#     from tm.core.db.postgresql import dao_manager
+#     d = {}
+#     for r in relations:
+#         offer_info = dao_manager.offer_dao.get_offer_info(offer_uri=r.offer_uri)
+#         if offer_info is None:
+#             logging.error(f"offer: {r.offer_uri} does not exist")
+#             raise Exception(f"offer: {r.offer_uri} does not exist")
+#         forecast_info = dao_manager.forecast_api.get_by_uri(forecast_uri=r.forecast_uri)
+#         if forecast_info is None:
+#             logging.error(f"offer: {r.forecast_info} does not exist")
+#             raise Exception(f"offer: {r.forecast_info} does not exist")
+#         d[r.forecast_uri] = offer_info.offer_id
+#     for f_uri, offer_id in d.items():
+#         assert dao_manager.forecast_api.set_forecast_offer(forecast_uri=f_uri, offer_id=offer_id)

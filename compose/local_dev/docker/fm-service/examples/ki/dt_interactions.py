@@ -2,13 +2,16 @@ import hashlib
 import math
 import random
 from datetime import timedelta
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from isodate import duration_isoformat, parse_duration
+from ke_client import KIHolder, BindingsBase, ki_object
+from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus, KIAskResponse
 from ke_client.utils import time_utils
-from ke_client import KIHolder, BindingsBase, OptionalLiteral, ki_object, rdf_nil
-from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus
 from rdflib import URIRef, Literal
+
+from examples.ki import dt_model
+from examples.ki.dt_model import TMMarketOfferBindings
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSUri, \
     DTDPUri, DTDPRUri, DTTSInfoRequest
 
@@ -17,20 +20,11 @@ from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTT
 class DTTSInfo(BindingsBase):
     command_uri: URIRef
     ts_uri: URIRef
+    forecast_of: URIRef
     time_create: Literal
     ts_interval_uri: URIRef
     ts_date_from: Literal
     ts_date_to: Literal
-    sequence: OptionalLiteral = None
-    # range section
-
-    power_range: Optional[URIRef] = rdf_nil
-    power_range_max: Optional[URIRef] = rdf_nil
-    max_value: OptionalLiteral = rdf_nil
-    power_range_min: Optional[URIRef] = rdf_nil
-    min_value: OptionalLiteral = rdf_nil
-
-    # range
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)
@@ -61,19 +55,6 @@ class DTTSInfo(BindingsBase):
         min_diff = ms_diff / 60000
         return math.ceil(min_diff / self.update_rate_min)
 
-    def get_sequence(self) -> str:
-        return self.convert_value(self.sequence)
-
-    def get_power_limit(self) -> Tuple[float, float]:
-        min_value = self.convert_value(self.min_value, float)
-        max_value = self.convert_value(self.max_value, float)
-        return min_value, max_value
-
-
-# @ki_object("forecast-test")
-# class DTPntTest(BindingsBase):
-#     ts_uri: URIRef
-#     dp: URIRef
 
 @ki_object("dt-ts")
 class DTPnt(BindingsBase):
@@ -106,13 +87,14 @@ class DTPntRequest(BindingsBase):
 
 
 dt_ki = KIHolder()
-_market_uri: URIRef = None
+# _market_uri: URIRef = None
+_tm_info: dt_model.TMInfo = None
 _current_forecast_uri: DTTSUri = None
 TM_KB_ID = ["http://demo.tm.bluebird.com", "http://tm.bluebird.com"]
 
 
 def _init_command_uri(market_uri: str):
-    md5_hash = hashlib.md5(_market_uri.encode())
+    md5_hash = hashlib.md5(market_uri.encode())
     hash_str = md5_hash.hexdigest()
 
     return URIRef(dt_ki.get_kb_id() + "/command/" + hash_str)
@@ -122,18 +104,18 @@ def _init_command_uri(market_uri: str):
 @dt_ki.post("dt-info")
 def _post_dt_info(market_uri: URIRef) -> List[DigitalTwinInfo]:
     dt_info = DigitalTwinInfo(dt_uri=URIRef(dt_ki.get_kb_id()),
-                              command_uri=_init_command_uri(market_uri=str(_market_uri)),
+                              command_uri=_init_command_uri(market_uri=str(market_uri)),
                               market_uri=market_uri)
     return [dt_info]
 
 
 @dt_ki.answer("dt-info")
 def on_dt_info_request(ki_id, bindings):
-    global _market_uri
+    global _tm_info
     print("on_dt_info_request")
     dt_info = DigitalTwinInfo(dt_uri=URIRef(dt_ki.get_kb_id()),
-                              command_uri=_init_command_uri(market_uri=str(_market_uri)),
-                              market_uri=_market_uri)
+                              command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
+                              market_uri=_tm_info.market_uri)
     print(dt_info)
 
     return [dt_info]
@@ -141,12 +123,13 @@ def on_dt_info_request(ki_id, bindings):
 
 #
 @dt_ki.post("dt-ts-info")
-def _post_ts_info(market_uri: URIRef, ts_uri: DTTSUri) -> List[DTTSInfo]:
+def _post_ts_info(offer_uri: URIRef, ts_uri: DTTSUri) -> List[DTTSInfo]:
+    global _tm_info
     ts_start = time_utils.current_timestamp()
     ts_end = ts_start + 3600 * 1000 * 24
     ts_interval_uri = URIRef(ts_uri.uri + "/interval")
-    dt_info = DTTSInfo(command_uri=_init_command_uri(market_uri=str(market_uri)),
-                       ts_uri=ts_uri.uri_ref,
+    dt_info = DTTSInfo(command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
+                       ts_uri=ts_uri.uri_ref, forecast_of=offer_uri,
                        update_rate=Literal(duration_isoformat(timedelta(minutes=15))),
                        time_create=Literal(time_utils.xsd_from_ts(time_utils.current_timestamp())),
                        ts_interval_uri=ts_interval_uri,
@@ -159,8 +142,8 @@ def _post_ts_info(market_uri: URIRef, ts_uri: DTTSUri) -> List[DTTSInfo]:
 #
 @dt_ki.answer("dt-ts-info")
 def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
-    global _market_uri
     global _current_forecast_uri
+    global _tm_info
     if _current_forecast_uri is None:
         current_forecast_uri = _get_forecast_uri()
     else:
@@ -169,7 +152,7 @@ def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     ts_start = time_utils.current_timestamp()
     ts_end = ts_start + 3600 * 1000 * 24
     ts_interval_uri = URIRef(current_forecast_uri.uri + "/interval")
-    ds_info = DTTSInfo(command_uri=_init_command_uri(market_uri=str(_market_uri)),
+    ds_info = DTTSInfo(command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
                        ts_uri=current_forecast_uri.uri_ref,
                        update_rate=Literal(duration_isoformat(timedelta(minutes=15))),
                        time_create=Literal(time_utils.xsd_from_ts(time_utils.current_timestamp())),
@@ -183,7 +166,7 @@ def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
 
 #
 #
-def _generate_sample_ts(ts_uri: DTTSUri, size=96) -> List[DTPnt]:
+def _generate_sample_ts_random(ts_uri: DTTSUri, size=96) -> List[DTPnt]:
     cur_ts = ts_uri.ts_start
     isp = 0
     res = []
@@ -199,11 +182,28 @@ def _generate_sample_ts(ts_uri: DTTSUri, size=96) -> List[DTPnt]:
     return res
 
 
+def _generate_sample_ts(ts_uri: DTTSUri, offer: List[TMMarketOfferBindings]) -> List[DTPnt]:
+    cur_ts = ts_uri.ts_start
+    isp = 0
+    res = []
+    for o in offer:
+        isp += 1
+        pnt = DTPnt(ts_uri=ts_uri.uri_ref,
+                    dp=DTDPUri(prefix=dt_ki.get_kb_id(), **ts_uri.__dict__, isp=isp).uri_ref,
+                    ts=Literal(time_utils.xsd_from_ts(cur_ts)),
+                    dpr=DTDPRUri(prefix=dt_ki.get_kb_id(), **ts_uri.__dict__, isp=isp).uri_ref,
+                    value=Literal(float(o.convert_value(o.value, float)) * (-1)))
+        res.append(pnt)
+        cur_ts += 60000 * 15
+    return res
+
+
 @dt_ki.post("dt-ts")
-def _post_ts(ts_uri: DTTSUri) -> List[DTPnt]:
+def _post_ts(ts_uri: DTTSUri, offer: List[TMMarketOfferBindings]) -> List[DTPnt]:
     # ts_interval_uri = URIRef(ts_uri.uri + "/interval")
     print("_post_ts:dt-ts")
-    sample_ts = _generate_sample_ts(ts_uri=ts_uri, size=96)
+    # sample_ts = _generate_sample_ts(ts_uri=ts_uri, size=96)
+    sample_ts = _generate_sample_ts(ts_uri=ts_uri, offer=offer)
 
     return sample_ts
 
@@ -227,17 +227,40 @@ def on_dt_ts_request(ki_id, bindings: List[DTPntRequest]) -> List[DTPnt]:
     return sample_ts
 
 
-def set_market_uri(market_uri: URIRef):
-    global _market_uri
-    if _market_uri is None:
-        _market_uri = market_uri
+@dt_ki.ask("tm-info")
+def _ask_tm_info():
+    return [dt_model.TMInfoRequest()]
+
+
+@dt_ki.ask("tm-market-offer-info")
+def _ask_offer_info(tm_uri: URIRef, command_uri: URIRef):
+    return [dt_model.TMMarketOfferInfoRequest(tm_uri=tm_uri, command_uri=command_uri)]
+
+
+@dt_ki.ask("tm-market-offer")
+def _ask_offer(offer_uris: List[URIRef], tm_uri: URIRef):
+    return [dt_model.TMMarketOfferRequest(offer_uri=u, tm_uri=tm_uri) for u in offer_uris]
+
+
+# def set_market_uri(market_uri: URIRef):
+#     global _market_uri
+#     if _market_uri is None:
+#         _market_uri = market_uri
+#     else:
+#         raise Exception(f"Market has been already set: {_market_uri}")
+
+
+def set_tm(tm: dt_model.TMInfo):
+    global _tm_info
+    if _tm_info is None:
+        _tm_info = tm
     else:
-        raise Exception(f"Market has been already set: {_market_uri}")
+        raise Exception(f"Market has been already set: {_tm_info}")
 
 
 def post_dt_info():
-    global _market_uri
-    resp_bindings: KIPostResponse = _post_dt_info(market_uri=_market_uri)
+    global _tm_info
+    resp_bindings: KIPostResponse = _post_dt_info(market_uri=_tm_info.market_uri)
     info_ack = [{"status": b.status == ExchangeInfoStatus.SUCCEEDED, "kb_id": b.knowledgeBaseId}
                 for b in resp_bindings.exchangeInfo]
     return info_ack
@@ -250,14 +273,15 @@ def _get_forecast_uri() -> DTTSUri:
     return ts_uri
 
 
-def post_forecast(market_uri: URIRef):
+def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
     global _current_forecast_uri
     ts_uri = _get_forecast_uri()
     _current_forecast_uri = ts_uri
     ################################################
     # post metadata
     ################################################
-    resp_bindings: KIPostResponse = _post_ts_info(market_uri, ts_uri)
+
+    resp_bindings: KIPostResponse = _post_ts_info( offer_uri=offer_uri, ts_uri=ts_uri )
     info_ack = resp_bindings.get_ack()
     print("info ack")
     print(info_ack)
@@ -266,8 +290,32 @@ def post_forecast(market_uri: URIRef):
     ################################################
     print("info ts")
     cur_ts = time_utils.current_timestamp()
-    resp_bindings: KIPostResponse = _post_ts(ts_uri)
+    resp_bindings: KIPostResponse = _post_ts(ts_uri,offer=offer)
     duration_sec = (time_utils.current_timestamp() - cur_ts) / 1000
     print(f"POST ts forecast duration {duration_sec}s")
     ts_ack = resp_bindings.get_ack()
     return ts_ack
+
+
+def find_tm() -> List[dt_model.TMInfo]:
+    resp: KIAskResponse = _ask_tm_info()
+    print(resp)
+    evaluated_resp: List[dt_model.TMInfo] = [dt_model.TMInfo(**b) for b in resp.binding_set]
+    return evaluated_resp
+
+
+def get_offer_uri() -> List[dt_model.TMMarketOfferInfoBindings]:
+    global _tm_info
+    resp: KIAskResponse = _ask_offer_info(tm_uri=_tm_info.tm_uri, command_uri=_tm_info.command_uri)
+    print(resp)
+    evaluated_resp: List[dt_model.TMMarketOfferInfoBindings] = [dt_model.TMMarketOfferInfoBindings(**b) for b in
+                                                                resp.binding_set]
+    return evaluated_resp
+
+
+def get_offer(offer_uris: List[URIRef]) -> List[dt_model.TMMarketOfferBindings]:
+    global _tm_info
+    resp: KIAskResponse = _ask_offer(offer_uris=offer_uris, tm_uri=_tm_info.tm_uri)
+    evaluated_resp: List[dt_model.TMMarketOfferBindings] = [dt_model.TMMarketOfferBindings(**b) for b in
+                                                            resp.binding_set]
+    return evaluated_resp

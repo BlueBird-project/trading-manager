@@ -1,0 +1,107 @@
+knowledge_engine:
+  knowledge_base_id: 'https://tm.pcss.pl/ke/smartconnector'
+  kb_name: 'TM service'
+  kb_description: 'TM service'
+  prefixes:
+    kb: "${KB_ID}/"
+    fm: "http://fm.bluebird.com/"
+    ubmarket: "https://ubflex.bluebird.eu/market/"
+    rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    rdfs: "http://www.w3.org/2000/01/rdf-schema#"
+    s4ener: "https://saref.etsi.org/saref4ener/"
+    saref: "https://saref.etsi.org/core/"
+    time: "http://www.w3.org/2006/time#"
+  include:
+    - "./resources/deployment/ki/dam.yaml"
+    - "./resources/deployment/ki/fm.yaml"
+    - "./resources/deployment/ki/dt.yaml"
+  #    - "./resources/deployment/ki/capacity.yml" TODO:
+  graph_patterns:
+    tou-price:
+      name: "tou-price"
+      description: "Data points for TOU (tou_uri) timeseries. . Used in ANSWER,ASK ."
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+      required_bindings:
+        - "tou_uri"
+      pattern:
+        - ' ?tou_uri rdf:type s4ener:TimeSeries .'
+        - ' ?tou_uri s4ener:producedBy kb:service  .'
+        - ' ?dp s4ener:belongsToTimeSeries ?tou_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ubmarket:period_15m ; saref:hasResult ?dpr.'
+        - ' ubmarket:period_15m time:hasXSDDuration ${ISP_UNIT} .'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn ubmarket:EURPerMegawattHour  .'
+    tou-price-info-filtered:
+      name: "tou-price-info-filtered"
+      description: "TOU metadata - find TOU timeseries (tou_uri). Used in ANSWER,ASK  . "
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        saref: "https://saref.etsi.org/core/"
+        om: "http://www.ontology-of-units-of-measure.org/resource/om-2/"
+      pattern:
+        - ' ?tou_uri rdf:type s4ener:TimeSeries .'
+        - ' ?tou_uri s4ener:producedBy kb:service  .'
+        - ' ?tou_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
+        - ' ?tou_uri s4ener:hasCreationTime ?time_create .'
+        - ' ?tou_uri s4ener:hasEffectivePeriod  ?tou_period_uri .'
+        - ' ?tou_period_uri  rdf:type  time:Interval; time:hasXSDDuration ?tou_period .'
+        - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to .'
+        - ' ?tou_uri ubmarket:hasPowerRange  ?power_range .'
+        - ' ?power_range s4ener:endOfRange ?power_range_max ; s4ener:startOfRange ?power_range_min . '
+        - '	?power_range_max rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+        - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
+        - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+        - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
+    tm-agent:
+      name: "tm-agent"
+      description: "Information TM. Used in ANSWER,ASK,POST,REACT."
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+        foaf: "http://xmlns.com/foaf/0.1/"
+      pattern:
+        - ' kb:service rdf:type foaf:Agent . '
+        - ' kb:service rdf:type ubmarket:MarketAgent. '
+    tm-info:
+      name: "tm-info"
+      description: "Information TM. Used in ANSWER,ASK,POST,REACT."
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+      pattern:
+        - ' kb:service rdf:type saref:Service . '
+        - ' kb:service saref:hasOperation ?command_uri . '
+        - ' ?command_uri  saref:observes ?market_uri . '
+    tm-market-offer-info:
+      name: "tm-market-offer-info"
+      description: "Information about new offer. Used in ANSWER,ASK,POST,REACT."
+      required_bindings:
+        - "command_uri"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+      pattern:
+        - ' ?market_uri rdf:type ?market_type .'
+        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+        - ' ?offer_uri ubmarket:hasMarketSequence ?sequence .'
+        - ' ?offer_uri s4ener:producedBy ?market_uri .'
+        - ' kb:service saref:hasOperation ?command_uri.'
+        - ' ?market_uri saref:isObservedBy ?command_uri .'
+        - ' ?offer_uri s4ener:hasUpdateRate  ?update_rate.'
+        - ' ?offer_uri s4ener:hasCreationTime ?time_create .'
+        - ' ?offer_uri s4ener:hasEffectivePeriod  ?duration_uri.'
+        - ' ?duration_uri  rdf:type  time:Interval; time:hasXSDDuration ?duration .'
+    tm-market-offer:
+      name: "tm-market-offer"
+      description: ""
+      required_bindings:
+        - "offer_uri"
+      prefixes:
+        xsd: "http://www.w3.org/2001/XMLSchema#"
+      pattern:
+        - ' ?offer_uri rdf:type ubmarket:MarketTimeSeries .'
+        - ' ?offer_uri s4ener:producedBy ?market_uri . '
+        - ' kb:service saref:hasOperation ?command_uri.'
+        - ' ?market_uri saref:isObservedBy ?command_uri .'
+        - ' ?dp s4ener:belongsToTimeSeries ?offer_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
+        - '   s4ener:hasEffectivePeriod ?duration_uri ; saref:hasResult ?dpr.'
+        - ' ?duration_uri  rdf:type  time:Interval; time:hasXSDDuration ?duration .'
+        - ' ?dpr saref:hasValue ?value ; saref:isMeasuredIn "EURPerMWH" .'

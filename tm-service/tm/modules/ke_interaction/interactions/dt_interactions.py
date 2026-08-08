@@ -25,11 +25,10 @@ def _request_dt_info():
 
 
 # endregion
-# noinspection PyUnusedLocal
-@ki.react("dt-offer-relation")
-def _request_dt_ts_info(ki_id, bindings: List[ForecastOfferRelation]):
-    dt_service.join_forecast_offer(relations=bindings)
-    return []
+# @ki.react("dt-offer-relation")
+# def _request_dt_ts_info(ki_id, bindings: List[ForecastOfferRelation]):
+#     dt_service.join_forecast_offer(relations=bindings)
+#     return []
 
 
 # noinspection PyUnusedLocal

@@ -22,7 +22,7 @@ services:
       - tm-net
 
   entsoe-service:
-    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/tm-local-entsoe-service:latest"
+    image: "${REGISTRY_DOMAIN}/${REGISTRY_PROJECT}/local-entsoe-service:latest"
     ports:
       - "11001:8080"
     build:
@@ -48,6 +48,8 @@ services:
       - KE_REST_ENDPOINT=http://tm-ke-service:8280/rest/
     networks:
       - tm-net
+    volumes:
+      - "${ENTSOE_MARKET_CONFIG}:/app/resources/deployment/entsoe.yaml"
 
   tm-db:
     image: postgres:alpine3.23

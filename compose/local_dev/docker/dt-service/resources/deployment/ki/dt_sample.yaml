@@ -9,24 +9,13 @@ knowledge_engine:
     rdfs: "<http://www.w3.org/2000/01/rdf-schema#>"
     s4ener: "https://saref.etsi.org/saref4ener/"
     time: "http://www.w3.org/2006/time#"
+    saref: "https://saref.etsi.org/core/"
   include:
     - "./resources/deployment/ki/dam.yaml"
     - "./resources/deployment/ki/dt.yaml"
+    - "./resources/deployment/ki/tm_sample.yaml"
 
   graph_patterns:
-#    dt-info:
-#      name: "dt-info"
-#      description: "Digital Twin info. Used in ANSWER,ASK,POST,REACT."
-#      prefixes:
-#        s4city: "https://saref.etsi.org/saref4city/"
-#        foaf: "http://xmlns.com/foaf/0.1/"
-#        saref: "https://saref.etsi.org/core/"
-#      pattern:
-#        - ' ?dt_uri rdf:type saref:Service ; saref:represents ?command_uri .'
-#        - ' ?command_uri  rdf:type saref:CommandOfInterest; saref:observes ?market_uri .'
-#        - ' ?command_uri  rdf:type ubmarket:MarketType .'
-##      result_pattern:
-##        - '?dt_uri rdf:type saref:Service . ?command_uri  rdf:type saref:CommandOfInterest .'
     dt-ts-info:
       name: "dt-ts-info"
       description: "DT's timeseries's metadata, model's , model's parameters, error rates. Used in ANSWER,ASK,POST,REACT."
@@ -43,14 +32,15 @@ knowledge_engine:
         - ' ?ts_uri s4ener:hasUpdateRate ${ISP_UNIT} .'
         - ' ?ts_uri s4ener:hasCreationTime ?time_create .'
         - ' ?ts_uri s4ener:hasEffectivePeriod  ?ts_interval_uri .'
-        - ' ?ts_uri ubmarket:hasMarketSequence ?sequence .'
+#        - ' ?ts_uri ubmarket:hasMarketSequence ?sequence .'
+        - ' ?ts_uri ubmarket:isForecastOf ?forecast_of .'
         - ' ?ts_interval_uri rdf:type time:Interval; time:hasBeginning ?ts_date_from; time:hasEnd ?ts_date_to . '
-        - ' ?ts_uri ubmarket:hasPowerRange  ?power_range .'
-        - ' ?power_range s4ener:endOfRange ?power_range_max ; s4ener:startOfRange ?power_range_min . '
-        - '	?power_range_max rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
-        - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
-        - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
-        - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
+#        - ' ?ts_uri ubmarket:hasPowerRange  ?power_range .'
+#        - ' ?power_range s4ener:endOfRange ?power_range_max ; s4ener:startOfRange ?power_range_min . '
+#        - '	?power_range_max rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+#        - '       saref:isValueOfProperty s4ener:Power ; saref:hasValue ?max_value .'
+#        - '	?power_range_min rdf:type saref:PropertyValue ;  saref:isMeasuredIn om:megawatt ; '
+#        - '     saref:isValueOfProperty s4ener:Power ; saref:hasValue ?min_value .'
     dt-ts:
       name: "dt-ts"
       description: "DT's timeseries's . Used in ANSWER,ASK,POST,REACT."
@@ -62,7 +52,7 @@ knowledge_engine:
       pattern:
         - ' ?ts_uri rdf:type ubmarket:Forecast .'
         - ' ?dp s4ener:belongsToTimeSeries ?ts_uri ; rdf:type s4ener:DataPoint ; saref:hasTimestamp ?ts ;'
-        - '   s4ener:hasEffectivePeriod ubmarket:period_15m ; saref:hasResult ?dpr.'
+        - '   s4ener:hasEffectivePeriod ubmarket:period_15m ; saref:hasResult ?dpr .'
         - ' ubmarket:period_15m rdf:type  time:Interval; time:hasXSDDuration ${ISP_UNIT} .'
         - ' ?dpr    saref:hasValue ?value ; saref:isMeasuredIn  ubmarket:EURPerMegawattHour .'
 

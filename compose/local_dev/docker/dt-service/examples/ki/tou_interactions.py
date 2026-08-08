@@ -2,20 +2,23 @@ from typing import List, Union
 
 from ke_client import KIHolder
 from ke_client.ki_model import KIAskResponse
-from ke_client.utils import time_utils
-from rdflib import URIRef, Literal
+from rdflib import URIRef
 
-from tm.modules.ke_interaction.interactions.ki_models import DurationURI
 from tm.utils import TimeSpan
 
 tou_ki = KIHolder()
-from tm.modules.ke_interaction.interactions.tou_model import TOUPrice,   TOUPriceQuery, \
-    TOUPriceInfoFiltered, TOUPriceInfoQueryFiltered
+from examples.ki.fm_model import TOUPrice, TOUPriceQuery, \
+    TOUPriceInfoFiltered, TOUPriceInfoQueryFiltered, TMAgent
+
+
+@tou_ki.ask("tm-agent")
+def _find_tm():
+    return []
 
 
 @tou_ki.ask("tou-price")
-def _get_tou_price(tou_uris: List[URIRef]):
-    ask_bindings = [TOUPriceQuery(tou_uri=tou_uri) for tou_uri in tou_uris]
+def _get_tou_price(tou_list: List[TOUPriceInfoFiltered], tm_uri: URIRef):
+    ask_bindings = [TOUPriceQuery(tou_uri=tou.tou_uri, tm_uri=tm_uri, ts_type=tou.ts_type) for tou in tou_list]
     return ask_bindings
 
 
@@ -26,7 +29,7 @@ def _get_price_info(query: Union[TOUPriceInfoQueryFiltered]):
     return [query]
 
 
-def get_tou_info(ts: TimeSpan) -> list[TOUPriceInfoFiltered]:
+def get_tou_info(ts: TimeSpan, tm_uri: URIRef) -> list[TOUPriceInfoFiltered]:
     """
     get timeseries metadata
     :param ts:
@@ -37,12 +40,17 @@ def get_tou_info(ts: TimeSpan) -> list[TOUPriceInfoFiltered]:
     # q = TOUPriceInfoQueryFiltered(time_create=Literal(time_utils.xsd_from_ts(ts.ts_from)),
     #                       tou_period=Literal(lexical_or_value=iso_duration, datatype="xsd:duration"),
     #                       tou_period_uri=DurationURI(minutes=minutes).uri_ref)
-    q = TOUPriceInfoQueryFiltered(ti=ts)
+    q = TOUPriceInfoQueryFiltered.init(ti=ts, tm_uri=tm_uri)
     price_info_bindings: KIAskResponse = _get_price_info(query=q)
     return [TOUPriceInfoFiltered(**b) for b in price_info_bindings.binding_set]
 
 
-def get_tou_price(tou_uris: List[str]) -> List[TOUPrice]:
-    tou_uris_refs = [URIRef(tou_uri) for tou_uri in tou_uris]
-    bindings: KIAskResponse = _get_tou_price(tou_uris=tou_uris_refs)
+def get_tou_price(tou_uris: List[TOUPriceInfoFiltered], tm_uri: URIRef) -> List[TOUPrice]:
+    # tou_uris_refs = [URIRef(tou_uri) for tou_uri in tou_uris]
+    bindings: KIAskResponse = _get_tou_price(tou_list=tou_uris, tm_uri=tm_uri)
     return [TOUPrice(**b) for b in bindings.binding_set]
+
+
+def find_tm() -> List[TMAgent]:
+    bindings: KIAskResponse = _find_tm()
+    return [TMAgent(**b) for b in bindings.binding_set]

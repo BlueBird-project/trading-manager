@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import List, Dict, Optional
 
 from tm.models.digital_twin import DigitalTwinDAO, DTForecastInfoDAO, DTForecastOfferDAO, DTForecastOfferDTO

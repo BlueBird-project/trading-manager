@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from effi_onto_tools.db.postgresql.connection_wrapper import ConnectionWrapper
 
@@ -16,6 +16,9 @@ class MarketQueries:
     SELECT_MARKET_BY_URI = """SELECT "market_id","market_uri", "market_name", "market_type", 
     "market_description", "market_location", "isp_unit", "isp_len","subscribe", "update_ts", "ext"
     FROM "${table_prefix}market_details" WHERE market_uri = :market_uri   """
+    SELECT_MARKET_BY_ID = """SELECT "market_id","market_uri", "market_name", "market_type", 
+    "market_description", "market_location", "isp_unit", "isp_len","subscribe", "update_ts", "ext"
+    FROM "${table_prefix}market_details" WHERE market_id = :market_id   """
 
     INSERT_MARKET = """INSERT INTO "${table_prefix}market_details" 
     ("market_uri", "market_name", "market_type", "market_description", "market_location","subscribe",
@@ -61,10 +64,15 @@ class MarketAPIImpl(MarketAPI):
             markets = conn.select(q=self.queries.LIST_SUBSCRIBED_MARKET, args=args, obj_type=EnergyMarket)
             return markets
 
-    def get_market(self, market_uri: str) -> EnergyMarket:
+    def get_market(self, market_uri: str) -> Optional[EnergyMarket]:
         with ConnectionWrapper() as conn:
             args = {"market_uri": market_uri}
             market = conn.get(q=self.queries.SELECT_MARKET_BY_URI, args=args, obj_type=EnergyMarket)
+            return market
+    def get_market_by_id(self, market_id: int) -> Optional[EnergyMarket]:
+        with ConnectionWrapper() as conn:
+            args = {"market_id": market_id}
+            market = conn.get(q=self.queries.SELECT_MARKET_BY_ID, args=args, obj_type=EnergyMarket)
             return market
 
     def set_subscribe(self, market_id: int, subscribe: bool) -> bool:

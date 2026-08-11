@@ -73,14 +73,14 @@ ubmarket:MarketAgent
     rdfs:comment    "MarketAgent   "@en ;
     rdfs:label      "MarketAgent" .
 
-ubmarket:isForecastOf
+ubmarket:isForecastedBy
     a            owl:ObjectProperty ;
     rdfs:domain  s4ener:TimeSeries ;
     rdfs:comment "Connect timeseries with forecast"@en ;
     rdfs:range   ubmarket:Forecast ;
     rdfs:label   "isForecastOf" .
 
-ubmarket:forecasts
+ubmarket:isForecastOf
     a            owl:ObjectProperty ;
     rdfs:domain  ubmarket:Forecast ;
     rdfs:comment "Forecast timeseries with forecasted timeseries"@en ;

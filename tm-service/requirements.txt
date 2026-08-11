@@ -25,7 +25,8 @@ effi_onto_tools==0.19.16
 ###########################
 #git+https://github.com/BlueBird-project/ke-pyclient.git@v0.31.4
 git+https://github.com/BlueBird-project/ke-pyclient.git@dev
+git+https://github.com/BlueBird-project/UBFlex.git@dev#subdirectory=ontology/PyUBFlex
 #git+https://github.com/BlueBird-project/ke-pyclient.git@reconnect_register_updates
 #ke_client==0.26.3
-ke_client==0.31.7
-
+ke_client==0.31.10
+ubflex==0.0.3

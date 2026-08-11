@@ -25,6 +25,7 @@ class DTTSInfo(BindingsBase):
     ts_interval_uri: URIRef
     ts_date_from: Literal
     ts_date_to: Literal
+    # update_rate: Literal
 
     def __init__(self, **kwargs):
         super().__init__(bindings=kwargs)
@@ -281,7 +282,7 @@ def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
     # post metadata
     ################################################
 
-    resp_bindings: KIPostResponse = _post_ts_info( offer_uri=offer_uri, ts_uri=ts_uri )
+    resp_bindings: KIPostResponse = _post_ts_info(offer_uri=offer_uri, ts_uri=ts_uri)
     info_ack = resp_bindings.get_ack()
     print("info ack")
     print(info_ack)
@@ -290,7 +291,7 @@ def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
     ################################################
     print("info ts")
     cur_ts = time_utils.current_timestamp()
-    resp_bindings: KIPostResponse = _post_ts(ts_uri,offer=offer)
+    resp_bindings: KIPostResponse = _post_ts(ts_uri, offer=offer)
     duration_sec = (time_utils.current_timestamp() - cur_ts) / 1000
     print(f"POST ts forecast duration {duration_sec}s")
     ts_ack = resp_bindings.get_ack()

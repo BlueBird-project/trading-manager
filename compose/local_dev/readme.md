@@ -131,11 +131,7 @@ docker load -i .\images\base-entsoe-service.latest.tar
 #TGE service
 docker load -i .\images\bluebird.tge-dayahead-service_latest.ta
 ```
-----                 -------------         ------ ----  
--a----        2026-07-23     15:03      668028928 local-dt-service.tar
--a----        2026-07-23     15:03      668035584 local-fm-service.tar
--a----        2026-07-23     15:03      667934208 trading-manager.0.7.2.tar
--a----        2026-07-23     15:03      671878656 trading-manager.latest.tar
+
 ### export image
 
 ```shell

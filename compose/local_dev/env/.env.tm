@@ -4,6 +4,7 @@ KE_KNOWLEDGE_BASE_ID=http://tm.bluebird.com
 #APP_USE_REST_API=True
 #APP_USE_KE_API=True
 
+#KI_KI_CONFIG_PATH=/app/resources/graph-patterns/tm/tm_config.yaml
 
 DB_TABLE_PREFIX=local_tm_
 DB_INIT=True

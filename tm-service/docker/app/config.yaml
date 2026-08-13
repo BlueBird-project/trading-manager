@@ -23,7 +23,7 @@ db:
   db_schema_name: "public"
   db_init: false
 ke:
-  ki_config_path: "/app/resources/ke_config.yaml"
+  ki_config_path: "/app/resources/graph-patterns/tm/tm_config.yaml"
   ki_vars:
     DAY_DURATION: '"PT1440M"^^xsd:duration'
     ISP_UNIT: '"PT15M"^^xsd:duration'

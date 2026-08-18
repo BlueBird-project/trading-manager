@@ -2,22 +2,44 @@
 # load env files :
 # ./resources/.env
 # ./resources/env/.env.fm
+# run: examples/fm_ki.py -c ./examples/config.yaml
 ################################################
-from effi_onto_tools.utils.time_utils import tick, tock
+from typing import Optional
 
 import tm
 import logging
 from time import sleep
+
 from tm.utils import TimeSpan
 
 ################################################
 # setup configurations
 ################################################
 app_args = tm.init_args()
-from tm.core import service_settings, app_settings
+from tm.core import  app_settings
 
 tm.set_logging()
-logging.info(f"START {service_settings.name}")
+logging.info(f"START FM")
+
+
+# region helpers
+def get_tm():
+    from examples.ki.fm_interactions import find_tm
+    from examples.ki.fm_interactions import set_tm
+    from examples.ki.fm_model import TMInfo
+    _tm: Optional[TMInfo] = None
+    tm_info_list = find_tm()
+    if len(tm_info_list) < 1:
+        print("Error: no tm")
+        sleep(10)
+    else:
+        _tm = tm_info_list[0]
+        set_tm(tm=_tm)
+        print(f"TM : {_tm}")
+    return _tm
+
+
+# endregion
 
 if __name__ == "__main__" and app_settings:
     logging.info("INIT KI")
@@ -31,37 +53,46 @@ if __name__ == "__main__" and app_settings:
     from tm.modules.ke_interaction.interactions import setup_ke
 
     setup_ke()
-    from examples.ki.sample_client import set_bg_ke_client
-    from examples.ki.sample_ki import sample_ki
+    from examples.ki.smart_client import set_bg_ke_client
     from examples.ki.fm_interactions import fm_ki
     from examples.ki.tou_interactions import tou_ki
 
     ################################################
     # register knowledge interaction modules
     ################################################
-    client = set_bg_ke_client([sample_ki, fm_ki, tou_ki])
+    client = set_bg_ke_client([fm_ki, tou_ki])
+
+    from examples.ki.fm_model import TMInfo
+
+    #####################################
+    # Find trading manager
+    #####################################
+    tm_agent: Optional[TMInfo] = None
+
+    while tm_agent is None:
+        try:
+            tm_agent = get_tm()
+            print(f"tick: {client.state()}")
+        except Exception as ex:
+            print(f"can't get TM :{ex} ")
+            sleep(5)
 
     while True:
         try:
             from examples.ki.fm_interactions import evaluate_flexibility_ask, evaluate_flexibility
-            from examples.ki.tou_interactions import get_tou_info, get_tou_price, find_tm
+            from examples.ki.tou_interactions import get_tou_info, get_tou_price
 
             print(f"tick: {client.state()}")
             ################################################
-            # get prices (currently TM returns first market offer on the list  )
+            # get prices
             ################################################
-            # timeseries details/metadata
-            # res = get_tou_info(ts=TimeSpan.last_day())
-            tm_agent = find_tm()
-            if tm_agent is None or len(tm_agent) == 0:
-                raise Exception("Can't find any trading manager")
-            tm_agent = tm_agent[0]
-            print(f"TM : {tm_agent}")
+            # get timeseries details/metadata
             res = get_tou_info(ts=TimeSpan.next_day(), tm_uri=tm_agent.tm_uri)
+            # res = get_tou_info(ts=TimeSpan.last_day())
             print(f"get_tou_info: {res}")
             for ts_info in res:
                 ################################################
-                # get timeseries data points for each uri
+                # get   data points for each timeseries uri
                 ################################################
                 print("get prices for: " + str(ts_info.tou_uri))
                 prices = get_tou_price(tou_uris=[ts_info], tm_uri=tm_agent.tm_uri)
@@ -71,11 +102,9 @@ if __name__ == "__main__" and app_settings:
                     print(f"empty price response")
             sleep(15)
             ###########################
-            tick()
             print(f"Evaluate power plan")
             # get prices for power demand
             response = evaluate_flexibility_ask()
-            tock()
             # print(len(response))
             if len(response) > 0:
                 print(f"{len(response)}: {response[0]}")

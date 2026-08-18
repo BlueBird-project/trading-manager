@@ -8,8 +8,8 @@ if __name__ == "__main__":
     ###
     tm.init_args()
     from effi_onto_tools import utils
-    from tm.core import service_settings, app_settings
-
+    from tm.core import   app_settings
+    from tm.core.service import settings as service_settings
     utils.ENV_FILE = tm.app_args.env_path
     tm.set_logging()
     logging.info(f"START {service_settings.name}")

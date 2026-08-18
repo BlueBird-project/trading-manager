@@ -91,7 +91,6 @@ dt_ki = KIHolder()
 # _market_uri: URIRef = None
 _tm_info: dt_model.TMInfo = None
 _current_forecast_uri: DTTSUri = None
-TM_KB_ID = ["http://demo.tm.bluebird.com", "http://tm.bluebird.com"]
 
 
 def _init_command_uri(market_uri: str):

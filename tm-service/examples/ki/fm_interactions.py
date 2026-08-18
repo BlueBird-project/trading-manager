@@ -5,38 +5,16 @@ from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIPostResponse, KIAskResponse
 
 from tm.modules.ke_interaction.interactions.fm_model import *
+from examples.ki import fm_model
 
 fm_ki = KIHolder()
-TM_KB_ID = ["http://demo.tm.bluebird.com", "http://tm.bluebird.com"]
+_tm_info: fm_model.TMInfo = None
 
 
-# TM_KB_ID = "http://demo.tm.bluebird.com"
 
-
-# BindingsBase
-#
-# @fm_ki.react("fm-ts-info-request")
-# def on_request_ts_info(ki_id, bindings: List[FMTSRequest]):
-#     # respond with timeseries metadata
-#     print("on_request_ts_info")
-#     for request in bindings:
-#         #      support only one request
-#         ts_from: int = time_utils.xsd_to_ts(request.ts_date_from.value)
-#         ts_to = time_utils.xsd_to_ts(request.ts_date_to.value)
-#         #######
-#         # Saref data point usage
-#         ###########
-#         ts_usage = URIRef("s4ener:Consumption")
-#         ts_usage2 = URIRef("s4ener:Production")
-#         ts_uri2 = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=15, ts_usage=ts_usage2).n3()
-#         ts_uri = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=15, ts_usage=ts_usage).n3()
-#         time_create = Literal(time_utils.xsd_now())
-#         return [
-#             FMTSResponse(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_usage=ts_usage,
-#                          time_create=time_create).n3(),
-#             FMTSResponse(ts_uri=ts_uri2, ts_interval_uri=request.ts_interval_uri, ts_usage=ts_usage2,
-#                          time_create=time_create).n3()
-#         ]  #
+@fm_ki.ask("tm-info")
+def _ask_tm_info():
+    return [fm_model.TMInfoRequest()]
 
 
 @fm_ki.answer("fm-ts-info-request")
@@ -109,7 +87,7 @@ def _evaluate_request():
         value = Literal(random.randrange(400, 1200))
         response.append(FMEvaluateQuery(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
                                         value=value))
-    return TargetedBindings(bindings=response, knowledge_bases=TM_KB_ID)
+    return TargetedBindings(bindings=response, knowledge_bases=[_tm_info.tm_uri])
 
 
 @fm_ki.ask("fm-ts-evaluate-ask")
@@ -132,7 +110,14 @@ def _evaluate_request_ask():
         response.append(
             FMEvaluateQueryAsk(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
                                value=value))
-    return TargetedBindings(bindings=response, knowledge_bases=TM_KB_ID)
+    return TargetedBindings(bindings=response,knowledge_bases=[_tm_info.tm_uri])
+
+
+def find_tm() -> List[fm_model.TMInfo]:
+    resp: KIAskResponse = _ask_tm_info()
+    print(resp)
+    evaluated_resp: List[fm_model.TMInfo] = [fm_model.TMInfo(**b) for b in resp.binding_set]
+    return evaluated_resp
 
 
 def evaluate_flexibility() -> List[FMEvaluateResponse]:
@@ -155,3 +140,11 @@ def evaluate_flexibility_ask() -> List[FMEvaluateResponseAsk]:
     # resp: KIAskResponse = _ask_evaluate_request()
     # evaluated_resp: List[FMEvaluateQuery] = [FMEvaluateQuery(**b) for b in resp.binding_set]
     return evaluated_resp
+
+
+def set_tm(tm: fm_model.TMInfo):
+    global _tm_info
+    if _tm_info is None:
+        _tm_info = tm
+    else:
+        raise Exception(f"Market has been already set: {_tm_info}")

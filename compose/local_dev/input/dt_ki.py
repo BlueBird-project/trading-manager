@@ -3,11 +3,11 @@
 # ./resources/.env
 # ./resources/env/.env.fm
 ################################################
-from rdflib import URIRef
-
-import tm
 import logging
 from time import sleep
+from typing import Optional
+
+import tm
 
 ################################################
 # setup configurations
@@ -38,31 +38,35 @@ if __name__ == "__main__" and app_settings:
     # register knowledge interaction modules
     ################################################
     client = set_bg_ke_client([sample_ki, dt_ki])
-    from examples.ki.sample_ki import get_markets
-    from tm.modules.ke_interaction.interactions.dam_model import EnergyMarketBindings
+    from examples.ki.dt_model import TMInfo
 
     success = False
     #####################################
     # Set market
-    ##################################33
-    market: EnergyMarketBindings = None
+    #####################################
+    tm_info: Optional[TMInfo] = None
 
     while not success:
         try:
-            from examples.ki.dt_interactions import set_market_uri
+            from examples.ki.dt_interactions import set_tm
+            from examples.ki.dt_interactions import find_tm
 
             print(f"tick: {client.state()}")
             # set market which will be forecasted
-            markets = get_markets()
-            market = markets[0]
-            set_market_uri(market_uri=market.market_uri)
-            success = True
+            tm_info_list = find_tm()
+            if len(tm_info_list) < 1:
+                print("Error: no tm")
+                sleep(10)
+            else:
+                tm_info = tm_info_list[0]
+                set_tm(tm=tm_info)
+                success = True
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)
             sleep(5)
 
-    print(f"Observed market : {market}")
+    print(f"Observed tm : {tm_info}")
     ################################################
     #############################
     # #publish information about digital twin
@@ -81,7 +85,7 @@ if __name__ == "__main__" and app_settings:
             if len(dt_info_ack) > 0:
                 success = True
             else:
-                sleep(10)
+                sleep(30)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)
@@ -89,20 +93,33 @@ if __name__ == "__main__" and app_settings:
 
     while True:
         try:
-            from examples.ki.dt_interactions import post_dt_info, post_forecast
+
+            from examples.ki.dt_interactions import post_dt_info, post_forecast, get_offer_uri, get_offer
+
+            offer_uris = get_offer_uri()
+            if len(offer_uris) < 1:
+                print("Error: no offer")
+                continue
+            else:
+                print(f"offer info: {len(offer_uris)}")
+                success = True
+            current_offer = get_offer(offer_uris=[o.offer_uri for o in offer_uris])
+            print(current_offer)
+            print(f"len offer: {len(current_offer)}")
+            current_offer_dict = {c.offer_uri: c for c in current_offer}
 
             print(f"tick: {client.state()}")
             print(f"Post ts")
-            ts_ack = post_forecast(market_uri=market.market_uri)
-            # ts_ack = post_forecast(market_uri=URIRef("http://market.uri.com.pl"))
-            print("ack: " + str(len(ts_ack)))
-            if len(ts_ack) > 0:
-                print("ack: " + str(len(ts_ack)) + " " + str(ts_ack[0]))
-            else:
+            for k in current_offer_dict.keys():
+                ts_ack = post_forecast(offer_uri=k, offer=[o for o in current_offer if o.offer_uri==k])
                 print("ack: " + str(len(ts_ack)))
+                if len(ts_ack) > 0:
+                    print("ack: " + str(len(ts_ack)) + " " + str(ts_ack[0]))
+                else:
+                    print("ack: " + str(len(ts_ack)))
 
             print(f"tock")
-            sleep(30)
+            sleep(240)
         except Exception as ex:
             print("Some issue occurred: ")
             print(ex)

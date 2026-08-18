@@ -10,10 +10,10 @@ tou_ki = KIHolder()
 from examples.ki.fm_model import TOUPrice, TOUPriceQuery, \
     TOUPriceInfoFiltered, TOUPriceInfoQueryFiltered, TMAgent
 
-
-@tou_ki.ask("tm-agent")
-def _find_tm():
-    return []
+#
+# @tou_ki.ask("tm-agent")
+# def _find_tm():
+#     return []
 
 
 @tou_ki.ask("tou-price")
@@ -51,6 +51,6 @@ def get_tou_price(tou_uris: List[TOUPriceInfoFiltered], tm_uri: URIRef) -> List[
     return [TOUPrice(**b) for b in bindings.binding_set]
 
 
-def find_tm() -> List[TMAgent]:
-    bindings: KIAskResponse = _find_tm()
-    return [TMAgent(**b) for b in bindings.binding_set]
+# def find_tm() -> List[TMAgent]:
+#     bindings: KIAskResponse = _find_tm()
+#     return [TMAgent(**b) for b in bindings.binding_set]

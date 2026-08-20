@@ -10,7 +10,7 @@ from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTT
 from tm.utils import isp_unit_to_ms
 
 
-def process(dt_info_list: List[DigitalTwinInfo]):
+def process(dt_info_list: List[DigitalTwinInfo], kb_id: str):
     for dt_info in dt_info_list:
         from tm.core.db.postgresql import dao_manager
         market = dao_manager.market_api.get_market(market_uri=dt_info.market_uri)
@@ -34,10 +34,11 @@ def process(dt_info_list: List[DigitalTwinInfo]):
             db_dt = dao_manager.dt_api.get_by_uri(dt_uri=dt_info.dt_uri)
             if db_dt is None:
                 dt = dao_manager.dt_api.save(
-                    DigitalTwinDAO(dt_uri=dt_info.dt_uri, job_id=job.job_id))
+                    DigitalTwinDAO(dt_uri=dt_info.dt_uri, kb_id=kb_id, job_id=job.job_id))
                 logging.info(f"Registered new dt: {dt.dt_uri}:{dt.job_id}")
             else:
                 db_dt.job_id = job.job_id
+                db_dt.kb_id = kb_id
                 dt = dao_manager.dt_api.update(db_dt)
                 logging.info(f"Updated dt: {dt.dt_uri}:{dt.job_id}")
                 # response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
@@ -124,7 +125,6 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
     # cost_mwh: Optional[float]
     # ts: int
     # isp_len: int = 1
-
 
 # def join_forecast_offer(relations: List[ForecastOfferRelation]):
 #     from tm.core.db.postgresql import dao_manager

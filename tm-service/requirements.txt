@@ -28,5 +28,5 @@ git+https://github.com/BlueBird-project/ke-pyclient.git@dev
 git+https://github.com/BlueBird-project/UBFlex.git@dev#subdirectory=ontology/PyUBFlex
 #git+https://github.com/BlueBird-project/ke-pyclient.git@reconnect_register_updates
 #ke_client==0.26.3
-ke_client==0.31.10
+ke_client==0.32.3
 ubflex==0.0.3

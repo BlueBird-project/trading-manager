@@ -13,10 +13,11 @@ ki = KIHolder()
 # region digital twin service details
 # noinspection PyUnusedLocal
 @ki.react("dt-info")
-def on_dt_info(ki_id, bindings: List[DigitalTwinInfo]):
+def on_dt_info(ki_id, bindings: List[DigitalTwinInfo],kb_id):
     print("on dt-info")
-    dt_service.process(bindings)
+    dt_service.process(bindings,kb_id)
     return []
+
 
 
 @ki.ask("dt-info")
@@ -83,9 +84,13 @@ def _request_dt_ts(ts_uri_ref: URIRef):
 
 def request_dt_info() -> List[DigitalTwinInfo]:
     bindings: KIAskResponse = _request_dt_info()
-    dts = [DigitalTwinInfo(**b) for b in bindings.binding_set]
-    dt_service.process(dts)
-    return dts
+
+    res= []
+    for i,b in enumerate(bindings.binding_set):
+        kb_id = bindings.exchangeInfo[i].knowledgeBaseId
+        dts = DigitalTwinInfo(**b)
+        res.append(dt_service.process([b],kb_id=kb_id))
+    return res
 
 
 def request_dt_ts_info(req: List[DTTSInfoRequest]) -> List[DTForecastInfoDAO]:

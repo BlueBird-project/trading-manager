@@ -56,6 +56,7 @@ def get_tm_offer_info(bindings: List[TMMarketOfferInfoRequest], kb_id: str) -> L
 
 def get_tm_market_offer(offer_uri: URIRef, kb_id: str):
     from tm.core.db.postgresql import dao_manager
+    from ke_client import to_literal
 
     offer_details = dao_manager.offer_dao.get_offer_info(offer_uri=offer_uri)
 
@@ -69,12 +70,12 @@ def get_tm_market_offer(offer_uri: URIRef, kb_id: str):
     offer_bindings = [
         TMMarketOfferBindings(offer_uri=URIRef(offer_uri), command_uri=command_uri.uri_ref,
                               market_uri=URIRef(market.market_uri),
-                              dp=SplitURIBase.uri_append_ref(offer_uri, "/dp"),
+                              dp=SplitURIBase.uri_append_ref(offer_uri, f"/{mo.isp_start}/dp"),
                               ts=Literal(time_utils.xsd_from_ts(mo.ts)),
-                              dpr=SplitURIBase.uri_append_ref(offer_uri, "/dpr"),
+                              dpr=SplitURIBase.uri_append_ref(offer_uri, f"/{mo.isp_start}/dpr"),
                               duration_uri=DurationURI(minutes=mo.isp_len * offer_details.isp_unit).uri_ref,
                               duration=Literal(
                                   duration_isoformat(timedelta(minutes=mo.isp_len * offer_details.isp_unit))),
-                              value=Literal(mo.cost_mwh))
+                              value=to_literal(mo.cost_mwh))
         for mo in market_offer]
     return offer_bindings

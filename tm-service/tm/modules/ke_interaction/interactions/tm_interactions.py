@@ -66,4 +66,6 @@ def on_price_request(ki_id: str, bindings: List[TMMarketOfferRequest]):
     result = []
     for b in bindings:
         result += tm_service.get_tm_market_offer(offer_uri=b.offer_uri, kb_id=tm_ki.get_kb_id())
+    # print(f"len result{len(result)}")
+    print(result)
     return result

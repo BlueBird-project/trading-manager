@@ -9,12 +9,16 @@ class DigitalTwinDAO(BaseModel):
     job_id: Optional[int] = None
     # market_id: Optional[int] = None
     dt_uri: str
+    kb_id: Optional[str] = None
     update_ts: Optional[int] = None
     ext: Optional[str] = None
 
 
 @dataclass
 class DTModelDAO(BaseModel):
+    """
+    forecast model
+    """
     isp_len: int
     isp_unit: int
     model_id: Optional[int] = None

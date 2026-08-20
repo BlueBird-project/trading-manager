@@ -1,8 +1,11 @@
+from datetime import timedelta
 from typing import List, Optional, Dict, Any
 
 from fastapi import APIRouter
-from rdflib import URIRef
+from isodate import duration_isoformat
+from rdflib import URIRef, Literal
 
+from tm.modules.ke_interaction.interactions.dam_model import MarketType
 from tm.utils import TimeSpan
 
 ki_router = APIRouter(prefix="", tags=["KI"])
@@ -37,17 +40,31 @@ async def dt_scan() -> List[Dict[str, Any]]:
 
 # @ki_router.get("/dt/forecast")
 @ki_router.post("/dt/forecast", description="Request for forecast from DT ")
-async def scan_forecast() -> Dict[str, Any]:
-    res = {}
-    from tm.modules.ke_interaction.interactions.dt_interactions import request_dt_ts_info, request_dt_data_by_id
-    ts_info = request_dt_ts_info(req=[])
-    res["ts_info"] = ts_info
-    for uri in ts_info:
-        ts = request_dt_data_by_id(ts_uri_ref=URIRef(uri.forecast_uri))
-        # ask_test(ts_uri_ref=URIRef( uri.forecast_uri))
-        res[uri.forecast_uri] = [ts[uri.forecast_uri]]
-        # res[uri.ts_uri] = [ts[uri.ts_uri]]
+async def scan_forecast() -> List[Dict[str, Any]]:
 
+    from tm.modules.ke_interaction.interactions.dt_interactions import request_dt_ts_info, request_dt_data_by_id
+    from tm.modules.ke_interaction.interactions.dam_model import MarketTypeValue
+    from tm.modules.ke_interaction.interactions.dt_model import DTTSInfoRequest
+    # e
+    from tm.core.db.postgresql import dao_manager
+    res = []
+    for dt in dao_manager.dt_api.list():
+        dt_forecast = {}
+        job = dao_manager.job_api.get(dt.job_id)
+        market = dao_manager.market_api.get_market_by_id(market_id=job.market_id)
+        offers = dao_manager.offer_dao.list_offer_info(ts=None, market_id=market.market_id)
+        mt: MarketTypeValue = MarketType.parse(market.market_type).value
+
+        ts_info = request_dt_ts_info(req=[DTTSInfoRequest(
+            command_uri=URIRef(job.command_uri),
+            forecast_of=URIRef(oi.offer_uri)) for oi in offers])
+        dt_forecast["ts_info"] = ts_info
+        for uri in ts_info:
+            ts = request_dt_data_by_id(ts_uri_ref=URIRef(uri.forecast_uri))
+            # ask_test(ts_uri_ref=URIRef( uri.forecast_uri))
+            dt_forecast[uri.forecast_uri] = [ts[uri.forecast_uri]]
+            # res[uri.ts_uri] = [ts[uri.ts_uri]]
+        res.append(dt_forecast)
     return res
 
 

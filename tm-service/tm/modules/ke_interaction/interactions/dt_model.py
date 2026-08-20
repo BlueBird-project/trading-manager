@@ -17,6 +17,15 @@ class DigitalTwinInfo(BindingsBase):
         super().__init__(bindings=kwargs)
 
 
+# @ki_object("self-dt-info")
+# class SelfDigitalTwinInfo(BindingsBase):
+#     command_uri: URIRef
+#     market_uri: URIRef
+#
+#     def __init__(self, **kwargs):
+#         super().__init__(bindings=kwargs)
+
+
 @ki_object("dt-ts-info")
 class DTTSInfo(BindingsBase):
     command_uri: URIRef
@@ -80,6 +89,7 @@ class DTTSInfo(BindingsBase):
 @ki_object("dt-ts-info", allow_partial=True)
 class DTTSInfoRequest(BindingsBase):
     command_uri: URIRef
+    forecast_of: URIRef
 
 
 @ki_object("dt-ts")

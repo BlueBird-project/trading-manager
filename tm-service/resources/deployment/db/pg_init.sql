@@ -28,6 +28,7 @@ CREATE SEQUENCE ${table_prefix}dt_info_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 92
 CREATE TABLE "public"."${table_prefix}dt_info" (
     "dt_id" bigint DEFAULT nextval('${table_prefix}dt_info_id_seq') NOT NULL,
     "dt_uri" character varying(250) NOT NULL,
+    "kb_id" character varying(250) NULL,
     "job_id" bigint,
     "update_ts" bigint NOT NULL,
     "ext" character varying(10000),

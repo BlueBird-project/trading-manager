@@ -19,9 +19,9 @@ class DTAPIQueries(QueryObject):
     dt_id = :dt_id  """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
-     ( "dt_uri",  "job_id", "ext" ,"update_ts"  )
-     VALUES (:dt_uri,  :job_id,   :ext,extract(epoch from now()) * 1000) """
-    UPDATE = """UPDATE   "${table_prefix}${table_name}" SET "job_id" = :job_id, "ext" = :ext  
+     ( "dt_uri", "kb_id", "job_id", "ext" ,"update_ts"  )
+     VALUES (:dt_uri, :kb_id, :job_id,   :ext,extract(epoch from now()) * 1000) """
+    UPDATE = """UPDATE   "${table_prefix}${table_name}" SET "job_id" = :job_id, "kb_id"=:kb_id, "ext" = :ext  
     ,"update_ts"  = extract(epoch from now()) * 1000  WHERE dt_id=:dt_id """
 
 

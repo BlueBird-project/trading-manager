@@ -16,6 +16,15 @@ from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTT
     DTDPUri, DTDPRUri, DTTSInfoRequest
 
 
+@ki_object("self-dt-info")
+class SelfDigitalTwinInfo(BindingsBase):
+    command_uri: URIRef
+    market_uri: URIRef
+
+    def __init__(self, **kwargs):
+        super().__init__(bindings=kwargs)
+
+
 @ki_object("dt-ts-info")
 class DTTSInfo(BindingsBase):
     command_uri: URIRef
@@ -25,6 +34,7 @@ class DTTSInfo(BindingsBase):
     ts_interval_uri: URIRef
     ts_date_from: Literal
     ts_date_to: Literal
+
     # update_rate: Literal
 
     def __init__(self, **kwargs):
@@ -109,6 +119,26 @@ def _post_dt_info(market_uri: URIRef) -> List[DigitalTwinInfo]:
     return [dt_info]
 
 
+@dt_ki.post("self-dt-info")
+def _post_self_dt_info(market_uri: URIRef) -> List[SelfDigitalTwinInfo]:
+    dt_info = SelfDigitalTwinInfo(
+        command_uri=_init_command_uri(market_uri=str(market_uri)),
+        market_uri=market_uri)
+    return [dt_info]
+
+
+@dt_ki.answer("self-dt-info")
+def on_self_dt_info_request(ki_id, bindings):
+    global _tm_info
+    print("on_self_dt_info_request")
+    dt_info = SelfDigitalTwinInfo(
+        command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
+        market_uri=_tm_info.market_uri)
+    print(dt_info)
+
+    return [dt_info]
+
+
 @dt_ki.answer("dt-info")
 def on_dt_info_request(ki_id, bindings):
     global _tm_info
@@ -186,13 +216,20 @@ def _generate_sample_ts(ts_uri: DTTSUri, offer: List[TMMarketOfferBindings]) -> 
     cur_ts = ts_uri.ts_start
     isp = 0
     res = []
+
+    def generate(v):
+        if v is None:
+            return -0.000123
+        else:
+            return float(v) * (-1)
+
     for o in offer:
         isp += 1
         pnt = DTPnt(ts_uri=ts_uri.uri_ref,
                     dp=DTDPUri(prefix=dt_ki.get_kb_id(), **ts_uri.__dict__, isp=isp).uri_ref,
                     ts=Literal(time_utils.xsd_from_ts(cur_ts)),
                     dpr=DTDPRUri(prefix=dt_ki.get_kb_id(), **ts_uri.__dict__, isp=isp).uri_ref,
-                    value=Literal(float(o.convert_value(o.value, float)) * (-1)))
+                    value=Literal(generate(o.convert_value(o.value, float))))
         res.append(pnt)
         cur_ts += 60000 * 15
     return res
@@ -261,6 +298,14 @@ def set_tm(tm: dt_model.TMInfo):
 def post_dt_info():
     global _tm_info
     resp_bindings: KIPostResponse = _post_dt_info(market_uri=_tm_info.market_uri)
+    info_ack = [{"status": b.status == ExchangeInfoStatus.SUCCEEDED, "kb_id": b.knowledgeBaseId}
+                for b in resp_bindings.exchangeInfo]
+    return info_ack
+
+
+def post_self_dt_info():
+    global _tm_info
+    resp_bindings: KIPostResponse = _post_self_dt_info(market_uri=_tm_info.market_uri)
     info_ack = [{"status": b.status == ExchangeInfoStatus.SUCCEEDED, "kb_id": b.knowledgeBaseId}
                 for b in resp_bindings.exchangeInfo]
     return info_ack

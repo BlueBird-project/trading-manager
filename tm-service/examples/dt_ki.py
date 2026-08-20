@@ -16,13 +16,13 @@ app_args = tm.init_args()
 from tm.core import   app_settings
 # from tm.core.service import settings as service_settings
 tm.set_logging()
-logging.info(f"START DT Smart Clieant")
+logging.info(f"START DT Smart Client")
 
 
 # region helpers
 def get_tm():
-    from examples.ki.dt_interactions import find_tm
-    from examples.ki.dt_interactions import set_tm
+    from examples.ki.dt_sc_interactions import find_tm
+    from examples.ki.dt_sc_interactions import set_tm
     _tm: Optional[TMInfo] = None
     tm_info_list = find_tm()
     if len(tm_info_list) < 1:
@@ -49,7 +49,7 @@ if __name__ == "__main__" and app_settings:
 
     setup_ke()
     from examples.ki.smart_client import set_bg_ke_client
-    from examples.ki.dt_interactions import dt_ki
+    from examples.ki.dt_sc_interactions import dt_ki
 
     ################################################
     # register knowledge interaction modules
@@ -80,7 +80,7 @@ if __name__ == "__main__" and app_settings:
     success = False
     while not success:
         try:
-            from examples.ki.dt_interactions import post_dt_info
+            from examples.ki.dt_sc_interactions import post_dt_info
 
             print(f"tick: {client.state()}")
             # inform TM that there is DT in the network
@@ -104,11 +104,12 @@ if __name__ == "__main__" and app_settings:
     while True:
         try:
 
-            from examples.ki.dt_interactions import post_dt_info, post_forecast, get_offer_uri, get_offer
+            from examples.ki.dt_sc_interactions import post_dt_info, post_forecast, get_offer_uri, get_offer
             # get current offer
             offer_uris = get_offer_uri()
             if len(offer_uris) < 1:
                 print("Error: no offer")
+                sleep(35)
                 continue
             else:
                 print(f"offer info: {len(offer_uris)}")

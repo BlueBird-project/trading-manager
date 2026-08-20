@@ -1,0 +1,15 @@
+#service:
+#  name: "Sample SC"
+app:
+  logging_conf_path: "./resources/logging.ini"
+  use_scheduler: false
+  use_rest_api: false
+  use_ke_api: true
+ke:
+  #  rest_endpoint:
+  allow_partial_ki: true
+  ki_vars:
+    DAY_DURATION: '"PT1440M"^^xsd:duration'
+    ISP_UNIT: '"PT15M"^^xsd:duration'
+    CURRENCY_UNIT: "EUR"
+    ENERGY_COST_UNIT: "EURPerMegawattHour"

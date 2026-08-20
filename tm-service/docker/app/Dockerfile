@@ -67,4 +67,4 @@ ENV APP_LOGGING_CONF_PATH="/app/resources/deployment/logging.ini"
 #ENV APP_USE_REST_API=True
 #ENV APP_USE_KE_API=True
 EXPOSE 8080
-CMD ["python", "manage.py","-c" ,"/config/app_config.yaml"  ]
+CMD ["python", "manage.py","-c" ,"/config/config.yaml"  ]

@@ -9,6 +9,7 @@ ENV SERVICE_LOG_DIR=/var/log/
 #RUN mkdir /app/examples
 COPY /docker/fm-service/examples /app/examples
 COPY /docker/fm-service/examples/fm_ki.py /app/fm_ki.py
+COPY /docker/dt-service/examples/config.yaml /app/config/config.yaml
 #COPY /docker/dt-service/resources/deployment/ki/fm_sample.yaml /app/resources/deployment/ki/fm_sample.yaml
 #COPY /docker/dt-service/resources/deployment/ki/fm.yaml /app/resources/deployment/ki/fm.yaml
 #COPY /docker/dt-service/resources/deployment/ki/dam.yaml /app/resources/deployment/ki/dam.yaml

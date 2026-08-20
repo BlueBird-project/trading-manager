@@ -11,8 +11,11 @@ ENV SERVICE_LOG_DIR=/var/log/
 #RUN mkdir /app/examples
 COPY /docker/dt-service/examples /app/examples
 COPY /docker/dt-service/examples/dt_ki.py /app/dt_ki.py
+COPY /docker/dt-service/examples/config.yaml /app/config/config.yaml
+
 #COPY /docker/dt-service/resources/deployment/ki/dt_sample.yaml /app/resources/deployment/ki/dt_sample.yaml
 #COPY /docker/dt-service/resources/deployment/ki/tm_sample.yaml /app/resources/deployment/ki/tm_sample.yaml
 #COPY /docker/dt-service/resources/deployment/ki/dam.yaml /app/resources/deployment/ki/dam.yaml
-EXPOSE 8080
-CMD ["python", "dt_ki.py","-c" ,"/config/config.yaml"    ]
+#EXPOSE 8080
+WORKDIR /app
+CMD ["python", "dt_ki.py","-c" ,"/config/config.yaml" ]

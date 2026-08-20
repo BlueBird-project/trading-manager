@@ -19,9 +19,9 @@ async def dam_scan(isp_unit: int = 15, ts_from: Optional[int] = None, ts_to: Opt
     res["markets"] = [m.n3() for m in get_all_markets(False)]
     # TODO: iterate overdays when ti is very long
     offer_infos = get_current_market_offer_info(isp_unit=isp_unit, ti=TimeSpan(ts_from=ts_from, ts_to=ts_to))
-    res["info_uris"] = [o.n3() for o in offer_infos]
+    res["offer_info_uri"] = [o.n3() for o in offer_infos]
     offer = get_market_offer(offer_uris=[offer_info.offer_uri for offer_info in offer_infos])
-    res["market_offer"] = offer
+    res["market_offer_ts"] = offer
     return res
 
 

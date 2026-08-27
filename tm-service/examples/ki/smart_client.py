@@ -64,6 +64,7 @@ def _set_ke_client(ke_ki_client: KEClient, bg_mode=False):
 def set_bg_ke_client(interaction_list: List[KIHolder]):
     ki_client: KEClient = KEClient.build(logger=logging.getLogger())
     for ki in interaction_list:
+        # include interaction
         ki_client.include(ki_holder=ki)
     ki_client = _set_ke_client(ki_client, bg_mode=True)
     while not ki_client.is_registered:

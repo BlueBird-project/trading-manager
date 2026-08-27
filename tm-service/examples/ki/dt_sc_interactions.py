@@ -12,6 +12,7 @@ from examples.ki.dt_model import *
 from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTTSUri, \
     DTTSInfoRequest
 
+# initialize knowledge engine
 dt_ki = KIHolder()
 _tm_info: dt_model.TMInfo = None
 
@@ -29,6 +30,7 @@ def _post_dt_info(market_uri: URIRef) -> List[DigitalTwinInfo]:
     dt_info = DigitalTwinInfo(dt_uri=URIRef(dt_ki.get_kb_id()),
                               command_uri=_init_command_uri(market_uri=str(market_uri)),
                               market_uri=market_uri)
+    # return graph pattern bindings - sent through KE
     return [dt_info]
 
 
@@ -41,14 +43,21 @@ def _post_self_dt_info(market_uri: URIRef) -> List[SelfDigitalTwinInfo]:
 
 
 @dt_ki.answer("self-dt-info")
-def on_self_dt_info_request(ki_id, bindings):
+def on_self_dt_info_request(ki_id, bindings: List):
+    """
+
+    :param ki_id: knowledge interaction id
+    :param bindings: input bindings
+    :return:
+    """
     global _tm_info
+    # someone send KI-ASK
     print("on_self_dt_info_request")
     dt_info = SelfDigitalTwinInfo(
         command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
         market_uri=_tm_info.market_uri)
     print(dt_info)
-
+    # return graph pattern bindings
     return [dt_info]
 
 
@@ -122,7 +131,6 @@ def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
         res.append(_get_forecast_info(b.forecast_of))
 
     print(res)
-
     return res
 
 
@@ -141,10 +149,11 @@ def on_ts_info(ki_id, bindings: List[DTPntRequest]) -> List[DTPnt]:
             offer = offer_manager.get_offer(tm_offer.offer_uri, get_info_handler=get_offer_uri,
                                             get_offer_handler=_get_offer)
             print(f"forecast size for {tm_offer.offer_uri} : {len(offer)} ")
-            forecast_ts = generate_sample_forecast(ts_uri=DTTSUri.parse(b.ts_uri,prefix=_init_command_uri(market_uri=str(_tm_info.market_uri))),
-                                                   offer=offer, kb_id=dt_ki.get_kb_id())
+            forecast_ts = generate_sample_forecast(
+                ts_uri=DTTSUri.parse(b.ts_uri, prefix=_init_command_uri(market_uri=str(_tm_info.market_uri))),
+                offer=offer, kb_id=dt_ki.get_kb_id())
 
-        print(f"forecast: {forecast_ts}")
+        # print(f"forecast: {forecast_ts}")
         res += forecast_ts
 
     return res
@@ -161,24 +170,6 @@ def _post_ts(ts_uri: DTTSUri, offer: List[TMMarketOfferBindings]) -> List[DTPnt]
 # endregion
 
 
-# @dt_ki.answer("dt-ts")
-# def on_dt_ts_request(ki_id, bindings: List[DTPntRequest]) -> List[DTPnt]:
-#     print("on_dt_ts_request:dt-ts")
-#     if len(bindings) > 0:
-#         ts_uri = DTTSUri.parse(uri=bindings[0].ts_uri, prefix=dt_ki.get_kb_id())
-#         sample_ts = _generate_sample_ts(ts_uri=ts_uri)
-#
-#     else:
-#         global _current_forecast_uri
-#         if _current_forecast_uri is None:
-#             current_forecast_uri = _get_forecast_uri()
-#         else:
-#             current_forecast_uri = _current_forecast_uri
-#         sample_ts = _generate_sample_ts(ts_uri=current_forecast_uri)
-#
-#     print(f"forecast size: {len(sample_ts)}")
-#     return sample_ts
-
 # region trading manager
 @dt_ki.ask("tm-info")
 def _ask_tm_info():
@@ -193,14 +184,6 @@ def _ask_offer_info(tm_uri: URIRef, command_uri: URIRef):
 @dt_ki.ask("tm-market-offer")
 def _ask_offer(offer_uris: List[URIRef], tm_uri: URIRef):
     return [dt_model.TMMarketOfferRequest(offer_uri=u, tm_uri=tm_uri) for u in offer_uris]
-
-
-# def set_market_uri(market_uri: URIRef):
-#     global _market_uri
-#     if _market_uri is None:
-#         _market_uri = market_uri
-#     else:
-#         raise Exception(f"Market has been already set: {_market_uri}")
 
 
 def set_tm(tm: dt_model.TMInfo):
@@ -228,9 +211,9 @@ def post_self_dt_info():
 
 
 def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
-    # global _current_forecast_uri
     from examples.ki.dt_offer_helper import offer_manager
     from examples.ki.dt_offer_helper import _get_forecast_uri
+
     offer_info = offer_manager.get_offer_info(offer_uri=offer_uri, get_info_handler=get_offer_uri)
     if offer_info is None:
         print(f"no offer: {offer_uri}")
@@ -238,7 +221,6 @@ def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
     ts_uri = _get_forecast_uri(command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
                                sequence=offer_info.sequence, offer_end_ts=offer_info.end_ts)
 
-    # _current_forecast_uri = ts_uri
     ################################################
     # post metadata
     ################################################
@@ -268,8 +250,8 @@ def find_tm() -> List[dt_model.TMInfo]:
 
 def get_offer_uri() -> List[dt_model.TMMarketOfferInfoBindings]:
     global _tm_info
+    # ask TM through KE for current offer
     resp: KIAskResponse = _ask_offer_info(tm_uri=_tm_info.tm_uri, command_uri=_tm_info.command_uri)
-    print(resp)
     evaluated_resp: List[dt_model.TMMarketOfferInfoBindings] = [dt_model.TMMarketOfferInfoBindings(**b) for b in
                                                                 resp.binding_set]
 

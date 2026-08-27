@@ -1,7 +1,7 @@
 ################################################
-# load env files :
+#  dt env files (load before start python) :
 # ./resources/.env
-# ./resources/env/.env.fm
+# ./resources/env/.env.tm
 ################################################
 import logging
 from time import sleep
@@ -22,6 +22,10 @@ logging.info(f"START DT Smart Client")
 
 # region helpers
 def get_tm():
+    """
+    Find trading manager in the KE
+    :return:
+    """
     from examples.ki.dt_sc_interactions import find_tm
     from examples.ki.dt_sc_interactions import set_tm
     _tm: Optional[TMInfo] = None
@@ -66,13 +70,13 @@ if __name__ == "__main__" and app_settings:
 
     while tm_info is None:
         try:
+            print("Try find TM")
             tm_info = get_tm()
-            print(f"tick: {client.state()}")
         except Exception as ex:
-            print(f"can't get TM :{ex} ")
+            print(f"can't get TM :{ex}({client.state()}) ")
             sleep(5)
 
-    print(f"Observed tm : {tm_info}")
+    print(f"Observed TM : {tm_info}")
     ################################################
     ################################################
     # #publish information about digital twin
@@ -82,19 +86,17 @@ if __name__ == "__main__" and app_settings:
     while not success:
         try:
             from examples.ki.dt_sc_interactions import post_dt_info
-
-            print(f"tick: {client.state()}")
             # inform TM that there is DT in the network
             print(f"Post Digital Twin metadata ")
             dt_info_ack = post_dt_info()
             print(len(dt_info_ack))
-            print(dt_info_ack)
+            # print(dt_info_ack)
             if len(dt_info_ack) > 0:
                 success = True
             else:
                 sleep(30)
         except Exception as ex:
-            print(f"can't publish DT info :{ex} ")
+            print(f"can't publish DT info :{ex} ({client.state()}) ")
             sleep(5)
 
     ################################################
@@ -104,11 +106,8 @@ if __name__ == "__main__" and app_settings:
     ################################################
     while True:
         try:
-
             from examples.ki.dt_sc_interactions import post_dt_info, post_forecast, get_offer_uri, get_offer
-
-
-            # get current offer
+            # get current offer metadata
             offer_uris = get_offer_uri()
             if len(offer_uris) < 1:
                 print("Error: no offer")
@@ -120,13 +119,11 @@ if __name__ == "__main__" and app_settings:
             for o in offer_uris:
                 from examples.ki.dt_offer_helper import offer_manager
                 offer_manager.set_offer_info(offer_uri=o.offer_uri,end_ts=o.end_ts,sequence=o.sequence)
+            #get offer timeseries
             current_offer = get_offer(offer_uris=[o.offer_uri for o in offer_uris])
-            print(current_offer)
+            # print(current_offer)
             print(f"len offer: {len(current_offer)}")
             current_offer_dict = {c.offer_uri: c for c in current_offer}
-
-            print(f"tick: {client.state()}")
-            print(f"Post ts")
             for k in current_offer_dict.keys():
                 # publish dummy forecast for each offer
                 offer_manager.set_offer(offer_uri=k,offer=[o for o in current_offer if o.offer_uri == k])
@@ -137,9 +134,7 @@ if __name__ == "__main__" and app_settings:
                 else:
                     print("ack: " + str(len(ts_ack)))
 
-            print(f"tock")
             sleep(240)
         except Exception as ex:
-            print("Some issue occurred: ")
-            print(ex)
+            print(f"Some issue occurred: {ex} ( {client.state()})")
             sleep(35)

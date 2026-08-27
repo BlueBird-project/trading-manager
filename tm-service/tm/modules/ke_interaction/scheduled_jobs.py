@@ -37,7 +37,6 @@ def _dt_jobs(scheduler: BaseScheduler):
         ts = scan_forecast(forecast_info=ts_info)
         logging.info(f"received timeseries , length: {len(ts)}")
 
-
     job = scheduler.get_job("dt_check")
     from tm import core
     job.modify(next_run_time=(datetime.now(tz=core.__TIME_ZONE__) + timedelta(seconds=_BASE_TIME_OFFSET_ + 120)))

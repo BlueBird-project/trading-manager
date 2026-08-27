@@ -8,7 +8,8 @@ from tm.utils import TimeSpan
 
 tou_ki = KIHolder()
 from examples.ki.fm_model import TOUPrice, TOUPriceQuery, \
-    TOUPriceInfoFiltered, TOUPriceInfoQueryFiltered, TMAgent
+    TOUPriceInfoFiltered, TOUPriceInfoQueryFiltered
+
 
 #
 # @tou_ki.ask("tm-agent")

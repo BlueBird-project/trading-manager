@@ -1,12 +1,8 @@
-from datetime import timedelta
 from typing import List, Optional, Dict, Any
 
 from fastapi import APIRouter
-from isodate import duration_isoformat
-from rdflib import URIRef, Literal
 
 from tm.models.digital_twin import DigitalTwinDAO
-from tm.modules.ke_interaction.interactions.dam_model import MarketType
 from tm.utils import TimeSpan
 
 ki_router = APIRouter(prefix="", tags=["KI"])
@@ -41,31 +37,18 @@ async def dt_scan() -> List[DigitalTwinDAO]:
 
 # @ki_router.get("/dt/forecast")
 @ki_router.post("/dt/forecast", description="Request for forecast from DT ")
-async def scan_forecast() -> List[Dict[str, Any]]:
-    from tm.modules.ke_interaction.interactions.dt_interactions import request_forecast_info, request_forecast
-    from tm.modules.ke_interaction.interactions.dt_model import DTTSInfoRequest
+async def scan_forecast() -> Dict[str, Any]:
     # e
-    from tm.core.db.postgresql import dao_manager
-    res = []
-    for dt_info in dao_manager.dt_api.list():
-        dt_forecast = {}
-        job = dao_manager.job_api.get(dt_info.job_id)
-        market = dao_manager.market_api.get_market_by_id(market_id=job.market_id)
-        offers = dao_manager.offer_dao.list_offer_info(ts=None, market_id=market.market_id)
-        # mt: MarketTypeValue = MarketType.parse(market.market_type).value
+    result = {"ts_info": [], "forecasts": {}}
 
-        if dt_info.kb_id is not None:
-            ts_info = request_forecast_info(req=[DTTSInfoRequest(
-                forecast_of=URIRef(oi.offer_uri)) for oi in offers], kb_id=dt_info.kb_id)
-            dt_forecast["ts_info"] = ts_info
-            for uri in ts_info:
-                ts = request_forecast(ts_uri=URIRef(uri.forecast_uri), kb_id=dt_info.kb_id)
-                # ask_test(ts_uri_ref=URIRef( uri.forecast_uri))
-                dt_forecast.update(**ts)
-                # res[uri.ts_uri] = [ts[uri.ts_uri]]
-            res.append(dt_forecast)
+    from tm.modules.ke_interaction.interactions.dt_api import scan_forecast_info, scan_forecast
+    ts_info = scan_forecast_info()
+    for ts_list in ts_info.values():
+        for ts in ts_list:
+            result["ts_info"] = ts.forecast_uri
+    result["forecasts"].update(scan_forecast(forecast_info=ts_info))
 
-    return res
+    return result
 
 
 # @ki_router.get("/fm/ask/flex_info", description="returns List[FMTSResponse]")
@@ -101,7 +84,7 @@ async def flex_ts() -> List[Dict[str, Any]]:
     from tm.modules.ke_interaction.interactions.client import ki_client
 
     info_resp = get_range_tou_filtered(binding_query=[info_q], kb_id=ki_client.kb_id)
-    price_q = [TOUPriceQuery(tou_uri=info.tou_uri) for info in info_resp]
+    price_q = [TOUPriceQuery(tou_uri=info.tou_uri, ts_type=info.ts_type) for info in info_resp]
     # async def flex_ts(ts_uri: str) -> List[FMPnt]:
     # q = TOUPriceQuery(tou_uri=uri)
     prices = get_price_filtered(binding_query=price_q, kb_id=tm_ki.get_kb_id())
@@ -111,17 +94,12 @@ async def flex_ts() -> List[Dict[str, Any]]:
 @ki_router.get("/tou/offer_info", response_description="returns List[FMPnt]",
                description="tou test")
 async def tou_offer_info() -> list[Dict]:
-    # sprawdzic
     from tm.modules.ke_interaction.interactions.tm_model import TOUPriceInfoQueryFiltered
     from tm.modules.ke_interaction.service.tou_service import get_range_tou_filtered
     from tm.core.db.postgresql import dao_manager
-    ts = TimeSpan.last_day()
-
-    range_id = dao_manager.offer_dao.get_range().range_id
+    # ts = TimeSpan.last_day()
+    # range_id = dao_manager.offer_dao.get_range().range_id
     info_q = TOUPriceInfoQueryFiltered.init()
-
     from tm.modules.ke_interaction.interactions.client import ki_client
-
     info_resp = get_range_tou_filtered(binding_query=[info_q], kb_id=ki_client.kb_id)
-    # todo zwracac informacje o sequence
     return [{**vars(i)} for i in info_resp]

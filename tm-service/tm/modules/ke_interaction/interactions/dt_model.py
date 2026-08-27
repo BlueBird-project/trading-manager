@@ -2,7 +2,7 @@ import math
 from typing import Optional
 
 from isodate import parse_duration
-from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral, is_nil
+from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 

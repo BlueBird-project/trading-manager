@@ -2,12 +2,14 @@ from typing import List
 
 from isodate import parse_duration
 from rdflib.util import from_n3
+from ubflex.rdf import UBMARKET_FORECAST
+from ubflex.rdf.saref.saref4ener import SAREF4ENER_TIMESERIES
 
 from tm.models.digital_twin import DTForecastOfferDAO
 from tm.models.job_dao import JobDAO
 from tm.models.market_offer import RangeInfo, EnergyMarketOfferDAO
 from tm.modules.ke_interaction import KIVars
-from tm.modules.ke_interaction.interactions.ki_models import DurationURI, SAREF4ENER_TIMESERIES, UBMARKET_FORECAST
+from tm.modules.ke_interaction.interactions.ki_models import DurationURI
 from tm.modules.ke_interaction.interactions.tm_model import *
 from tm.modules.ke_interaction.interactions.tm_uris import *
 from tm.utils import TimeSpan

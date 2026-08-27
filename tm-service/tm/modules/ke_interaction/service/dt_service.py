@@ -53,14 +53,6 @@ def process_forecast_info(bindings: List[DTTSInfo]) -> List[DTForecastInfoDAO]:
     # unlimited_range = dao_manager.offer_dao.get_range(None, None)
     # range_id = unlimited_range.range_id
     for b in bindings:
-        # min_power, max_power = b.get_power_limit()
-        # power_range = dao_manager.offer_dao.get_range(min_power, max_power)
-        # if power_range is None:
-        #     logging.warning("Adding new power range")
-        #     # should we prevent automatic range generation ?
-        #     range_id = dao_manager.offer_dao.add_range(RangeInfo(min_value=min_power, max_value=max_power)).range_id
-        # else:
-        #     range_id = power_range.range_id
         job = dao_manager.job_api.get_by_command(command_uri=b.command_uri)
         if job is None:
             logging.error(f"Job(Command) not found: {b.command_uri} for forecast :{b.ts_uri}")
@@ -127,19 +119,3 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
     # cost_mwh: Optional[float]
     # ts: int
     # isp_len: int = 1
-
-# def join_forecast_offer(relations: List[ForecastOfferRelation]):
-#     from tm.core.db.postgresql import dao_manager
-#     d = {}
-#     for r in relations:
-#         offer_info = dao_manager.offer_dao.get_offer_info(offer_uri=r.offer_uri)
-#         if offer_info is None:
-#             logging.error(f"offer: {r.offer_uri} does not exist")
-#             raise Exception(f"offer: {r.offer_uri} does not exist")
-#         forecast_info = dao_manager.forecast_api.get_by_uri(forecast_uri=r.forecast_uri)
-#         if forecast_info is None:
-#             logging.error(f"offer: {r.forecast_info} does not exist")
-#             raise Exception(f"offer: {r.forecast_info} does not exist")
-#         d[r.forecast_uri] = offer_info.offer_id
-#     for f_uri, offer_id in d.items():
-#         assert dao_manager.forecast_api.set_forecast_offer(forecast_uri=f_uri, offer_id=offer_id)

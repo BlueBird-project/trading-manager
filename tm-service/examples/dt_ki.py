@@ -13,7 +13,8 @@ import tm
 # setup configurations
 ################################################
 app_args = tm.init_args()
-from tm.core import   app_settings
+from tm.core import app_settings
+
 # from tm.core.service import settings as service_settings
 tm.set_logging()
 logging.info(f"START DT Smart Client")
@@ -54,7 +55,7 @@ if __name__ == "__main__" and app_settings:
     ################################################
     # register knowledge interaction modules
     ################################################
-    client = set_bg_ke_client([  dt_ki])
+    client = set_bg_ke_client([dt_ki])
     from examples.ki.dt_model import TMInfo
 
     success = False
@@ -105,6 +106,8 @@ if __name__ == "__main__" and app_settings:
         try:
 
             from examples.ki.dt_sc_interactions import post_dt_info, post_forecast, get_offer_uri, get_offer
+
+
             # get current offer
             offer_uris = get_offer_uri()
             if len(offer_uris) < 1:
@@ -114,6 +117,9 @@ if __name__ == "__main__" and app_settings:
             else:
                 print(f"offer info: {len(offer_uris)}")
                 success = True
+            for o in offer_uris:
+                from examples.ki.dt_offer_helper import offer_manager
+                offer_manager.set_offer_info(offer_uri=o.offer_uri,end_ts=o.end_ts,sequence=o.sequence)
             current_offer = get_offer(offer_uris=[o.offer_uri for o in offer_uris])
             print(current_offer)
             print(f"len offer: {len(current_offer)}")
@@ -123,6 +129,7 @@ if __name__ == "__main__" and app_settings:
             print(f"Post ts")
             for k in current_offer_dict.keys():
                 # publish dummy forecast for each offer
+                offer_manager.set_offer(offer_uri=k,offer=[o for o in current_offer if o.offer_uri == k])
                 ts_ack = post_forecast(offer_uri=k, offer=[o for o in current_offer if o.offer_uri == k])
                 print("ack: " + str(len(ts_ack)))
                 if len(ts_ack) > 0:

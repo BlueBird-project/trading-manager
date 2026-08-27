@@ -1,7 +1,7 @@
 import logging
 from string import Template
 
-from effi_onto_tools.db.postgresql.init_db import DBMeta, APP_CONFIG_TABLE_NAME
+from effi_onto_tools.db.postgresql.init_db import DBMeta
 from sqlalchemy import text
 
 

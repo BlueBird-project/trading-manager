@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List
 from zoneinfo import ZoneInfo
 
 from effi_onto_tools.utils import DictBaseSettings

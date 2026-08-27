@@ -11,6 +11,4 @@ ADD "kb_id" character varying(250) NULL;
 
 
 def db_0_2_update(db_meta: DBMeta):
-    from tm.core.db.postgresql import dao_manager
-
     _run_ddl(ddl_str=_0_2_ddl, db_version="0.2", table_prefix=db_meta.db_table_prefix)

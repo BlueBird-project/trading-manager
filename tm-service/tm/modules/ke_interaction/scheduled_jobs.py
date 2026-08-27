@@ -6,7 +6,6 @@ from typing import List
 
 from apscheduler.schedulers.base import BaseScheduler
 from ke_client.utils import time_utils
-from rdflib import URIRef
 
 from tm.utils import TimeSpan
 
@@ -21,23 +20,23 @@ def _dt_jobs(scheduler: BaseScheduler):
         from tm.modules.ke_interaction.interactions.dt_interactions import request_dt_info
         logging.info("Scan for Digital Twins")
         from tm.models.digital_twin import DigitalTwinDAO
-        dt_ack:List[DigitalTwinDAO] = request_dt_info()
+        dt_ack: List[DigitalTwinDAO] = request_dt_info()
         logging.info(f"Scanned dts: {",".join([f"{dt.dt_uri}({dt.kb_id})" for dt in dt_ack])}")
 
     @scheduler.scheduled_job(trigger='cron', id="forecast_scan", day_of_week='*', hour='8',
                              minute='15',
                              month='*', year='*', day='*', max_instances=1, coalesce=True)
     def scan_forecast():
-        from tm.modules.ke_interaction.interactions.dt_interactions import request_forecast, request_forecast_info
+        from tm.modules.ke_interaction.interactions.dt_api import scan_forecast_info, scan_forecast
+
         logging.info("Scan for Forecast")
         # todo: set 'req' argument
-        ts_info = request_forecast_info(req=[])
-        logging.info(f"Scanned dts: {",".join([ts.forecast_uri for ts in ts_info])}")
-        for uri in ts_info:
-            ts = request_dt_data_by_id(ts_uri_ref=URIRef(uri.forecast_uri))
-            logging.info(f"received timeseries , length: {len(ts)}")
-            #         TODO store timeseries
-            print(ts)
+        ts_info = scan_forecast_info()
+        logging.info(f"Scanned dts: {",".join([ts.forecast_uri for ts_list in ts_info.values() for ts in ts_list])}")
+
+        ts = scan_forecast(forecast_info=ts_info)
+        logging.info(f"received timeseries , length: {len(ts)}")
+
 
     job = scheduler.get_job("dt_check")
     from tm import core

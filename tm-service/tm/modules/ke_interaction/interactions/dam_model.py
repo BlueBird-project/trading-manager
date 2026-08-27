@@ -100,6 +100,12 @@ class MarketOfferInfoBindings(BindingsBase):
                 self.sequence = None
 
     @property
+    def end_ts(self) -> int:
+        return int(
+            parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() * 1000) + time_utils.xsd_to_ts(
+            self.time_create)
+
+    @property
     def create_ts(self):
         return time_utils.xsd_to_ts(self.time_create)
 

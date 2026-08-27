@@ -19,6 +19,10 @@ class DTAPI:
         pass
 
     @abstractmethod
+    def find(self, job_id: Optional[int] = None) -> List[DigitalTwinDAO]:
+        pass
+
+    @abstractmethod
     def get(self, dt_id: int) -> Optional[DigitalTwinDAO]:
         pass
 

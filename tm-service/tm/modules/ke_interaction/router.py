@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from isodate import duration_isoformat
 from rdflib import URIRef, Literal
 
+from tm.models.digital_twin import DigitalTwinDAO
 from tm.modules.ke_interaction.interactions.dam_model import MarketType
 from tm.utils import TimeSpan
 
@@ -32,39 +33,38 @@ async def dam_scan(isp_unit: int = 15, ts_from: Optional[int] = None, ts_to: Opt
 @ki_router.post("/dt/scan", response_description="returns List[DigitalTwinInfoACK]",
                 description="Scan for available digital twin services in KE network")
 # async def dt_scan() -> List[DigitalTwinInfoACK]:
-async def dt_scan() -> List[Dict[str, Any]]:
+async def dt_scan() -> List[DigitalTwinDAO]:
     from tm.modules.ke_interaction.interactions.dt_interactions import request_dt_info
-    dt_ack = request_dt_info()
-    return [b.n3() for b in dt_ack]
+    dt_dao = request_dt_info()
+    return dt_dao
 
 
 # @ki_router.get("/dt/forecast")
 @ki_router.post("/dt/forecast", description="Request for forecast from DT ")
 async def scan_forecast() -> List[Dict[str, Any]]:
-
-    from tm.modules.ke_interaction.interactions.dt_interactions import request_dt_ts_info, request_dt_data_by_id
-    from tm.modules.ke_interaction.interactions.dam_model import MarketTypeValue
+    from tm.modules.ke_interaction.interactions.dt_interactions import request_forecast_info, request_forecast
     from tm.modules.ke_interaction.interactions.dt_model import DTTSInfoRequest
     # e
     from tm.core.db.postgresql import dao_manager
     res = []
-    for dt in dao_manager.dt_api.list():
+    for dt_info in dao_manager.dt_api.list():
         dt_forecast = {}
-        job = dao_manager.job_api.get(dt.job_id)
+        job = dao_manager.job_api.get(dt_info.job_id)
         market = dao_manager.market_api.get_market_by_id(market_id=job.market_id)
         offers = dao_manager.offer_dao.list_offer_info(ts=None, market_id=market.market_id)
-        mt: MarketTypeValue = MarketType.parse(market.market_type).value
+        # mt: MarketTypeValue = MarketType.parse(market.market_type).value
 
-        ts_info = request_dt_ts_info(req=[DTTSInfoRequest(
-            command_uri=URIRef(job.command_uri),
-            forecast_of=URIRef(oi.offer_uri)) for oi in offers])
-        dt_forecast["ts_info"] = ts_info
-        for uri in ts_info:
-            ts = request_dt_data_by_id(ts_uri_ref=URIRef(uri.forecast_uri))
-            # ask_test(ts_uri_ref=URIRef( uri.forecast_uri))
-            dt_forecast[uri.forecast_uri] = [ts[uri.forecast_uri]]
-            # res[uri.ts_uri] = [ts[uri.ts_uri]]
-        res.append(dt_forecast)
+        if dt_info.kb_id is not None:
+            ts_info = request_forecast_info(req=[DTTSInfoRequest(
+                forecast_of=URIRef(oi.offer_uri)) for oi in offers], kb_id=dt_info.kb_id)
+            dt_forecast["ts_info"] = ts_info
+            for uri in ts_info:
+                ts = request_forecast(ts_uri=URIRef(uri.forecast_uri), kb_id=dt_info.kb_id)
+                # ask_test(ts_uri_ref=URIRef( uri.forecast_uri))
+                dt_forecast.update(**ts)
+                # res[uri.ts_uri] = [ts[uri.ts_uri]]
+            res.append(dt_forecast)
+
     return res
 
 

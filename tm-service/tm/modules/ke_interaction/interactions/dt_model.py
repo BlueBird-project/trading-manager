@@ -2,7 +2,7 @@ import math
 from typing import Optional
 
 from isodate import parse_duration
-from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral
+from ke_client import ki_split_uri, SplitURIBase, BindingsBase, ki_object, OptionalLiteral, is_nil
 from ke_client.utils import time_utils
 from rdflib import URIRef, Literal
 
@@ -29,12 +29,12 @@ class DigitalTwinInfo(BindingsBase):
 @ki_object("dt-ts-info")
 class DTTSInfo(BindingsBase):
     command_uri: URIRef
+    market_uri: URIRef
     ts_uri: URIRef
     forecast_of: URIRef
     time_create: Literal
     ts_interval_uri: URIRef
     ts_date_from: Literal
-    # sequence: OptionalLiteral = None
     ts_date_to: Literal
     update_rate: Literal
 
@@ -88,8 +88,26 @@ class DTTSInfo(BindingsBase):
 
 @ki_object("dt-ts-info", allow_partial=True)
 class DTTSInfoRequest(BindingsBase):
-    command_uri: URIRef
+    # command_uri: URIRef
     forecast_of: URIRef
+
+    # def __init__(self, skip_nil=True, **kwargs):
+    #     super().__init__(bindings=kwargs)
+    #     if skip_nil:
+    #         if is_nil(self.sequence):
+    #             self.sequence = None
+
+
+# @ki_object("dt-ts-info", allow_partial=True)
+# class DTTSInfoMarketRequest(BindingsBase):
+#     # find by market
+#     market_uri: URIRef
+
+
+# @ki_object("dt-ts-info", result=True)
+# class DTTSInfoResponse(BindingsBase):
+#     ts_uri: URIRef
+#     command_uri: URIRef
 
 
 @ki_object("dt-ts")
@@ -128,10 +146,23 @@ class DTPntRequest(BindingsBase):
         return DTTSUri.parse(uri=self.ts_uri)
 
 
-@ki_split_uri(uri_template="ts/${ts_start}/${ts_end}")
+@ki_split_uri(uri_template="ts/${sequence}/${ts_start}/${ts_end}")
 class DTTSUri(SplitURIBase):
+    sequence: str
     ts_start: int
     ts_end: int
+    __EMPTY__ = "_"
+
+    def __init__(self, sequence: Optional[str], **kwargs):
+        if sequence is None:
+            sequence = DTTSUri.__EMPTY__
+        super().__init__(sequence=sequence, **kwargs)
+
+    @property
+    def processed_sequence(self) -> Optional[str]:
+        if self.sequence == DTTSUri.__EMPTY__:
+            return None
+        return self.sequence
 
 
 @ki_split_uri(uri_template="${ts_start}/${ts_end}/dp/${isp}")

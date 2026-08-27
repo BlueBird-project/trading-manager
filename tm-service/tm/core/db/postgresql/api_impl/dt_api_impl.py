@@ -10,13 +10,15 @@ from tm.models.digital_twin import DigitalTwinDAO
 # class JobDAO
 
 class DTAPIQueries(QueryObject):
-    __PROJECTION__ = """ "dt_id" ,  "dt_uri" ,"job_id" ,  "update_ts" ,"ext" """
+    __PROJECTION__ = """ "dt_id" ,  "dt_uri" ,"job_id" , "kb_id",  "update_ts" ,"ext" """
     __TABLE_NAME__ = "dt_info"
     LIST = """SELECT ${projection}  FROM "${table_prefix}${table_name}" """
     GET_BY_URI = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE 
     dt_uri = :dt_uri  """
     GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE 
     dt_id = :dt_id  """
+    SELECT = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE 
+     COALESCE(job_id= :job_id)  """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
      ( "dt_uri", "kb_id", "job_id", "ext" ,"update_ts"  )
@@ -51,6 +53,11 @@ class DTAPIImpl(DTAPI):
     def list(self, ) -> List[DigitalTwinDAO]:
         with ConnectionWrapper() as conn:
             return conn.select(q=self.queries.LIST, args={}, obj_type=DigitalTwinDAO)
+
+    def find(self, job_id: Optional[int] = None) -> List[DigitalTwinDAO]:
+
+        with ConnectionWrapper() as conn:
+            return conn.select(q=self.queries.LIST, args={"job_id": job_id}, obj_type=DigitalTwinDAO)
 
     def get(self, dt_id: int) -> Optional[DigitalTwinDAO]:
         with ConnectionWrapper() as conn:

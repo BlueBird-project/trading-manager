@@ -10,7 +10,8 @@ from tm.modules.ke_interaction.interactions.dt_model import DigitalTwinInfo, DTT
 from tm.utils import isp_unit_to_ms
 
 
-def process(dt_info_list: List[DigitalTwinInfo], kb_id: str):
+def process(dt_info_list: List[DigitalTwinInfo], kb_id: str) -> List[DigitalTwinDAO]:
+    res = []
     for dt_info in dt_info_list:
         from tm.core.db.postgresql import dao_manager
         market = dao_manager.market_api.get_market(market_uri=dt_info.market_uri)
@@ -41,8 +42,9 @@ def process(dt_info_list: List[DigitalTwinInfo], kb_id: str):
                 db_dt.kb_id = kb_id
                 dt = dao_manager.dt_api.update(db_dt)
                 logging.info(f"Updated dt: {dt.dt_uri}:{dt.job_id}")
-                # response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
-    # return response
+            res.append(db_dt)
+            # response.append(DigitalTwinInfoACK(dt_uri=URIRef(dt.dt_uri), command_uri=URIRef(job.command_uri)))
+    return res
 
 
 def process_forecast_info(bindings: List[DTTSInfo]) -> List[DTForecastInfoDAO]:
@@ -99,7 +101,7 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
             #     TODO:
             # raise Exception(f"Init offer info {offer_uri}")
             # TODO: add bg task to ask KE for offer details
-            logging.error(f"Forecast Offer not registered {forecast_info}")
+            logging.error(f"Forecast Offer not registered: {ts_uri}")
             # del grouped_bindings[offer_uri]
         else:
             if clear:

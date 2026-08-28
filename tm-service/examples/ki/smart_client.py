@@ -5,7 +5,7 @@ from typing import List
 from ke_client import KIHolder, KEClient
 
 
-def _set_ke_client(ke_ki_client: KEClient, bg_mode=False):
+def _start_ke_client(ke_ki_client: KEClient, bg_mode=False):
     from tm.modules.ke_interaction.interactions import setup_ke
     setup_ke()
     import ke_client
@@ -61,12 +61,12 @@ def _set_ke_client(ke_ki_client: KEClient, bg_mode=False):
     return ke_ki_client
 
 
-def set_bg_ke_client(interaction_list: List[KIHolder]):
+def start_bg_ke_client(interaction_list: List[KIHolder]):
     ki_client: KEClient = KEClient.build(logger=logging.getLogger())
     for ki in interaction_list:
         # include interaction
         ki_client.include(ki_holder=ki)
-    ki_client = _set_ke_client(ki_client, bg_mode=True)
+    ki_client = _start_ke_client(ki_client, bg_mode=True)
     while not ki_client.is_registered:
         logging.info(f"KE client is not registered, wait for all KI to be registered.")
         time.sleep(3)

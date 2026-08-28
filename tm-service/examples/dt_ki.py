@@ -1,7 +1,8 @@
 ################################################
-#  dt env files (load before start python) :
+#  dt env files (load before starting script ) :
 # ./resources/.env
 # ./resources/env/.env.tm
+# then run: ./examples/dt_ki.py -c ./examples/config.yaml
 ################################################
 import logging
 from time import sleep
@@ -53,13 +54,13 @@ if __name__ == "__main__" and app_settings:
     from tm.modules.ke_interaction.interactions import setup_ke
 
     setup_ke()
-    from examples.ki.smart_client import set_bg_ke_client
+    from examples.ki.smart_client import start_bg_ke_client
     from examples.ki.dt_sc_interactions import dt_ki
 
     ################################################
     # register knowledge interaction modules
     ################################################
-    client = set_bg_ke_client([dt_ki])
+    client = start_bg_ke_client([dt_ki])
     from examples.ki.dt_model import TMInfo
 
     success = False

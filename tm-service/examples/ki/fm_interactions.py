@@ -92,7 +92,7 @@ def _evaluate_request():
 
 @fm_ki.ask("fm-ts-evaluate-ask")
 def _evaluate_request_ask():
-    # ask TM to evaluate
+    # ask Trading manager for prices for current power demand
     hour_ms = 3600000
     current_ts = int(time_utils.current_timestamp() / hour_ms) * hour_ms
     ts_end = current_ts + 24 * hour_ms

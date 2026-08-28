@@ -19,40 +19,48 @@ TM Smart Client connection graph patterns  to read/subscribe data from other cli
 
 ## TM docker management
 
+#### Build:
+
+```
 docker-compose -f .\compose\local.yaml --env-file .\resources\.env build
+
 docker-compose -f .\compose\local.yaml --env-file .\resources\.env build tm-service
 
-docker-compose -f .\compose\local.yaml --env-file .\resources\.env build --no-cache
+docker-compose -f .\compose\local.yaml --env-file .\resources\.env build tm-service --no-cache
+```
+
+#### Export docker imager
 
 docker save -o d:/tmp/tm-service-app_latest.tar tm-service-app:latest
 docker save -o d:/tmp/${image_name}_${image_version}.tar ${full_image_name}
 
 docker save -o d:/tmp/${image_name}_${image_version}.tar ${full_image_name}
 
-### Healthcheck
+## Healthcheck
 
-Service status API:
-http://localhost:9090/healthcheck/docs
-
+Service status API (Swagger docs):
+```
+http://localhost:9090/healthcheck/docs (
+```
 ## Samples 
 
-### Smart Clients
+### Smart Clients Samples
 
 * Flexibility Manager   : `./examples/ki/fm_ki.py`
 * Digital Twin : `./examples/ki/dm_ki.py`
 
-### KI interactions
+### Testing KI interactions
 
 Testing the REACT and ANSWER KE Interaction (FM and DT), The Swagger UI is available by default at:
-`{endpoint}/api`
-For example:
-`http://localhost:9090/api`
-
-The Swagger interface provides access to the available API endpoints (KI section) that can be used to test the REACT and ANSWER  (KE) interactions for FM and DT.
-
-Using these APIs, users can manually trigger data demand requests without waiting for the scheduled execution cycle. 
-This allows the interaction flow to be tested on demand and helps validate the system behavior during development and troubleshooting.
+```
+http://{TM_HOST}:{TM_PORT}/api#/KI (swagger)
+ 
+http://localhost:9090/api#/KI
+``` 
+The Swagger interface allows users to manually trigger data Knowledge Interactions without waiting for the scheduled execution cycle.  
 
 
 
 ## License
+
+TODO:

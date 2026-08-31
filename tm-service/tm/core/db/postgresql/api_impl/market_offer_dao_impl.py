@@ -16,6 +16,7 @@ class MarketOfferQueries:
          ( coalesce(:ts_from<= ("ts" + "isp_unit"::bigint * 60000 *isp_len::bigint),TRUE) and  coalesce(:ts_to>="ts",TRUE))
         and COALESCE("isp_unit"=:isp_unit,TRUE  )
        AND COALESCE(market_id = :market_id,TRUE)    AND COALESCE(sequence = :sequence,TRUE)
+       ORDER BY "market_id","sequence" desc , "ts" asc
         """
     GET_MAX_TS = """SELECT max("ts") as ts FROM "${table_prefix}offer_details"  
       WHERE COALESCE("isp_unit"=:isp_unit,TRUE  ) AND COALESCE(market_id = :market_id,TRUE) 
@@ -54,7 +55,8 @@ class MarketOfferQueries:
       WHERE offer_info.market_id =:market_id 
       AND ( coalesce(:ts_from<=(offer."ts" + offer."isp_unit"::bigint * 60000 *offer.isp_len::bigint),TRUE) 
             and  coalesce(:ts_to>=offer."ts",TRUE) )
-      and COALESCE(offer_info."isp_unit"=:isp_unit,TRUE )  """
+      and COALESCE(offer_info."isp_unit"=:isp_unit,TRUE )  
+       ORDER BY offer_info.market_id , offer_info.sequence desc, offer."ts" asc """
 
     INSERT_MARKET_OFFER = """ INSERT INTO "${table_prefix}market_offer" 
         ("offer_id", "isp_start",  "cost_mwh", "ts", "isp_len")

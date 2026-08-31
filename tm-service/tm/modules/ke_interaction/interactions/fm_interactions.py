@@ -31,7 +31,7 @@ def _request_data(ts_uris: List[FMPntQuery]):
 def _on_evaluate_request(ki_id, bindings: List[FMEvaluateQuery]):
     print("fm react")
     print(len(bindings))
-    resp = fm_service.evaluate(bindings)
+    resp = fm_service.evaluate(bindings,kb_id=ki.get_kb_id())
     print("fm react2")
     print(len(resp))
     # return resp

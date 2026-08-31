@@ -67,20 +67,25 @@ class FMEvaluateQuery(BindingsBase):
     dpr: URIRef
     value: Literal
 
-    def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
+    # def __init__(self, **kwargs):
+    #     super().__init__(bindings=kwargs)
+
+    @property
+    def ts_ms(self) -> int:
+        return time_utils.xsd_to_ts(self.ts)
 
 
 @ki_object("fm-ts-evaluate-ask", allow_partial=True)
-class FMEvaluateQueryAsk(BindingsBase):
-    ts_uri: URIRef
-    dp: URIRef
-    ts: Literal
-    dpr: URIRef
-    value: Literal
-
-    def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
+class FMEvaluateQueryAsk(FMEvaluateQuery):
+    pass
+    # ts_uri: URIRef
+    # dp: URIRef
+    # ts: Literal
+    # dpr: URIRef
+    # value: Literal
+    #
+    # def __init__(self, **kwargs):
+    #     super().__init__(bindings=kwargs)
 
 
 @ki_object("fm-ts-evaluate-ask")

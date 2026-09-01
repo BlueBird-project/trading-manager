@@ -2,14 +2,13 @@ import random
 from typing import List
 
 from ke_client import KIHolder, TargetedBindings
-from ke_client.ki_model import KIPostResponse, KIAskResponse
+from ke_client.ki_model import KIPostResponse, KIAskResponse, ExchangeInfoStatus
 
 from tm.modules.ke_interaction.interactions.fm_model import *
 from examples.ki import fm_model
 
 fm_ki = KIHolder()
 _tm_info: fm_model.TMInfo = None
-
 
 
 @fm_ki.ask("tm-info")
@@ -87,7 +86,7 @@ def _evaluate_request():
         value = Literal(random.randrange(400, 1200))
         response.append(FMEvaluateQuery(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
                                         value=value))
-    return TargetedBindings(bindings=response, knowledge_bases=[_tm_info.tm_uri])
+    return TargetedBindings(bindings=response, knowledge_bases=[_tm_info.kb_id])
 
 
 @fm_ki.ask("fm-ts-evaluate-ask")
@@ -110,14 +109,21 @@ def _evaluate_request_ask():
         response.append(
             FMEvaluateQueryAsk(ts_uri=ts_uri.uri_ref, dp=dp_uri.uri_ref, ts=Literal(xsd_ts), dpr=dpr_uri_ref,
                                value=value))
-    return TargetedBindings(bindings=response,knowledge_bases=[_tm_info.tm_uri])
+    return TargetedBindings(bindings=response, knowledge_bases=[_tm_info.kb_id])
 
 
 def find_tm() -> List[fm_model.TMInfo]:
     resp: KIAskResponse = _ask_tm_info()
     print(resp)
-    evaluated_resp: List[fm_model.TMInfo] = [fm_model.TMInfo(**b) for b in resp.binding_set]
-    return evaluated_resp
+    for tm_src in resp.exchangeInfo:
+        if tm_src.status == ExchangeInfoStatus.SUCCEEDED:
+            evaluated_resp: List[fm_model.TMInfo] = [
+                fm_model.TMInfo(**{**{"tm_uri": URIRef(tm_src.knowledgeBaseId)}, **b}, kb_id=URIRef(tm_src.knowledgeBaseId)) for
+                b in tm_src.bindingSet]
+            return evaluated_resp
+    return []
+    # evaluated_resp: List[fm_model.TMInfo] = [fm_model.TMInfo(**b) for b in resp.binding_set]
+    # return evaluated_resp
 
 
 def evaluate_flexibility() -> List[FMEvaluateResponse]:

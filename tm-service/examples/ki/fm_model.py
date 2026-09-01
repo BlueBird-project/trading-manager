@@ -13,6 +13,7 @@ class TMInfo(BindingsBase):
     tm_uri: URIRef
     market_uri: URIRef
     command_uri: URIRef
+    kb_id:URIRef
 
 
 @ki_object("tm-info", allow_partial=True)

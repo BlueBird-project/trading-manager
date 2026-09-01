@@ -244,8 +244,16 @@ def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
 def find_tm() -> List[dt_model.TMInfo]:
     resp: KIAskResponse = _ask_tm_info()
     print(resp)
-    evaluated_resp: List[dt_model.TMInfo] = [dt_model.TMInfo(**b) for b in resp.binding_set]
-    return evaluated_resp
+    for tm_src in resp.exchangeInfo:
+        if tm_src.status == ExchangeInfoStatus.SUCCEEDED:
+            evaluated_resp: List[dt_model.TMInfo] = [
+                dt_model.TMInfo(**{**{"tm_uri": URIRef(tm_src.knowledgeBaseId)}, **b},
+                                kb_id=URIRef(tm_src.knowledgeBaseId)) for
+                b in tm_src.bindingSet]
+            return evaluated_resp
+    return []
+    # evaluated_resp: List[dt_model.TMInfo] = [dt_model.TMInfo(**b,) for b in resp.binding_set]
+    # return evaluated_resp
 
 
 def get_offer_uri() -> List[dt_model.TMMarketOfferInfoBindings]:

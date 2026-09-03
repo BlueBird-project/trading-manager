@@ -62,7 +62,7 @@ class DTForecastInfoQueries(QueryObject):
      WHERE   forecast_uri = :forecast_uri """
     # GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}"
     #     WHERE COALESCE( job_id = :job_id , TRUE ) AND COALESCE( model_id = :model_id , TRUE )  """
-    GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" 
+    GET_MAX_TS = """SELECT max("ts") as "ts" from "${table_prefix}${table_name}" as ${table_alias} 
         JOIN  "${table_prefix}""" + DTAPIQueries.__TABLE_NAME__ + """" as dt_info 
          ON ${table_alias}."job_id" = dt_info."job_id" 
         WHERE  COALESCE( dt_info.job_id = :job_id , TRUE ) 
@@ -163,8 +163,8 @@ class DTForecastAPImpl(DTForecastAPI):
         return self._find_recent_forecasts(ts=ts, job_id=job_id, model_id=model_id, sequence=sequence,
                                            range_id=range_id, offer_id=None)
 
-    def get_offer_forecasts(self, offer_id: Optional[int], model_id: Optional[int], ) -> List[DTForecastInfoDAO]:
-        return self._find_forecasts(ts=None, job_id=None, model_id=None, sequence=None, range_id=None,
+    def get_offer_forecasts(self, offer_id: Optional[int], model_id: Optional[int] = None) -> List[DTForecastInfoDAO]:
+        return self._find_forecasts(ts=None, job_id=None, model_id=model_id, sequence=None, range_id=None,
                                     offer_id=offer_id)
 
     def set_forecast_offer(self, forecast_uri: str, offer_id: Optional[int]) -> bool:

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 
 from pydantic import BaseModel
+from rdflib import URIRef
 
 
 class DigitalTwinDAO(BaseModel):
@@ -51,6 +52,20 @@ class DTForecastOfferDAO:
     cost_mwh: Optional[float]
     ts: int
     isp_len: int = 1
+
+    @staticmethod
+    def get_value_type() -> URIRef:
+        from ubflex.rdf import UBMARKET_FORECAST_PROPERTY_VALUE
+        return UBMARKET_FORECAST_PROPERTY_VALUE
+
+    # def get_value_timestamp(self, isp_unit):
+    #     """
+    #
+    #     :param isp_unit: in minutes
+    #     :return:
+    #     """
+    #     isp_unit_ms = isp_unit * 1000 * 60
+    #     return self.ts + self.isp_start * isp_unit_ms
 
 
 @dataclass

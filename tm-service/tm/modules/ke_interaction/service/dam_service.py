@@ -79,7 +79,7 @@ def save_offer(offer_bindings: List[MarketOfferBindings], clear: bool = False):
             market_offer_items: list = [None] * len(grouped_bindings[offer_info.offer_uri])
             for i, binding in enumerate(market_offer):
                 isp_start = (binding.ts_ms - ts_start) / isp_len_ms
-                mo = EnergyMarketOfferDAO(offer_id=offer_info.offer_id, ts=offer_info.ts,
+                mo = EnergyMarketOfferDAO(offer_id=offer_info.offer_id, ts=binding.ts_ms,
                                           isp_start=isp_start, cost_mwh=binding.get_value(),
                                           isp_len=binding.isp_len(offer_info.isp_unit))
 

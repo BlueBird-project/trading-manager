@@ -105,7 +105,7 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
             forecast_dao: list = [None] * len(grouped_bindings[forecast_info.forecast_uri])
             for i, dp in enumerate(forecast):
                 isp_start = (dp.ts_ms - ts_start) / isp_len_ms
-                dp_dao = DTForecastOfferDAO(forecast_id=forecast_info.forecast_id, ts=forecast_info.ts,
+                dp_dao = DTForecastOfferDAO(forecast_id=forecast_info.forecast_id, ts=dp.ts_ms,
                                             isp_start=isp_start, cost_mwh=dp.get_value(),
                                             isp_len=dp.isp_len(forecast_info.isp_unit))
 

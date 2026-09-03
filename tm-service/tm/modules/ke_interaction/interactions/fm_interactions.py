@@ -29,33 +29,20 @@ def _request_data(ts_uris: List[FMPntQuery]):
 
 @ki.react("fm-ts-evaluate")
 def _on_evaluate_request(ki_id, bindings: List[FMEvaluateQuery]):
-    print("fm react")
-    print(len(bindings))
-    resp = fm_service.evaluate(bindings,kb_id=ki.get_kb_id())
-    print("fm react2")
-    print(len(resp))
-    # return resp
+    # print(len(bindings))
+    resp = fm_service.evaluate(bindings, kb_id=ki.get_kb_id())
+    # print(len(resp))
     return resp
 
 
 @ki.answer("fm-ts-evaluate-ask")
 def _on_evaluate_request(ki_id, bindings: List[FMEvaluateQueryAsk]):
-    print("fm answer")
-    print(len(bindings))
-    resp = fm_service.evaluate_ask(bindings)
-    print("fm answer 2 ")
-    print(len(resp))
-    # return resp
+    # print(len(bindings))
+    resp = fm_service.evaluate_ask(bindings, kb_id=ki.get_kb_id())
+    # print(len(resp))
     return resp
 
 
-# def request_ts_info(ts: TimeSpan) -> List[FMTSResponse]:
-#     resp_bindings: KIPostResponse = _request_flexibility_info(FMTSRequest(
-#         ts_interval_uri=KETimeIntervalUri(ts_from=ts.ts_from, ts_to=ts.ts_to).n3(),
-#         ts_date_from=Literal(time_utils.xsd_from_ts(ts.ts_from)),
-#         ts_date_to=Literal(time_utils.xsd_from_ts(ts.ts_to)),
-#     ))
-#     return [FMTSResponse(**b) for b in resp_bindings.result_binding_set]
 
 def request_ts_info(ts: TimeSpan) -> List[FMTSResponse]:
     resp_bindings: KIAskResponse = _ask_request_flexibility_info(FMTSRequest(

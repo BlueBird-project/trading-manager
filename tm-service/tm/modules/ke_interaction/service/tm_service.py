@@ -39,10 +39,12 @@ def get_tm_offer_info(bindings: List[TMMarketOfferInfoRequest], kb_id: str) -> L
         if market is not None:
             offers = dao_manager.offer_dao.list_offer_info(ts=None, market_id=market.market_id)
             mt: MarketTypeValue = MarketType.parse(market.market_type).value
+
             result += [
                 TMMarketOfferInfoBindings(market_uri=URIRef(market.market_uri), market_type=mt.uri_ref,
                                           command_uri=command_uri.uri_ref,
                                           offer_uri=URIRef(oi.offer_uri),
+                                          ts_type=oi.ty,
                                           time_create=Literal(time_utils.xsd_from_ts(ts=oi.ts)),
                                           sequence=Literal(oi.sequence),
                                           update_rate=Literal(duration_isoformat(timedelta(minutes=oi.isp_unit))),

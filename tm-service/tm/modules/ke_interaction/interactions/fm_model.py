@@ -77,21 +77,14 @@ class FMEvaluateQuery(BindingsBase):
 
 @ki_object("fm-ts-evaluate-ask", allow_partial=True)
 class FMEvaluateQueryAsk(FMEvaluateQuery):
-    pass
-    # ts_uri: URIRef
-    # dp: URIRef
-    # ts: Literal
-    # dpr: URIRef
-    # value: Literal
-    #
-    # def __init__(self, **kwargs):
-    #     super().__init__(bindings=kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 @ki_object("fm-ts-evaluate-ask")
 class FMEvaluateResponseAsk(FMEvaluateQueryAsk):
-    cost_dp: URIRef
     cost_dpr: URIRef
+    cost_dpr_type: URIRef
     cost: OptionalLiteral
 
     def __init__(self, **kwargs):
@@ -102,6 +95,7 @@ class FMEvaluateResponseAsk(FMEvaluateQueryAsk):
 class FMEvaluateResponse(BindingsBase):
     dp: URIRef
     cost_dpr: URIRef
+    cost_dpr_type: URIRef
     cost: OptionalLiteral
 
     def __init__(self, **kwargs):

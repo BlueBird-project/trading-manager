@@ -3,7 +3,7 @@ from datetime import timedelta
 from typing import List
 
 from isodate import duration_isoformat
-from ke_client import KIHolder
+from ke_client import KIHolder, TargetedBindings
 from ke_client.ki_model import KIPostResponse, ExchangeInfoStatus, KIAskResponse
 from ke_client.utils import time_utils
 
@@ -172,8 +172,10 @@ def _post_ts(ts_uri: DTTSUri, offer: List[TMMarketOfferBindings]) -> List[DTPnt]
 
 # region trading manager
 @dt_ki.ask("tm-info")
-def _ask_tm_info():
-    return [dt_model.TMInfoRequest()]
+def _ask_tm_info(kb_id: Optional[str] = None):
+    if kb_id is None:
+        return [dt_model.TMInfoRequest()]
+    return TargetedBindings(bindings=[dt_model.TMInfoRequest()], knowledge_bases=[kb_id])
 
 
 @dt_ki.ask("tm-market-offer-info")
@@ -243,17 +245,20 @@ def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
 
 def find_tm() -> List[dt_model.TMInfo]:
     resp: KIAskResponse = _ask_tm_info()
-    print(resp)
-    for tm_src in resp.exchangeInfo:
-        if tm_src.status == ExchangeInfoStatus.SUCCEEDED:
-            evaluated_resp: List[dt_model.TMInfo] = [
-                dt_model.TMInfo(**{**{"tm_uri": URIRef(tm_src.knowledgeBaseId)}, **b},
-                                kb_id=URIRef(tm_src.knowledgeBaseId)) for
-                b in tm_src.bindingSet]
-            return evaluated_resp
-    return []
-    # evaluated_resp: List[dt_model.TMInfo] = [dt_model.TMInfo(**b,) for b in resp.binding_set]
-    # return evaluated_resp
+
+    if len(resp.exchangeInfo) > 1:
+        print(
+            f"Found {len(resp.exchangeInfo)} TMs: {[str(f"{ei.knowledgeBaseId}:{ei.status}") for ei in resp.exchangeInfo]}")
+        for tm_src in resp.exchangeInfo:
+            if tm_src.status == ExchangeInfoStatus.SUCCEEDED:
+                resp = _ask_tm_info(kb_id=tm_src.knowledgeBaseId)
+
+    if len(resp.exchangeInfo) == 0:
+        return []
+    kb_id = resp.exchangeInfo[0].knowledgeBaseId
+
+    resp: List[dt_model.TMInfo] = [dt_model.TMInfo(**b, kb_id=URIRef(kb_id)) for b in resp.binding_set]
+    return resp
 
 
 def get_offer_uri() -> List[dt_model.TMMarketOfferInfoBindings]:

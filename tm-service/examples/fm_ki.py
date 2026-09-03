@@ -72,7 +72,7 @@ if __name__ == "__main__" and app_settings:
     from examples.ki.fm_model import TMInfo
 
     #####################################
-    # Find trading manager
+    #     Find trading manager
     #####################################
     tm_agent: Optional[TMInfo] = None
 

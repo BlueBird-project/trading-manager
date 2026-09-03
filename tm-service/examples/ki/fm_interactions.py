@@ -12,8 +12,10 @@ _tm_info: fm_model.TMInfo = None
 
 
 @fm_ki.ask("tm-info")
-def _ask_tm_info():
-    return [fm_model.TMInfoRequest()]
+def _ask_tm_info(kb_id: Optional[str] = None):
+    if kb_id is None:
+        return [fm_model.TMInfoRequest()]
+    return TargetedBindings(bindings=[fm_model.TMInfoRequest()], knowledge_bases=[kb_id])
 
 
 @fm_ki.answer("fm-ts-info-request")
@@ -93,6 +95,7 @@ def _evaluate_request():
 def _evaluate_request_ask():
     # ask Trading manager for prices for current power demand
     hour_ms = 3600000
+    minute_15_ms = 900000
     current_ts = int(time_utils.current_timestamp() / hour_ms) * hour_ms
     ts_end = current_ts + 24 * hour_ms
     ts_usage = URIRef("s4ener:Consumption")
@@ -101,7 +104,7 @@ def _evaluate_request_ask():
     response: List[FMEvaluateQueryAsk] = []
     # return response
     for i in range(0, 24 * 4):
-        ts = i * hour_ms + current_ts
+        ts = i * minute_15_ms + current_ts
         xsd_ts = time_utils.xsd_from_ts(ts)
         dp_uri = DPSplitURI(ts_start=ts, ts_usage=FMTSSplitURI.convert_ts_usage(ts_usage), isp_start=i)
         dpr_uri_ref = URIRef(dp_uri.uri + "/dpr")
@@ -114,16 +117,20 @@ def _evaluate_request_ask():
 
 def find_tm() -> List[fm_model.TMInfo]:
     resp: KIAskResponse = _ask_tm_info()
-    print(resp)
-    for tm_src in resp.exchangeInfo:
-        if tm_src.status == ExchangeInfoStatus.SUCCEEDED:
-            evaluated_resp: List[fm_model.TMInfo] = [
-                fm_model.TMInfo(**{**{"tm_uri": URIRef(tm_src.knowledgeBaseId)}, **b}, kb_id=URIRef(tm_src.knowledgeBaseId)) for
-                b in tm_src.bindingSet]
-            return evaluated_resp
-    return []
-    # evaluated_resp: List[fm_model.TMInfo] = [fm_model.TMInfo(**b) for b in resp.binding_set]
-    # return evaluated_resp
+
+    if len(resp.exchangeInfo) > 1:
+        print(
+            f"Found {len(resp.exchangeInfo)} TMs: {[str(f"{ei.knowledgeBaseId}:{ei.status}") for ei in resp.exchangeInfo]}")
+        for tm_src in resp.exchangeInfo:
+            if tm_src.status == ExchangeInfoStatus.SUCCEEDED:
+                resp = _ask_tm_info(kb_id=tm_src.knowledgeBaseId)
+
+    if len(resp.exchangeInfo) == 0:
+        return []
+    kb_id = resp.exchangeInfo[0].knowledgeBaseId
+
+    tm_resp: List[fm_model.TMInfo] = [fm_model.TMInfo(**b, kb_id=URIRef(kb_id)) for b in resp.binding_set]
+    return tm_resp
 
 
 def evaluate_flexibility() -> List[FMEvaluateResponse]:
@@ -132,16 +139,13 @@ def evaluate_flexibility() -> List[FMEvaluateResponse]:
     :return:
     """
     resp: KIPostResponse = _evaluate_request()
-    # print(resp)
     evaluated_resp: List[FMEvaluateResponse] = [FMEvaluateResponse(**b) for b in resp.result_binding_set]
-    # resp: KIAskResponse = _ask_evaluate_request()
-    # evaluated_resp: List[FMEvaluateQuery] = [FMEvaluateQuery(**b) for b in resp.binding_set]
     return evaluated_resp
 
 
 def evaluate_flexibility_ask() -> List[FMEvaluateResponseAsk]:
     resp: KIAskResponse = _evaluate_request_ask()
-    print(resp)
+    # print(resp)
     evaluated_resp: List[FMEvaluateResponseAsk] = [FMEvaluateResponseAsk(**b) for b in resp.binding_set]
     # resp: KIAskResponse = _ask_evaluate_request()
     # evaluated_resp: List[FMEvaluateQuery] = [FMEvaluateQuery(**b) for b in resp.binding_set]

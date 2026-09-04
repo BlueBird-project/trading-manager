@@ -27,15 +27,17 @@ def _init_command_uri(market_uri: str):
 
 @dt_ki.post("dt-info")
 def _post_dt_info(market_uri: URIRef) -> List[DigitalTwinInfo]:
+    print("post Digital Twin info")
     dt_info = DigitalTwinInfo(dt_uri=URIRef(dt_ki.get_kb_id()),
                               command_uri=_init_command_uri(market_uri=str(market_uri)),
                               market_uri=market_uri)
-    # return graph pattern bindings - sent through KE
     return [dt_info]
 
 
 @dt_ki.post("self-dt-info")
 def _post_self_dt_info(market_uri: URIRef) -> List[SelfDigitalTwinInfo]:
+    # same as _post_dt_info but part of information is already included statically in the graph pattern
+    print("post Digital Twin info")
     dt_info = SelfDigitalTwinInfo(
         command_uri=_init_command_uri(market_uri=str(market_uri)),
         market_uri=market_uri)
@@ -43,9 +45,8 @@ def _post_self_dt_info(market_uri: URIRef) -> List[SelfDigitalTwinInfo]:
 
 
 @dt_ki.answer("self-dt-info")
-def on_self_dt_info_request(ki_id, bindings: List):
+def on_self_dt_info_request(ki_id, bindings) -> List[SelfDigitalTwinInfo]:
     """
-
     :param ki_id: knowledge interaction id
     :param bindings: input bindings
     :return:
@@ -53,10 +54,8 @@ def on_self_dt_info_request(ki_id, bindings: List):
     global _tm_info
     # someone send KI-ASK
     print("on_self_dt_info_request")
-    dt_info = SelfDigitalTwinInfo(
-        command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
-        market_uri=_tm_info.market_uri)
-    print(dt_info)
+    dt_info = SelfDigitalTwinInfo(command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
+                                  market_uri=_tm_info.market_uri)
     # return graph pattern bindings
     return [dt_info]
 
@@ -68,8 +67,6 @@ def on_dt_info_request(ki_id, bindings):
     dt_info = DigitalTwinInfo(dt_uri=URIRef(dt_ki.get_kb_id()),
                               command_uri=_init_command_uri(market_uri=str(_tm_info.market_uri)),
                               market_uri=_tm_info.market_uri)
-    print(dt_info)
-
     return [dt_info]
 
 
@@ -130,7 +127,7 @@ def on_ts_info(ki_id, bindings: List[DTTSInfoRequest]) -> List[DTTSInfo]:
     for b in bindings:
         res.append(_get_forecast_info(b.forecast_of))
 
-    print(res)
+    print(f"on_ts_info {[f.ts_uri for f in res]}")
     return res
 
 
@@ -229,8 +226,7 @@ def post_forecast(offer_uri: URIRef, offer: List[TMMarketOfferBindings]):
 
     resp_bindings: KIPostResponse = _post_ts_info(offer_uri=offer_uri, sequence=offer_info.sequence)
     info_ack = resp_bindings.get_ack()
-    print("info ack")
-    print(info_ack)
+    print(f"info ack {info_ack}")
     ################################################
     # post timeseries
     ################################################

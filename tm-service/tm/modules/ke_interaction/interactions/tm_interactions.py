@@ -36,7 +36,7 @@ def on_tm_info_ask(ki_id: str, bindings: List[TMInfoRequest]):
 
 
 @tm_ki.answer("tm-agent")
-def on_tm_info_ask(ki_id: str, bindings: List):
+def on_tm_info_ask( ):
     # return [TMAgent(tm_uri=URIRef(tm_ki.get_kb_id() + "/service"))]
     return [{}]
 
@@ -47,7 +47,7 @@ def on_tm_info_post(ki_id: str, bindings: List[TMInfoRequest]):
 
 
 @tm_ki.react("tm-agent")
-def on_tm_info_ask(ki_id: str, bindings: List):
+def on_tm_info_ask( ):
     return [TMAgent(tm_uri=URIRef(tm_ki.get_kb_id() + "/service"))]
 
 

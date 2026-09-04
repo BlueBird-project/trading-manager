@@ -1,3 +1,7 @@
+## Graph patterns
+
+Graph patterns and UBFlex ontology is defined [here](https://github.com/BlueBird-project/UBFlex/tree/main/ke.graph-patterns)
+
 ## Flexibility Manager
 
 ### Run

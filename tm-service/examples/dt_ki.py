@@ -35,6 +35,7 @@ def get_tm():
         print("Error: no tm")
         sleep(10)
     else:
+        # choose first observed market
         _tm = tm_info_list[0]
         set_tm(tm=_tm)
     return _tm
@@ -45,7 +46,7 @@ def get_tm():
 if __name__ == "__main__" and app_settings:
     logging.info("INIT KI")
     ################################################
-    # setup ke
+    # setup knowledge engine client (also called smart client)
     ################################################
     import ke_client
 
@@ -120,7 +121,7 @@ if __name__ == "__main__" and app_settings:
             for o in offer_uris:
                 from examples.ki.dt_offer_helper import offer_manager
                 offer_manager.set_offer_info(offer_uri=o.offer_uri,end_ts=o.end_ts,sequence=o.sequence)
-            #get offer timeseries
+            # get offer(prices) timeseries/datapoints
             current_offer = get_offer(offer_uris=[o.offer_uri for o in offer_uris])
             # print(current_offer)
             print(f"len offer: {len(current_offer)}")

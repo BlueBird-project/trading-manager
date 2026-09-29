@@ -113,9 +113,9 @@ def request_forecast_info(req: List[DTTSInfoRequest], kb_id: Optional[str]) -> L
     return ack
 
 
-def request_forecast(ts_uri: URIRef, kb_id) -> Dict[Any, List[DTPnt]]:
+def request_forecast(ts_uri: URIRef,   kb_id) -> Dict[Any, List[DTPnt]]:
     # noinspection PyTypeChecker
-    resp: KIAskResponse = _request_forecast([DTPntRequest(ts_uri=ts_uri)], kb_id)
+    resp: KIAskResponse = _request_forecast([DTPntRequest(ts_uri=ts_uri )], kb_id)
     forecast = [DTPnt(**b) for b in resp.binding_set]
     ack = dt_service.process_forecast(forecast=forecast)
     return ack

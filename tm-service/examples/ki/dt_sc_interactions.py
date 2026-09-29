@@ -146,10 +146,11 @@ def on_ts_info(ki_id, bindings: List[DTPntRequest]) -> List[DTPnt]:
             offer = offer_manager.get_offer(tm_offer.offer_uri, get_info_handler=get_offer_uri,
                                             get_offer_handler=_get_offer)
             print(f"forecast size for {tm_offer.offer_uri} : {len(offer)} ")
+            ts_uri = DTTSUri.parse(b.ts_uri, prefix=_init_command_uri(market_uri=str(_tm_info.market_uri)))
             forecast_ts = generate_sample_forecast(
-                ts_uri=DTTSUri.parse(b.ts_uri, prefix=_init_command_uri(market_uri=str(_tm_info.market_uri))),
-                offer=offer, kb_id=dt_ki.get_kb_id())
-
+                ts_uri=ts_uri, offer=offer, kb_id=dt_ki.get_kb_id())
+            offer_manager.set_forecast(ts_uri=ts_uri, forecast_ts=forecast_ts)
+            print(f"forecast: {forecast_ts}")
         # print(f"forecast: {forecast_ts}")
         res += forecast_ts
 
@@ -275,4 +276,5 @@ def get_offer(offer_uris: List[URIRef]) -> List[dt_model.TMMarketOfferBindings]:
     resp: KIAskResponse = _ask_offer(offer_uris=offer_uris, tm_uri=_tm_info.tm_uri)
     evaluated_resp: List[dt_model.TMMarketOfferBindings] = [dt_model.TMMarketOfferBindings(**b) for b in
                                                             resp.binding_set]
+    print(f"evaluated_resp :{evaluated_resp}")
     return evaluated_resp

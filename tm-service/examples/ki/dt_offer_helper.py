@@ -37,7 +37,7 @@ class TMOffer:
 
 class OfferManager:
     offer_map: Dict[str, TMOffer]
-    forecast_map: Dict[URIRef, List[DTPnt]]
+    forecast_map: Dict[str, List[DTPnt]]
     jobs: List[Callable]
     r_lock: RLock
     t: Thread = None
@@ -53,7 +53,7 @@ class OfferManager:
             self.jobs.append(j)
 
     def set_forecast(self, ts_uri: URIRef, forecast_ts: List[DTPnt]):
-        self.forecast_map[ts_uri] = forecast_ts
+        self.forecast_map[ts_uri.n3()] = forecast_ts
 
     def get_forecast_of(self, forecast_uri):
         tm_offer_lst: List[TMOffer] = [o for o in self.offer_map.values() if o.forecast_uri == forecast_uri]
@@ -64,7 +64,7 @@ class OfferManager:
     def get_forecast(self, ts_uri: URIRef) -> List[DTPnt]:
         if ts_uri not in self.forecast_map:
             return []
-        return self.forecast_map[ts_uri]
+        return self.forecast_map[ts_uri.n3()]
 
     def get_job(self):
         with self.r_lock:

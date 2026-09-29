@@ -30,6 +30,7 @@ class DigitalTwinInfo(BindingsBase):
 class DTTSInfo(BindingsBase):
     command_uri: URIRef
     market_uri: URIRef
+    dt_uri: URIRef
     ts_uri: URIRef
     forecast_of: URIRef
     time_create: Literal
@@ -112,12 +113,13 @@ class DTTSInfoRequest(BindingsBase):
 
 @ki_object("dt-ts")
 class DTPnt(BindingsBase):
+    dt_uri:URIRef
     ts_uri: URIRef
     dp: URIRef
     ts: Literal
     dpr: URIRef
-    duration: Literal
-    duration_uri: URIRef
+    # duration: Literal
+    # duration_uri: URIRef
     value: OptionalLiteral
 
     def __init__(self, **kwargs):
@@ -130,9 +132,9 @@ class DTPnt(BindingsBase):
     def get_value(self) -> Optional[float]:
         return self.convert_value(self.value, float)
 
-    def isp_len(self, isp_unit: int):
-        period_minutes = int(parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() / 60)
-        return math.ceil(period_minutes / isp_unit)
+    # def isp_len(self, isp_unit: int):
+    #     period_minutes = int(parse_duration(self.duration, as_timedelta_if_possible=True).total_seconds() / 60)
+    #     return math.ceil(period_minutes / isp_unit)
 
 
 @ki_object("dt-ts", allow_partial=True)

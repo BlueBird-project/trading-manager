@@ -33,6 +33,7 @@ def scan_forecast(forecast_info: Dict[str, List[DTForecastInfoDAO]]) -> Dict[Any
     dt_forecast = {}
     for kb_id, fi_list in forecast_info.items():
         for fi in fi_list:
-            ts = request_forecast(ts_uri=URIRef(fi.forecast_uri), kb_id=kb_id)
+
+            ts = request_forecast(ts_uri=URIRef(fi.forecast_uri),  kb_id=kb_id)
             dt_forecast.update(**ts)
     return dt_forecast

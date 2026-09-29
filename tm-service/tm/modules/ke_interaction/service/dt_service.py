@@ -71,7 +71,12 @@ def process_forecast_info(bindings: List[DTTSInfo]) -> List[DTForecastInfoDAO]:
         else:
             new_ts = dao_manager.forecast_api.save(
                 # b.n3()
-                forecast_info=DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.create_ts,
+                # b.ts_date_from
+                # forecast_info=DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.create_ts,
+                #                                 offer_id=offer.offer_id,
+                #                                 isp_unit=b.update_rate_min, sequence=offer.sequence,
+                #                                 isp_len=b.isp_len, range_id=offer.range_id))
+                forecast_info=DTForecastInfoDAO(forecast_uri=b.ts_uri, job_id=job.job_id, ts=b.from_ts,
                                                 offer_id=offer.offer_id,
                                                 isp_unit=b.update_rate_min, sequence=offer.sequence,
                                                 isp_len=b.isp_len, range_id=offer.range_id))
@@ -107,7 +112,7 @@ def process_forecast(forecast: List[DTPnt], clear: bool = True, ):
                 isp_start = (dp.ts_ms - ts_start) / isp_len_ms
                 dp_dao = DTForecastOfferDAO(forecast_id=forecast_info.forecast_id, ts=dp.ts_ms,
                                             isp_start=isp_start, cost_mwh=dp.get_value(),
-                                            isp_len=dp.isp_len(forecast_info.isp_unit))
+                                            isp_len=1)
 
                 forecast_dao[i] = dp_dao
             saved_bindings[forecast_info.forecast_uri] = dao_manager.forecast_api.save_offer(

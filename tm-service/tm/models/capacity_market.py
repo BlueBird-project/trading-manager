@@ -14,5 +14,5 @@ class CapacityNotification:
     power_limit_uri: str
     ts: int
     max_consumption_uri: str
-    max_consumption_value: float
+    max_consumption: float
     update_ts: Optional[int] = None

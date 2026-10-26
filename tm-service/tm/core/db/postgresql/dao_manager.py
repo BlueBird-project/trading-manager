@@ -7,7 +7,7 @@ from tm.core.db.api.job_api import JobAPI
 from tm.core.db.api.market import MarketAPI
 from tm.core.db.api.market_offer_dao import MarketOfferAPI
 from tm.core.db.api.dt_forecast import DTForecastAPI
-from tm.core.db.api.capacity_notification import CapacityNotification
+from tm.core.db.api.capacity_notification import  NotificationAPI
 from tm.core.db.postgresql.api_impl import market_dao_impl, market_offer_dao_impl, job_api_impl, dt_api_impl, \
     dt_forecast_impl, capacity_notification_impl
 
@@ -18,7 +18,7 @@ app_settings_dao: AppSettingsDAO
 job_api: JobAPI
 dt_api: DTAPI
 forecast_api: DTForecastAPI
-capacity_notification_api: CapacityNotification
+capacity_notification_api: NotificationAPI
 
 
 def init_postgresql(db_meta: DBMeta):

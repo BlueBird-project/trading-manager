@@ -1,8 +1,12 @@
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix saref:    <https://saref.etsi.org/core/> .
-@prefix time:     <http://www.w3.org/2006/time#/>.
+@prefix time:     <http://www.w3.org/2006/time#> .
 @prefix ubmarket: <https://ubflex.bluebird.eu/market/> .
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix s4ener:   <https://saref.etsi.org/saref4ener/> .
+@prefix om: <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
 
 <http://fm.bluebird.com/>
     rdf:type saref:Service .
@@ -11,10 +15,77 @@
     rdf:type saref:Service .
 
 
-ubmarket:period_15m
+ubmarket:update_rate_15min
     rdf:type            time:Interval ;
-    time:hasXSDDuration "PT15M"^^xsd:duration .
+    s4ener:hasUpdateRate "PT15M"^^xsd:duration .
 
-ubmarket:period_60m
+ubmarket:update_rate_60min
     rdf:type            time:Interval ;
-    time:hasXSDDuration "PT60M"^^xsd:duration .
+    s4ener:hasUpdateRate "PT60M"^^xsd:duration .
+
+ubmarket:get_data_command
+    a               owl:NamedIndividual ;
+    rdfs:label      "get_data_command"@en .
+
+ubmarket:ack_event
+    rdf:type s4mari:Event ;
+    saref:hasFeatureKind s4mari:Acknowledgement .
+
+
+
+
+# ============================================================
+# Energy market units
+# ============================================================
+
+ubmarket:EURPerMegawattHour
+    a owl:Class ;
+    rdfs:subClassOf saref:UnitOfMeasure ;
+    rdfs:comment "Euro per megawatt-hour."@en ;
+    rdfs:label "EUR per megawatt-hour"@en .
+
+
+ubmarket:PLNPerMegawattHour
+    a owl:Class ;
+    rdfs:subClassOf saref:UnitOfMeasure ;
+    rdfs:comment "Polish zloty per megawatt-hour."@en ;
+    rdfs:label "PLN per megawatt-hour"@en .
+
+ubmarket:PLNPerKilowatt
+    a owl:Class ;
+    rdfs:subClassOf saref:UnitOfMeasure ;
+    rdfs:comment "Polish zloty per kilo was."@en ;
+    rdfs:label "PLN per kilo wat"@en .
+
+# ============================================================
+# Capacity Market Contract
+# ============================================================
+
+ubmarket:CapacityObligation
+    a owl:Class ;
+    rdfs:subClassOf saref:StateOfInterest ;
+    saref:isStateOfInterestOf ubmarket:CapacityMarket;
+    rdfs:comment "Represents a capacity obligation."@en ;
+    rdfs:label "Capacity Obligation"@en .
+
+ubmarket:ProductionCapacityObligation
+    a owl:Class ;
+    rdfs:subClassOf ubmarket:CapacityObligation ;
+    rdfs:comment "Represents a production capacity obligation."@en ;
+    rdfs:label "Production Capacity Obligation"@en .
+
+ubmarket:ConsumptionCapacityObligation
+    a owl:Class ;
+    rdfs:subClassOf ubmarket:CapacityObligation ;
+    rdfs:comment "Represents a consumption capacity obligation."@en ;
+    rdfs:label "Consumption Capacity Obligation"@en .
+
+
+ubmarket:CapacityObligationPower
+    a saref:Power ;
+    saref:isMeasuredIn om:megawatt ;
+    rdfs:label "Capacity Obligation Power"@en .
+
+
+ubmarket:CapacityMarket
+    saref:controls ubmarket:CapacityObligation .

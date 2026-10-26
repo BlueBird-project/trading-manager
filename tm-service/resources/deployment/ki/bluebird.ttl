@@ -5,6 +5,7 @@
 @prefix ubmarket: <https://ubflex.bluebird.eu/market/> .
 @prefix saref:    <https://saref.etsi.org/core/> .
 @prefix s4city:   <https://saref.etsi.org/saref4city/> .
+@prefix s4mari:   <https://saref.etsi.org/s4mari/> .
 @prefix s4ener:   <https://saref.etsi.org/saref4ener/> .
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix foaf:     <http://xmlns.com/foaf/0.1/> .
@@ -24,12 +25,10 @@ ubmarket:Forecast
 ubmarket:MarketTimeSeries
     a               owl:Class ;
     rdfs:subClassOf s4ener:TimeSeries ;
-    rdfs:subClassOf [
-                        a                        owl:Restriction ;
-                        owl:onProperty           ubmarket:hasMarketSequence ;
-                        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-                        owl:onDataRange          xsd:string
-                    ] ;
+    rdfs:subClassOf [ a                        owl:Restriction ;
+                      owl:onProperty           ubmarket:hasMarketSequence ;
+                      owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                      owl:onDataRange          xsd:string ] ;
     rdfs:comment    "A time series containing market data."@en ;
     rdfs:label      "Market Time Series"@en .
 
@@ -48,6 +47,7 @@ ubmarket:Market
     rdfs:label      "Market"@en .
 
 
+
 ubmarket:MarketAgent
     a               owl:Class ;
     rdfs:subClassOf foaf:Agent ;
@@ -56,17 +56,17 @@ ubmarket:MarketAgent
 
 
 ubmarket:MarketType
-    a               owl:Class ;
-    rdfs:comment    "Represents a type of market, such as a day-ahead market, intraday market, or capacity market."@en ;
-    rdfs:label      "Market Type"@en .
+    a            owl:Class ;
+    rdfs:comment "Represents a type of market, such as a day-ahead market, intraday market, or capacity market."@en ;
+    rdfs:label   "Market Type"@en .
 
 
 ubmarket:hasMarketType
-    a               owl:ObjectProperty ;
-    rdfs:domain      ubmarket:Market ;
-    rdfs:range       ubmarket:MarketType ;
-    rdfs:comment     "Associates a market with its market type."@en ;
-    rdfs:label       "has market type"@en .
+    a            owl:ObjectProperty ;
+    rdfs:domain  ubmarket:Market ;
+    rdfs:range   ubmarket:MarketType ;
+    rdfs:comment "Associates a market with its market type."@en ;
+    rdfs:label   "has market type"@en .
 
 
 ubmarket:DayAheadMarket
@@ -90,19 +90,14 @@ ubmarket:CapacityMarket
     rdfs:label      "Capacity Market"@en .
 
 
+
 ubmarket:hasMarketSequence
-    a               owl:DatatypeProperty ;
-    rdfs:domain      [
-                        a           owl:Class ;
-                        owl:unionOf (
-                                        ubmarket:DayAheadMarket
-                                        ubmarket:IntradayMarket
-                                        ubmarket:MarketTimeSeries
-                                    )
-                    ] ;
-    rdfs:comment    "Identifies the market sequence associated with a market or market time series."@en ;
-    rdfs:range      xsd:string ;
-    rdfs:label      "has market sequence"@en .
+    a            owl:DatatypeProperty ;
+    rdfs:domain  [ a           owl:Class ;
+                   owl:unionOf ( ubmarket:DayAheadMarket ubmarket:IntradayMarket ubmarket:MarketTimeSeries ) ] ;
+    rdfs:comment "Identifies the market sequence associated with a market or market time series."@en ;
+    rdfs:range   xsd:string ;
+    rdfs:label   "has market sequence"@en .
 
 
 # ============================================================
@@ -111,19 +106,19 @@ ubmarket:hasMarketSequence
 
 
 ubmarket:isForecastOf
-    a               owl:ObjectProperty ;
-    rdfs:domain      ubmarket:Forecast ;
-    rdfs:range       s4ener:TimeSeries ;
-    rdfs:comment    "Associates a forecast time series with the time series for which it provides forecast values."@en ;
-    rdfs:label      "is forecast of"@en .
+    a            owl:ObjectProperty ;
+    rdfs:domain  ubmarket:Forecast ;
+    rdfs:range   s4ener:TimeSeries ;
+    rdfs:comment "Associates a forecast time series with the time series for which it provides forecast values."@en ;
+    rdfs:label   "is forecast of"@en .
 
 
 ubmarket:isForecastedBy
-    a               owl:ObjectProperty ;
-    rdfs:domain      s4ener:TimeSeries ;
-    rdfs:range       ubmarket:Forecast ;
-    rdfs:comment    "Associates a time series with its forecast."@en ;
-    rdfs:label      "is Forecasted By"@en .
+    a            owl:ObjectProperty ;
+    rdfs:domain  s4ener:TimeSeries ;
+    rdfs:range   ubmarket:Forecast ;
+    rdfs:comment "Associates a time series with its forecast."@en ;
+    rdfs:label   "is Forecasted By"@en .
 
 
 ubmarket:isForecastOf
@@ -135,33 +130,44 @@ ubmarket:isForecastOf
 # ============================================================
 
 ubmarket:hasAdministrativeArea
-    a               owl:ObjectProperty ;
-    rdfs:domain      ubmarket:Market ;
-    rdfs:range       s4city:AdministrativeArea ;
-    rdfs:comment    "Associates a market with the administrative area in which it operates."@en ;
-    rdfs:label      "has administrative area"@en .
+    a            owl:ObjectProperty ;
+    rdfs:domain  ubmarket:Market ;
+    rdfs:range   s4city:AdministrativeArea ;
+    rdfs:comment "Associates a market with the administrative area in which it operates."@en ;
+    rdfs:label   "has administrative area"@en .
 
-
+ubmarket:hasISO3166CountryCode
+    a           owl:DatatypeProperty ;
+    rdfs:domain s4city:Country ;
+    rdfs:range  xsd:string .
 
 ubmarket:hasEICCode
-    a               owl:DatatypeProperty ;
-    rdfs:domain      ubmarket:Market ;
-    rdfs:range       xsd:string ;
-    rdfs:label      "has EIC code"@en ;
-    rdfs:comment    "Associates a market  with its Energy Identification Code (EIC)."@en .
+    a            owl:DatatypeProperty ;
+    rdfs:domain  ubmarket:Market ;
+    rdfs:range   xsd:string ;
+    rdfs:label   "has EIC code"@en ;
+    rdfs:comment "Associates a market  with its Energy Identification Code (EIC)."@en .
 
 
 ubmarket:hasCountryName
-    a               owl:DatatypeProperty ;
-    rdfs:domain      s4city:Country ;
-    rdfs:range       xsd:string ;
-    rdfs:label      "has country name"@en ;
-    rdfs:comment    "The official English name of the country."@en .
+    a            owl:DatatypeProperty ;
+    rdfs:domain  s4city:Country ;
+    rdfs:range   xsd:string ;
+    rdfs:label   "has country name"@en ;
+    rdfs:comment "The official English name of the country."@en .
 
 
 # ============================================================
 # Baseline, contracts and offers
 # ============================================================
+
+
+ubmarket:subjectTo
+    a            owl:ObjectProperty ;
+    rdfs:label   "Subject to document"@en ;
+    rdfs:comment "Links a flexibility request to the contract document  associated with that request."@en ;
+    rdfs:domain  s4ener:FlexRequest ;
+    rdfs:range   s4mari:Document .
 
 ubmarket:FlexContractRequest
     a               owl:Class ;
@@ -178,162 +184,154 @@ ubmarket:FlexContractOffer
 
 
 ubmarket:hasCost
-    a               owl:ObjectProperty ;
+    a                  owl:ObjectProperty ;
     rdfs:subPropertyOf s4ener:hasCost ;
-    rdfs:domain      [
-                        a owl:Class ;
-                        owl:unionOf (
-                              ubmarket:FlexContractRequest
-                              ubmarket:FlexContractOffer
-                          )
-                    ] ;
-    rdfs:range       s4ener:DataPoint ;
-    rdfs:label       "has cost"@en ;
-    rdfs:comment     "Associates a flexibility contract request or offer with its cost."@en .
+    rdfs:domain        [ a           owl:Class ;
+                         owl:unionOf ( ubmarket:FlexContractRequest ubmarket:FlexContractOffer s4ener:BaseLine ) ] ;
+    rdfs:range         s4ener:DataPoint ;
+    rdfs:label         "has cost"@en ;
+    rdfs:comment       "Associates a flexibility contract request or offer with its cost."@en .
 
 
-ubmarket:DynamicBaseline
-    a               owl:Class ;
-    rdfs:subClassOf s4ener:BaseLine ;
-    rdfs:comment    "A baseline calculated dynamically based on recent energy consumption."@en ;
-    rdfs:label      "Dynamic Baseline"@en .
+#ubmarket:DynamicBaseline
+#    a               owl:Class ;
+#    rdfs:subClassOf s4ener:BaseLine ;
+#    rdfs:comment    "A baseline calculated dynamically based on recent energy consumption."@en ;
+#    rdfs:label      "Dynamic Baseline"@en .
+#
+#
 
 
 # ============================================================
 # Baseline calculation
 # ============================================================
 
-ubmarket:CalculationMethod
-    a               owl:Class ;
-    rdfs:comment    "A method used to calculate a baseline."@en ;
-    rdfs:label      "Calculation Method"@en .
-
-
-ubmarket:hasCalculationMethod
-    a               owl:ObjectProperty ;
-    rdfs:domain      ubmarket:CapacityMarket ;
-    rdfs:range       ubmarket:CalculationMethod ;
-    rdfs:label      "has calculation method"@en .
+#ubmarket:CalculationMethod
+#    a               owl:Class ;
+#    rdfs:comment    "A method used to calculate a baseline."@en ;
+#    rdfs:label      "Calculation Method"@en .
+#
+#
+#ubmarket:hasCalculationMethod
+#    a               owl:ObjectProperty ;
+#    rdfs:domain      ubmarket:CapacityMarket ;
+#    rdfs:range       ubmarket:CalculationMethod ;
+#    rdfs:label      "has calculation method"@en .
 
 
 # ============================================================
 # Day filters
 # ============================================================
 
-ubmarket:DayFilter
-    a               owl:Class ;
-    rdfs:comment    "A filter specifying which types of days are considered by a calculation method."@en ;
-    rdfs:label      "Day Filter"@en .
-
-
-ubmarket:Weekend
-    a               owl:Class ;
-    rdfs:subClassOf ubmarket:DayFilter ;
-    rdfs:label      "Weekend"@en .
-
-
-ubmarket:Weekday
-    a               owl:Class ;
-    rdfs:subClassOf ubmarket:DayFilter ;
-    rdfs:label      "Weekday"@en .
-
-
-ubmarket:SameDay
-    a               owl:Class ;
-    rdfs:subClassOf ubmarket:DayFilter ;
-    rdfs:label      "Same Day"@en .
-
-
-ubmarket:hasDayFilter
-    a               owl:ObjectProperty ;
-    rdfs:domain      ubmarket:CalculationMethod ;
-    rdfs:range       ubmarket:DayFilter ;
-    rdfs:label      "has day filter"@en .
+#ubmarket:DayFilter
+#    a               owl:Class ;
+#    rdfs:comment    "A filter specifying which types of days are considered by a calculation method."@en ;
+#    rdfs:label      "Day Filter"@en .
+#
+#
+#ubmarket:Weekend
+#    a               owl:Class ;
+#    rdfs:subClassOf ubmarket:DayFilter ;
+#    rdfs:label      "Weekend"@en .
+#
+#
+#ubmarket:Weekday
+#    a               owl:Class ;
+#    rdfs:subClassOf ubmarket:DayFilter ;
+#    rdfs:label      "Weekday"@en .
+#
+#
+#ubmarket:SameDay
+#    a               owl:Class ;
+#    rdfs:subClassOf ubmarket:DayFilter ;
+#    rdfs:label      "Same Day"@en .
+#
+#
+#ubmarket:hasDayFilter
+#    a               owl:ObjectProperty ;
+#    rdfs:domain      ubmarket:CalculationMethod ;
+#    rdfs:range       ubmarket:DayFilter ;
+#    rdfs:label      "has day filter"@en .
 
 
 # ============================================================
 # Time filters
 # ============================================================
-
-ubmarket:TimeFilter
-    a               owl:Class ;
-    rdfs:comment    "A filter specifying which time intervals are considered by a calculation method."@en ;
-    rdfs:label      "Time Filter"@en .
-
-
-ubmarket:Peak
-    a               owl:Class ;
-    rdfs:subClassOf ubmarket:TimeFilter ;
-    rdfs:comment    "Peak hours."@en ;
-    rdfs:label      "Peak"@en .
-
-
-ubmarket:OffPeak
-    a               owl:Class ;
-    rdfs:subClassOf ubmarket:TimeFilter ;
-    rdfs:comment    "Off-peak hours."@en ;
-    rdfs:label      "Off-Peak"@en .
-
-
-ubmarket:SameTime
-    a               owl:Class ;
-    rdfs:subClassOf ubmarket:TimeFilter ;
-    rdfs:comment    "The same time interval as the flexibility demand."@en ;
-    rdfs:label      "Same Time"@en .
-
-
-ubmarket:hasTimeFilter
-    a               owl:ObjectProperty ;
-    rdfs:domain      ubmarket:CalculationMethod ;
-    rdfs:range       ubmarket:TimeFilter ;
-    rdfs:label      "has time filter"@en .
+#
+#ubmarket:TimeFilter
+#    a            owl:Class ;
+#    rdfs:comment "A filter specifying which time intervals are considered by a calculation method."@en ;
+#    rdfs:label   "Time Filter"@en .
+#
+#
+#ubmarket:Peak
+#    a               owl:Class ;
+#    rdfs:subClassOf ubmarket:TimeFilter ;
+#    rdfs:comment    "Peak hours."@en ;
+#    rdfs:label      "Peak"@en .
+#
+#
+#ubmarket:OffPeak
+#    a               owl:Class ;
+#    rdfs:subClassOf ubmarket:TimeFilter ;
+#    rdfs:comment    "Off-peak hours."@en ;
+#    rdfs:label      "Off-Peak"@en .
+#
+#
+#ubmarket:SameTime
+#    a               owl:Class ;
+#    rdfs:subClassOf ubmarket:TimeFilter ;
+#    rdfs:comment    "The same time interval as the flexibility demand."@en ;
+#    rdfs:label      "Same Time"@en .
+#
+#
+#ubmarket:hasTimeFilter
+#    a           owl:ObjectProperty ;
+#    rdfs:domain ubmarket:CalculationMethod ;
+#    rdfs:range  ubmarket:TimeFilter ;
+#    rdfs:label  "has time filter"@en .
 
 
 # ============================================================
 # Aggregation
 # ============================================================
 
-ubmarket:AggregationFunction
-    a               owl:Class ;
-    rdfs:comment    "A function used to aggregate power values when calculating a baseline, such as the mean or maximum."@en ;
-    rdfs:label      "Aggregation Function"@en .
-
-
-ubmarket:hasAggregationFunction
-    a               owl:ObjectProperty ;
-    rdfs:domain      ubmarket:CalculationMethod ;
-    rdfs:range       ubmarket:AggregationFunction ;
-    rdfs:label      "has aggregation function"@en .
-
-
-ubmarket:Mean
-    a               owl:NamedIndividual ;
-    a               ubmarket:AggregationFunction ;
-    rdfs:label      "Mean"@en .
-
-
-ubmarket:Max
-    a               owl:NamedIndividual ;
-    a               ubmarket:AggregationFunction ;
-    rdfs:label      "Maximum"@en .
-
-
-# ============================================================
-# Power range
-# ============================================================
-
-ubmarket:hasPowerRange
-    a               owl:ObjectProperty ;
-    rdfs:domain      [
-                        a owl:Class ;
-                        owl:unionOf (
-                              ubmarket:FlexContractOffer
-                              ubmarket:MarketTimeSeries
-                              ubmarket:FlexContractRequest
-                          )
-                    ] ;
-    rdfs:range       s4ener:PowerRange ;
-    rdfs:label      "has power range"@en ;
-    rdfs:comment    "Associates a flexibility contract or market time series with a power range."@en .
+#ubmarket:AggregationFunction
+#    a          owl:Class ;
+#    rdfs:comment
+#               "A function used to aggregate power values when calculating a baseline, such as the mean or maximum."@en ;
+#    rdfs:label "Aggregation Function"@en .
+#
+#
+#ubmarket:hasAggregationFunction
+#    a           owl:ObjectProperty ;
+#    rdfs:domain ubmarket:CalculationMethod ;
+#    rdfs:range  ubmarket:AggregationFunction ;
+#    rdfs:label  "has aggregation function"@en .
+#
+#
+#ubmarket:Mean
+#    a          owl:NamedIndividual ;
+#    a          ubmarket:AggregationFunction ;
+#    rdfs:label "Mean"@en .
+#
+#
+#ubmarket:Max
+#    a          owl:NamedIndividual ;
+#    a          ubmarket:AggregationFunction ;
+#    rdfs:label "Maximum"@en .
+#
+#
+## ============================================================
+## Power range
+## ============================================================
+#
+#ubmarket:hasPowerRange
+#    a            owl:ObjectProperty ;
+#    rdfs:domain  [ a           owl:Class ;
+#                   owl:unionOf ( ubmarket:FlexContractOffer ubmarket:MarketTimeSeries ubmarket:FlexContractRequest ) ] ;
+#    rdfs:range   s4ener:PowerRange ;
+#    rdfs:label   "has power range"@en ;
+#    rdfs:comment "Associates a flexibility contract or market time series with a power range."@en .
 
 

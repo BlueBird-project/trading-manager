@@ -185,6 +185,21 @@ NULLS NOT DISTINCT;
 CREATE UNIQUE INDEX ${table_prefix}offer_details_offer_uri ON public.${table_prefix}offer_details USING btree (offer_uri);
 
 
+CREATE TABLE "demo_tm_ke_capacity_notification" (
+  "asset_manager_uri" character varying(250) NOT NULL,
+  "flex_instruction_uri" character varying(250) NOT NULL,
+  "flex_profile_uri" character varying(250) NOT NULL,
+  "power_limit_uri" character varying(250) NOT NULL,
+  "ts" bigint NOT NULL,
+  "max_consumption_uri" character varying(250) NOT NULL,
+  "max_consumption" double precision NOT NULL,
+  "update_ts" bigint NOT NULL
+);
+
+ALTER TABLE "demo_tm_ke_capacity_notification"
+ADD CONSTRAINT "demo_tm_ke_capacity_notification_asset_manager_uri_ts" PRIMARY KEY ("asset_manager_uri", "ts");
+CREATE INDEX "demo_tm_ke_capacity_notification_ts" ON "demo_tm_ke_capacity_notification" ("ts");
+
 
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_model_id_fkey" FOREIGN KEY (model_id) REFERENCES ${table_prefix}forecast_model(model_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."${table_prefix}forecast_details" ADD CONSTRAINT "${table_prefix}forecast_details_offer_id_fkey" FOREIGN KEY (offer_id) REFERENCES ${table_prefix}offer_details(offer_id) ON UPDATE RESTRICT ON DELETE RESTRICT NOT DEFERRABLE;

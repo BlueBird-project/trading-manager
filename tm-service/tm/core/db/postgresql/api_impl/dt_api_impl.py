@@ -18,7 +18,7 @@ class DTAPIQueries(QueryObject):
     GET = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE 
     dt_id = :dt_id  """
     SELECT = """SELECT ${projection}  FROM "${table_prefix}${table_name}" WHERE 
-     COALESCE(job_id= :job_id)  """
+     COALESCE(job_id= :job_id, TRUE)  """
 
     INSERT = """INSERT INTO "${table_prefix}${table_name}"
      ( "dt_uri", "kb_id", "job_id", "ext" ,"update_ts"  )

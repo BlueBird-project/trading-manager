@@ -18,6 +18,20 @@ class MarketOfferQueries:
        AND COALESCE(market_id = :market_id,TRUE)    AND COALESCE(sequence = :sequence,TRUE)
        ORDER BY "market_id","sequence" desc , "ts" asc
         """
+    LIST_CURRENT_OFFER_INFO = """SELECT "offer_id","market_id", "ts", "date_str",
+     "offer_uri","range_id","sequence",  "isp_unit", "isp_len", "update_ts", "ext" 
+      FROM "${table_prefix}offer_details" as offer_details
+      JOIN ( 
+        SELECT max("ts") as max_ts , offer_details.market_id _m_id , offer_details.sequence _seq
+        FROM "${table_prefix}offer_details"   as offer_details
+        WHERE COALESCE(:market_id = offer_details.market_id,TRUE) 
+        AND ( :sequence is NULL OR  :sequence = offer_details.sequence ) 
+        group by offer_details.market_id , offer_details.sequence
+      ) _max_t ON _max_t.max_ts = offer_details."ts" and offer_details.market_id = _max_t._m_id 
+       and (offer_details.sequence = _max_t._seq or (offer_details.sequence is null and  _max_t._seq is null) )
+       WHERE        COALESCE("isp_unit"=:isp_unit,TRUE  ) 
+       ORDER BY "market_id","sequence" desc , "ts" asc
+        """
     GET_MAX_TS = """SELECT max("ts") as ts FROM "${table_prefix}offer_details"  
       WHERE COALESCE("isp_unit"=:isp_unit,TRUE  ) AND COALESCE(market_id = :market_id,TRUE) 
         AND COALESCE(sequence = :sequence,TRUE)
@@ -53,10 +67,23 @@ class MarketOfferQueries:
       FROM "${table_prefix}market_offer" offer  
       JOIN "${table_prefix}offer_details"  offer_info  on offer.offer_id = offer_info.offer_id 
       WHERE offer_info.market_id =:market_id 
-      AND ( coalesce(:ts_from<=(offer."ts" + offer."isp_unit"::bigint * 60000 *offer.isp_len::bigint),TRUE) 
+      AND ( coalesce(:ts_from<=(offer."ts" + offer_info."isp_unit"::bigint * 60000 *offer.isp_len::bigint),TRUE) 
             and  coalesce(:ts_to>=offer."ts",TRUE) )
       and COALESCE(offer_info."isp_unit"=:isp_unit,TRUE )  
        ORDER BY offer_info.market_id , offer_info.sequence desc, offer."ts" asc """
+    LIST_CURRENT_MARKET_OFFER = """SELECT offer."offer_id", offer."isp_start", 
+      offer."cost_mwh", offer."ts", offer."isp_len", offer_details.range_id,offer_details.sequence
+      FROM "${table_prefix}market_offer" offer  
+      JOIN "${table_prefix}offer_details"  offer_details  on offer.offer_id = offer_details.offer_id  
+      JOIN ( 
+        SELECT max("ts") as max_ts , offer_details.market_id _m_id , offer_details.sequence _seq
+        FROM "${table_prefix}offer_details"   as offer_details
+        WHERE COALESCE(:market_id = offer_details.market_id,TRUE) AND ( :sequence is NULL OR  :sequence = offer_details.sequence ) 
+        group by offer_details.market_id , offer_details.sequence
+      ) _max_t ON _max_t.max_ts = offer_details."ts" and offer_details.market_id = _max_t._m_id 
+       and (offer_details.sequence = _max_t._seq or (offer_details.sequence is null and  _max_t._seq is null) ) 
+      WHERE   COALESCE(offer_details."isp_unit"=:isp_unit,TRUE )  
+       ORDER BY offer_details.market_id , offer_details.sequence desc, offer."ts" asc """
 
     INSERT_MARKET_OFFER = """ INSERT INTO "${table_prefix}market_offer" 
         ("offer_id", "isp_start",  "cost_mwh", "ts", "isp_len")
@@ -94,6 +121,14 @@ class MarketOfferAPIImpl(MarketOfferAPI):
                 args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "isp_unit": isp_unit, "market_id": market_id,
                         "sequence": sequence}
             offers = conn.select(q=self.queries.LIST_OFFER_INFO, args=args, obj_type=EnergyMarketOfferInfo)
+            return offers
+
+    def list_current_offer_info(self, market_id: Optional[int] = None,
+                                isp_unit: Optional[int] = None, sequence: Optional[str] = None) -> (
+            List)[EnergyMarketOfferInfo]:
+        with ConnectionWrapper() as conn:
+            args = {"isp_unit": isp_unit, "market_id": market_id, "sequence": sequence}
+            offers = conn.select(q=self.queries.LIST_CURRENT_OFFER_INFO, args=args, obj_type=EnergyMarketOfferInfo)
             return offers
 
     def get_offer_info(self, offer_uri: str) -> EnergyMarketOfferInfo:
@@ -144,6 +179,14 @@ class MarketOfferAPIImpl(MarketOfferAPI):
         with ConnectionWrapper() as conn:
             args = {"ts_from": ts.ts_from, "ts_to": ts.ts_to, "isp_unit": isp_unit, "market_id": market_id}
             offers = conn.select(q=self.queries.LIST_MARKET_OFFER, args=args, obj_type=EnergyMarketOffer)
+
+            return offers
+
+    def list_current_market_offer(self, market_id: Optional[int] = None, isp_unit: Optional[int] = None,
+                                  sequence: Optional[str] = None)    -> List[EnergyMarketOffer]:
+        with ConnectionWrapper() as conn:
+            args = {"isp_unit": isp_unit, "market_id": market_id,"sequence": sequence}
+            offers = conn.select(q=self.queries.LIST_CURRENT_MARKET_OFFER, args=args, obj_type=EnergyMarketOffer)
 
             return offers
 

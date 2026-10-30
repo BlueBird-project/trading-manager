@@ -13,7 +13,7 @@ The Trading Manager (TM) is a core component of the BlueBird project, responsibl
 
 ### Graph Patterns 
 
-Smart client configuration and TM shared knowledge graph patterns are in: [ke_config.yaml](./resources/deployment/ke_config.yaml)
+Smart client configuration and TM shared knowledge graph patterns are in: [ke_config.yaml](resources/deployment/ki/old/ke_config.yaml)
 TM Smart Client connection graph patterns  to read/subscribe data from other clients in the network  are located in thus [directory](./resources/deployment/ki)
 
 

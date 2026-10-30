@@ -10,15 +10,27 @@ def list_markets() -> List[EnergyMarket]:
     return dao_manager.market_api.list_market()
 
 
-def list_offer_info(market_id, ts: Optional[TimeSpan], granularity: Optional[int] = None, sequence: Optional[str] = None) \
+def list_offer_info(market_id, ts: Optional[TimeSpan], granularity: Optional[int] = None,
+                    sequence: Optional[str] = None) \
         -> List[EnergyMarketOfferInfo]:
     from tm.core.db.postgresql import dao_manager
     return dao_manager.offer_dao.list_offer_info(market_id=market_id, ts=ts, isp_unit=granularity, sequence=sequence)
 
 
+def list_current_offer_info(market_id: Optional[int], granularity: Optional[int] = None, sequence: Optional[str] = None) \
+        -> List[EnergyMarketOfferInfo]:
+    from tm.core.db.postgresql import dao_manager
+    return dao_manager.offer_dao.list_current_offer_info(market_id=market_id, isp_unit=granularity, sequence=sequence)
+
+
 def list_offer(market_id: int, ts: TimeSpan, granularity: Optional[int] = None) -> List[EnergyMarketOffer]:
     from tm.core.db.postgresql import dao_manager
     return dao_manager.offer_dao.list_market_offer(ts=ts, market_id=market_id, isp_unit=granularity)
+
+
+def list_current_offer(market_id: Optional[int], granularity: Optional[int] = None) -> List[EnergyMarketOffer]:
+    from tm.core.db.postgresql import dao_manager
+    return dao_manager.offer_dao.list_current_market_offer(market_id=market_id, isp_unit=granularity)
 
 
 def get_offer(offer_id: int) -> List[EnergyMarketOfferDAO]:

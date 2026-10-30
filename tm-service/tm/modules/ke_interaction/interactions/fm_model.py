@@ -14,15 +14,20 @@ from rdflib import URIRef, Literal
 #     def __init__(self, **kwargs):
 #         super().__init__(bindings=kwargs)
 
-
 @ki_object("fm-ts-info-request", allow_partial=True)
 class FMTSRequest(BindingsBase):
     ts_interval_uri: URIRef
     ts_date_from: Literal
     ts_date_to: Literal
+    ts_usage: URIRef
 
-    def __init__(self, **kwargs):
-        super().__init__(bindings=kwargs)
+    # def __init__(self, **kwargs):
+    #     super().__init__(bindings=kwargs)
+
+
+@ki_object("fm-ts-info-request-60", allow_partial=True)
+class FMTSRequest60(FMTSRequest):
+    pass
 
 
 # @ki_object("fm-ts-info-request", result=True)
@@ -41,7 +46,7 @@ class FMTSRequest(BindingsBase):
 class FMTSResponse(FMTSRequest):
     ts_uri: URIRef
     # ts_interval_uri: URIRef
-    ts_usage: URIRef
+    # ts_usage: URIRef
     time_create: Literal
 
     # ts_date_from: Literal
@@ -126,6 +131,20 @@ class DPSplitURI(SplitURIBase):
     ts_start: int
     ts_usage: int
     isp_start: int
+
+
+@ki_split_uri(uri_template=f"http://fm.bluebird.com/dp" + "/${ts_start}/${isp_start}/${ts_usage}")
+class DPSplitURI(SplitURIBase):
+    ts_start: int
+    ts_usage: int
+    isp_start: int
+
+
+@ki_split_uri(uri_template=f"http://fm.bluebird.com/dp" + "/${ts_start}/${isp_len}/${ts_usage}")
+class DPConsumptionSplitURI(SplitURIBase):
+    ts_start: int
+    ts_usage: int
+    isp_len: int
 
 
 @ki_split_uri(uri_template="http://ke.bluebird.com/interval/${ts_from}/${ts_to}")

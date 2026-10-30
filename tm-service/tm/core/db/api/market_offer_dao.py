@@ -21,6 +21,12 @@ class MarketOfferAPI(DAO):
         pass
 
     @abstractmethod
+    def list_current_offer_info(self, market_id: Optional[int] = None,
+                                isp_unit: Optional[int] = None, sequence: Optional[str] = None) -> (
+            List)[EnergyMarketOfferInfo]:
+        pass
+
+    @abstractmethod
     def get_offer_info(self, offer_uri: str) -> EnergyMarketOfferInfo:
         pass
 
@@ -48,6 +54,11 @@ class MarketOfferAPI(DAO):
     @abstractmethod
     def list_market_offer(self, ts: TimeSpan, market_id: Optional[int] = None,
                           isp_unit: Optional[int] = None) -> List[EnergyMarketOffer]:
+        pass
+
+    @abstractmethod
+    def list_current_market_offer(self, market_id: Optional[int] = None, isp_unit: Optional[int] = None,
+                                  sequence: Optional[str] = None) -> List[EnergyMarketOffer]:
         pass
 
     @abstractmethod

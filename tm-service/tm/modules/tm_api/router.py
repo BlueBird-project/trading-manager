@@ -15,6 +15,20 @@ async def list_markets() -> List[EnergyMarket]:
     return service.list_markets()
 
 
+@router.get("/current/offerinfo")
+async def get_market_current_offer_info(granularity: Optional[int] = None) -> List[EnergyMarketOfferInfo]:
+    from tm.modules.tm_api import service
+
+    return service.list_current_offer_info(market_id=None, granularity=granularity)
+
+
+@router.get("/current/offer")
+async def get_market_current_offer(granularity: Optional[int] = None) -> List[EnergyMarketOffer]:
+    from tm.modules.tm_api import service
+
+    return service.list_current_offer(market_id=None, granularity=granularity)
+
+
 @router.get("/market/{market_id}/offerinfo")
 async def get_market_offer_info(market_id: int, ts_from: Optional[int] = None, ts_to: Optional[int] = None,
                                 granularity: Optional[int] = None) -> List[EnergyMarketOfferInfo]:
@@ -33,6 +47,7 @@ async def get_market_offer(market_id: int, ts_from: Optional[int] = None, ts_to:
     from tm.modules.tm_api import service
     ts = TimeSpan(ts_from=ts_from, ts_to=ts_to)
     return service.list_offer(market_id=market_id, ts=ts, granularity=granularity)
+
 
 #
 # @router.get("/offer/", deprecated=True)

@@ -31,5 +31,5 @@ ke:
 #    foaf: "http://xmlns.com/foaf/0.1/"
 #    ubmarket: "https://ubflex.bluebird.eu/market/"
   extension_ontology_files:
-    - "./resources/deployment/ki/bluebird.ttl"
-    - "./resources/deployment/ki/resources.ttl"
+    - "../UBFlex/ontology/bluebirdontology/bluebird.ttl"
+    - "../UBFlex/ontology/imported/resources.ttl"

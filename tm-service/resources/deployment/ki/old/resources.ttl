@@ -29,7 +29,7 @@ ubmarket:get_data_command
 
 ubmarket:ack_event
     rdf:type s4mari:Event ;
-    saref:hasFeatureKind s4mari:Acknowledgement .
+    saref:hasFeatureKind `s4mari`:Acknowledgement .
 
 
 

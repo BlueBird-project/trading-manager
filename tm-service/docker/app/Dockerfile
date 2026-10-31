@@ -15,7 +15,7 @@ RUN apt-get update \
 # RUN apt-get update; apt-get install -y gcc libc-dev git
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-COPY /requirements.txt /tmp/requirements.txt
+COPY ./requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 RUN git clone --filter=blob:none --quiet  --depth=1 --branch docker-build  https://github.com/BlueBird-project/UBFlex.git /ubflex
@@ -38,6 +38,7 @@ RUN mkdir app
 RUN mkdir app/resources
 COPY --from=builder /ubflex/ontology/imported /app/resources/ontologies
 COPY --from=builder /ubflex/ontology/bluebirdontology/bluebird.ttl /app/resources/ontologies/bluebird.ttl
+
 RUN mkdir config
 RUN mkdir logs
 RUN mkdir env

@@ -70,7 +70,7 @@ def _fm_jobs(scheduler: BaseScheduler):
 
 
 def _dam_jobs(scheduler: BaseScheduler):
-    @scheduler.scheduled_job(trigger='cron', id="market_scan", day_of_week='*', hour='8',
+    @scheduler.scheduled_job(trigger='cron', id="market_scan", day_of_week='*', hour='*',
                              minute='15',
                              month='*', year='*', day='*', max_instances=1, coalesce=True)
     def market_scan():
@@ -79,7 +79,7 @@ def _dam_jobs(scheduler: BaseScheduler):
         from tm.modules.ke_interaction.interactions.dam_interactions import get_all_markets
         get_all_markets(False)
 
-    @scheduler.scheduled_job(trigger='cron', id="offer_scan", day_of_week='*', hour='8,19',
+    @scheduler.scheduled_job(trigger='cron', id="offer_scan", day_of_week='*', hour='8,17,19',
                              minute='25',
                              month='*', year='*', day='*', max_instances=1, coalesce=True)
     def scan_offer():

@@ -53,9 +53,7 @@ docker-compose -f .\compose\local.yaml --env-file .\resources\.env build tm-serv
 
 #### Export docker imager
 
-docker save -o d:/tmp/tm-service-app_latest.tar tm-service-app:latest
-docker save -o d:/tmp/${image_name}_${image_version}.tar ${full_image_name}
-
+docker save -o d:/tmp/tm-service-app_latest.tar tm-service-app:latest 
 docker save -o d:/tmp/${image_name}_${image_version}.tar ${full_image_name}
 
 ## Healthcheck

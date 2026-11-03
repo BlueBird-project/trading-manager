@@ -18,6 +18,17 @@ class EnergyMarketOfferInfo(BaseModel):
     ext: Optional[str] = None
 
 
+class EnergyMarketOfferInfoResponse(EnergyMarketOfferInfo):
+    dt_ts: str
+
+    @staticmethod
+    def init(em: EnergyMarketOfferInfo) -> 'EnergyMarketOfferInfoResponse':
+        from ke_client.utils import time_utils
+        return EnergyMarketOfferInfoResponse(
+            dt_ts=time_utils.datetime_to_str(time_utils.from_timestamp(em.ts)),
+            **vars(em))
+
+
 # TODO: add offer range to graphs and ontology
 class EnergyMarketOfferDAO(BaseModel):
     offer_id: int

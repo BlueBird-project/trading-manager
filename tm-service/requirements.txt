@@ -20,10 +20,10 @@ isodate==0.7.2
 rdflib==7.5.0
 setuptools==80.10.2
 ###########################
- effi_onto_tools==0.19.16
+effi_onto_tools==0.19.16
 ###########################
-#git+https://github.com/BlueBird-project/ke-pyclient.git@v0.31.4
+ 
 git+https://github.com/BlueBird-project/ke-pyclient.git@dev
 git+https://github.com/BlueBird-project/UBFlex.git@pyubflex_0.5#subdirectory=ontology/PyUBFlex
-ke_client==0.32.4
+ke_client==0.32.5
 ubflex==0.5

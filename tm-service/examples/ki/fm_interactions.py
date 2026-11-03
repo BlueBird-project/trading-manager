@@ -11,6 +11,14 @@ fm_ki = KIHolder()
 _tm_info: fm_model.TMInfo = None
 
 
+@ki_object("fm-ts-info-request", allow_partial=True)
+class FMTSRequest(BindingsBase):
+    ts_interval_uri: URIRef
+    ts_date_from: Literal
+    ts_date_to: Literal
+    ts_usage: Optional[URIRef] = None
+
+
 @fm_ki.ask("tm-info")
 def _ask_tm_info(kb_id: Optional[str] = None):
     if kb_id is None:
@@ -26,27 +34,31 @@ def on_request_ts_info(ki_id, bindings: List[FMTSRequest]):
         #      support only one request
         ts_from: int = time_utils.xsd_to_ts(request.ts_date_from.value)
         ts_to = time_utils.xsd_to_ts(request.ts_date_to.value)
+        time_create = Literal(time_utils.xsd_now())
         #######
         # Saref data point usage
         ###########
-        ts_usage = URIRef("s4ener:Consumption")
-        ts_usage2 = URIRef("s4ener:Production")
-        ts_uri2 = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=15, ts_usage=ts_usage2).n3()
-        ts_uri = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=15, ts_usage=ts_usage).n3()
-        time_create = Literal(time_utils.xsd_now())
-        return [
-            # FMTSResponse2(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_usage=ts_usage,
-            #               time_create=time_create, ts_date_from=request.ts_date_from,
-            #               ts_date_to=request.ts_date_to).n3(),
-            # FMTSResponse2(ts_uri=ts_uri2, ts_interval_uri=request.ts_interval_uri, ts_usage=ts_usage2,
-            #               time_create=time_create, ts_date_from=request.ts_date_from,
-            #               ts_date_to=request.ts_date_to).n3()
-            FMTSResponse(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_date_from=request.ts_date_from,
-                         ts_date_to=request.ts_date_to, time_create=time_create, ts_usage=ts_usage, ).n3(),
-            FMTSResponse(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_date_from=request.ts_date_from,
-                         ts_date_to=request.ts_date_to, time_create=time_create, ts_usage=ts_usage2).n3()
+        if request.ts_usage is None:
+            ts_usage = URIRef("s4ener:Consumption")
+            ts_usage2 = URIRef("s4ener:Production")
+            ts_uri2 = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=15, ts_usage=ts_usage2).n3()
+            ts_uri = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=15, ts_usage=ts_usage).n3()
 
-        ]  #
+            return [
+                FMTSResponse(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_date_from=request.ts_date_from,
+                             ts_date_to=request.ts_date_to, time_create=time_create, ts_usage=ts_usage, ).n3(),
+                FMTSResponse(ts_uri=ts_uri2, ts_interval_uri=request.ts_interval_uri, ts_date_from=request.ts_date_from,
+                             ts_date_to=request.ts_date_to, time_create=time_create, ts_usage=ts_usage2).n3()
+
+            ]  #
+        else:
+            ts_uri = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=15, ts_usage=request.ts_usage).n3()
+
+            return [
+                FMTSResponse(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_date_from=request.ts_date_from,
+                             ts_date_to=request.ts_date_to, time_create=time_create, ts_usage=request.ts_usage, ).n3(),
+
+            ]  #
 
 
 @fm_ki.answer("fm-ts-info-request-60")
@@ -60,12 +72,6 @@ def on_request_ts_info_60(ki_id, bindings: List[FMTSRequest60]):
         ts_uri = FMTSSplitURI(ts_from=ts_from, ts_to=ts_to, period_minutes=65, ts_usage=request.ts_usage).n3()
         time_create = Literal(time_utils.xsd_now())
         return [
-            # FMTSResponse2(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_usage=ts_usage,
-            #               time_create=time_create, ts_date_from=request.ts_date_from,
-            #               ts_date_to=request.ts_date_to).n3(),
-            # FMTSResponse2(ts_uri=ts_uri2, ts_interval_uri=request.ts_interval_uri, ts_usage=ts_usage2,
-            #               time_create=time_create, ts_date_from=request.ts_date_from,
-            #               ts_date_to=request.ts_date_to).n3()
             FMTSResponse(ts_uri=ts_uri, ts_interval_uri=request.ts_interval_uri, ts_date_from=request.ts_date_from,
                          ts_date_to=request.ts_date_to, time_create=time_create, ts_usage=request.ts_usage, ).n3(),
 

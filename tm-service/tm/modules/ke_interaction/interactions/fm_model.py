@@ -19,7 +19,6 @@ class FMTSRequest(BindingsBase):
     ts_interval_uri: URIRef
     ts_date_from: Literal
     ts_date_to: Literal
-    ts_usage: URIRef
 
     # def __init__(self, **kwargs):
     #     super().__init__(bindings=kwargs)
@@ -27,6 +26,7 @@ class FMTSRequest(BindingsBase):
 
 @ki_object("fm-ts-info-request-60", allow_partial=True)
 class FMTSRequest60(FMTSRequest):
+    ts_usage: URIRef
     pass
 
 
@@ -48,6 +48,7 @@ class FMTSResponse(FMTSRequest):
     # ts_interval_uri: URIRef
     # ts_usage: URIRef
     time_create: Literal
+    ts_usage: URIRef
 
     # ts_date_from: Literal
     # ts_date_to: Literal

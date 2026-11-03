@@ -13,3 +13,4 @@ tm-service/resources/env/.env.tomekc
 tm-service/resources/deployment/ki.zip
 compose/local_dev/postgres-data2/
 compose/local_dev/postgres-data3/
+tm-service/buildrequirements.txt

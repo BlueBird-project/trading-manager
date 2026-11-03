@@ -45,11 +45,17 @@ def _on_evaluate_request(ki_id, bindings: List[FMEvaluateQueryAsk]):
 
 
 def request_ts_info(ts: TimeSpan) -> List[FMTSResponse]:
+    # resp_bindings: KIAskResponse = _ask_request_flexibility_info(FMTSRequest(
+    #     ts_interval_uri=KETimeIntervalUri(ts_from=ts.ts_from, ts_to=ts.ts_to).uri_ref,
+    #     ts_date_from=Literal(time_utils.xsd_from_ts(ts.ts_from)),
+    #     ts_date_to=Literal(time_utils.xsd_from_ts(ts.ts_to)),
+    #     ts_usage=URIRef("s4ener:Consumption")
+    # ))
     resp_bindings: KIAskResponse = _ask_request_flexibility_info(FMTSRequest(
         ts_interval_uri=KETimeIntervalUri(ts_from=ts.ts_from, ts_to=ts.ts_to).uri_ref,
         ts_date_from=Literal(time_utils.xsd_from_ts(ts.ts_from)),
         ts_date_to=Literal(time_utils.xsd_from_ts(ts.ts_to)),
-        ts_usage=URIRef("s4ener:Consumption")
+
     ))
     return [FMTSResponse(**b) for b in resp_bindings.binding_set]
 

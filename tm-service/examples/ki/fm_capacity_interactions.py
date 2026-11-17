@@ -12,6 +12,9 @@ from examples.ki import fm_model
 
 fm_ki = KIHolder()
 
+flex_request: KEFlexRequest
+flex_offer: KEFlexOffer
+
 
 @fm_ki.ask("baseline-request")
 def _get_required_days() -> List[BaselineDateRequest]:
@@ -74,8 +77,9 @@ def _on_baseline(ki_id, bindings: List[Baseline]):
 @fm_ki.post("flex-offer")
 def _send_flexibility(flex_value: float) -> List[KEFlexOffer]:
     global flex_request
+    global flex_offer
     print(f"_send_flexibility {flex_value}")
-    flex_profile = SplitURIBase.uri_append_ref( URIRef(fm_ki.get_kb_id()) , "profile")
+    flex_profile = SplitURIBase.uri_append_ref(URIRef(fm_ki.get_kb_id()), "profile")
     flex_offer = KEFlexOffer(
         market=flex_request.market, flex_request=flex_request.flex_request, asset_manager=URIRef(fm_ki.get_kb_id()),
         flex_profile=flex_profile,
@@ -84,6 +88,15 @@ def _send_flexibility(flex_value: float) -> List[KEFlexOffer]:
         dpr=SplitURIBase.uri_append_ref(flex_profile, "dpr"),
         ts=Literal(time_utils.xsd_from_ts(ts=time_utils.current_timestamp())),
         value=Literal(flex_value))
+    return [flex_offer]
+
+
+@fm_ki.answer("flex-offer")
+def _send_flexibility() -> List[KEFlexOffer]:
+    global flex_offer
+    todo
+    implement
+    ASK in TM
     return [flex_offer]
 
 
@@ -98,9 +111,6 @@ def on_flex_request(ki_id, bindings: List[KEFlexRequest]):
     t = Thread(target=_handle_request)
     t.start()
     return []
-
-
-flex_request: KEFlexRequest
 
 
 def handle_request(bindings: List[KEFlexRequest]):

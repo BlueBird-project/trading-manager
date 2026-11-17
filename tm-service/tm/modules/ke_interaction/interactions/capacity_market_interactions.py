@@ -1,9 +1,11 @@
+from threading import Thread
 from typing import List
 
 from ke_client import KIHolder
 from ke_client.ki_model import KIPostResponse
 
-from tm.modules.ke_interaction.interactions.capacity_market_model import KECapacityNotification, KEFlexOffer
+from tm.modules.ke_interaction.interactions.capacity_market_model import   KEFlexOffer
+from tm.modules.ke_interaction.interactions.capacity_market_notification_model import KECapacityNotification
 
 ki = KIHolder()
 
@@ -26,6 +28,13 @@ def _on_notification(ki_id: str, bindings: List[KECapacityNotification]):
 
 @ki.react("flex-offer")
 def _on_flex_offer(kb_id, bindings: List[KEFlexOffer]) -> List:
+    from tm.modules.ke_interaction.service.capacity_market_service import process_flex_offers
     print(f"todo process offer{bindings}")
-    # todo
+
+    def _t():
+        process_flex_offers(offers=bindings)
+
+    # todo use job scheduler
+    t = Thread(target=_t)
+    t.start()
     return []

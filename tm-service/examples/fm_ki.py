@@ -36,7 +36,7 @@ def get_tm():
     tm_info_list = find_tm()
     if len(tm_info_list) < 1:
         print("Error: no tm")
-        sleep(10)
+        sleep(60)
     else:
         _tm = tm_info_list[0]
         set_tm(tm=_tm)
@@ -61,12 +61,13 @@ if __name__ == "__main__" and app_settings:
     setup_ke()
     from examples.ki.smart_client import start_bg_ke_client
     from examples.ki.fm_interactions import fm_ki
+    from examples.ki.fm_capacity_interactions import fm_ki as contract_ki
     from examples.ki.tou_interactions import tou_ki
 
     ################################################
     # register knowledge interaction modules
     ################################################
-    client = start_bg_ke_client([fm_ki, tou_ki])
+    client = start_bg_ke_client([fm_ki,contract_ki, tou_ki])
     # endregion
 
     from examples.ki.fm_model import TMInfo

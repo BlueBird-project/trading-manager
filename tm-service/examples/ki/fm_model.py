@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from ke_client import ki_object, BindingsBase, OptionalLiteral, is_nil, rdf_nil
 from ke_client.utils import time_utils
@@ -13,7 +13,7 @@ class TMInfo(BindingsBase):
     tm_uri: URIRef
     market_uri: URIRef
     command_uri: URIRef
-    kb_id:URIRef
+    kb_id: URIRef
 
 
 @ki_object("tm-info", allow_partial=True)
@@ -156,3 +156,81 @@ class TOUPriceQuery(BindingsBase):
 @ki_object("tm-agent")
 class TMAgent(BindingsBase):
     tm_uri: URIRef
+
+
+@ki_object("flex-request")
+class KEFlexRequest(BindingsBase):
+    market: URIRef
+    flex_request: URIRef
+    offer_period: URIRef
+    ts: Literal
+    ts_date_from: Literal
+    ts_date_to: Literal
+
+
+@ki_object("baseline-request", allow_partial=True)
+class BaselineDateRequest(BindingsBase):
+    market: URIRef = URIRef("http://bluebird.com/capacity-market/pl")
+    asset_manager: URIRef
+    # my timeseries uri
+    ts_uri: URIRef
+    ts_baseline_from: Literal
+    ts_baseline_to: Literal
+    baseline_interval_uri: URIRef
+
+    @property
+    def baseline_from_ts(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_baseline_from)
+
+    @property
+    def baseline_to_ts(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_baseline_to)
+
+
+# @ki_object("baseline-request")
+# class BaselineDate(BaselineDateRequest):
+#     baseline_ts_uri: URIRef
+#     baseline_interval_uri: URIRef
+
+
+@ki_object("baseline-request")
+class BaselineDateResponse(BaselineDateRequest):
+    baseline_ts_uri: URIRef
+    ts_uri: URIRef
+    day_interval_uri: URIRef
+    ts_day_from: Literal
+    ts_day_to: Literal
+
+    @property
+    def from_ts(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_day_from)
+
+    @property
+    def to_ts(self) -> int:
+        return time_utils.xsd_to_ts(self.ts_day_to)
+
+
+@ki_object("baseline")
+class BaselineRequest(BindingsBase):
+    ts_uri: URIRef
+    asset_manager: URIRef
+    dp: URIRef
+    ts: Literal
+    dpr: URIRef
+    value: OptionalLiteral
+
+    @property
+    def ts_ms(self):
+        return time_utils.xsd_to_ts(self.ts)
+
+    def get_value(self):
+        return self.convert_value(self.value, float)
+
+
+@ki_object("baseline-response" )
+class Baseline(BindingsBase):
+    ts_uri: URIRef
+    dp_baseline: URIRef
+    ts: Literal
+    dpr_baseline: URIRef
+    value_baseline: Union[URIRef, Literal, None]

@@ -3,7 +3,7 @@ from typing import List
 from ke_client import KIHolder
 from ke_client.ki_model import KIPostResponse
 
-from tm.modules.ke_interaction.interactions.capacity_market_model import KECapacityNotification
+from tm.modules.ke_interaction.interactions.capacity_market_model import KECapacityNotification, KEFlexOffer
 
 ki = KIHolder()
 
@@ -21,4 +21,11 @@ def _on_notification(ki_id: str, bindings: List[KECapacityNotification]):
                                             max_consumption=b.convert_value(b.max_consumption_value, float)
                                             )
         dao_manager.capacity_notification_api.save(notification=notification)
+    return []
+
+
+@ki.react("flex-offer")
+def _on_flex_offer(kb_id, bindings: List[KEFlexOffer]) -> List:
+    print(f"todo process offer{bindings}")
+    # todo
     return []

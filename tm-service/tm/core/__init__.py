@@ -15,11 +15,13 @@ class APPSettings(DictBaseSettings):
     use_scheduler: bool = Field(default=False)
     use_rest_api: bool = Field(default=True)
     use_ke_api: bool = Field(default=False)
+    time_zone:str = Field(default="UTC")
     # logging_out_path: str = Field(default="./resources/logging.ini")
     # ke_config_path: str = Field(default="./resources/ke_config.yaml")
     country_list: List[str] = Field(default=[])
     model_config = SettingsConfigDict(env_prefix='APP_', env_file=DictBaseSettings.env_path(),
                                       env_file_encoding="utf-8")
+
 
     @property
     def country_list_upper(self) -> List[str]:
@@ -29,7 +31,8 @@ class APPSettings(DictBaseSettings):
     def load(cls, **kwargs):
         return super().load(app_args.config_path, "APP".lower())
 
-
+    def zone_info(self):
+        return ZoneInfo(self.time_zone) 
 
 
 app_settings: APPSettings = APPSettings.load()

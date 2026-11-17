@@ -17,7 +17,6 @@ RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 COPY ./requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
-
 RUN git clone --filter=blob:none --quiet  --depth=1 --branch docker-build  https://github.com/BlueBird-project/UBFlex.git /ubflex
 
 ##############################################################
